@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane prefHeight="429.0" prefWidth="787.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="calc.Controller">
+      <TabPane fx:id="iTabPane" prefHeight="337.0" prefWidth="743.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab fx:id="iTabSym" text="Симуляционный калькулятор">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="60.0" layoutY="46.0" text="Label" />
+                        <Button fx:id="iBtHide" layoutX="142.0" layoutY="80.0" mnemonicParsing="false" onAction="#iBtHideAction" text="Button" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="iCVintra" closable="false" text="CVintra">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
+                        </children>
+                    </AnchorPane>
+                </content>
+          </Tab>
+            <Tab closable="false" text="Расчет доверительных интервалов">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
+            <Tab fx:id="iTabArhive" closable="false" disable="true" text="Архив">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
+            <Tab closable="false" disable="true" text="Признаки">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
+            <Tab closable="false" disable="true" text="Критерии Стьюдента">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
+            <Tab closable="false" disable="true" text="Пользователи">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+    <BorderPane fx:id="iPaneAddSchedule" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="700.0" visible="false" StackPane.alignment="CENTER">
+        <center>
+            <VBox style="-fx-background-color: #eeeeee; -fx-border-color: #808080; -fx-border-width: 2;" BorderPane.alignment="CENTER">
+                <children>
+                    <HBox maxWidth="1.7976931348623157E308" prefHeight="38.0" spacing="10.0">
+                        <children>
+                            <Label text="Авторизация">
+                            </Label>
+                        </children>
+                        <padding>
+                            <Insets left="5.0" top="5.0" />
+                        </padding>
+                    </HBox>
+                    <HBox maxWidth="800.0" prefHeight="38.0" prefWidth="800.0" spacing="10.0">
+                        <children>
+                            <Label text="Логин" />
+                            <TextField fx:id="iLogin" prefWidth="550.0" />
+                        </children>
+                        <padding>
+                            <Insets left="5.0" top="5.0" />
+                        </padding>
+                    </HBox>
+                    <HBox maxWidth="800.0" prefHeight="55.0" prefWidth="800.0" spacing="10.0">
+                        <children>
+                            <Label text="Пароль" />
+                            <TextField fx:id="iPassword" prefWidth="550.0" />
+                        </children>
+                        <padding>
+                            <Insets left="5.0" top="5.0" />
+                        </padding>
+                    </HBox>
+                    <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxWidth="800.0" prefHeight="38.0" prefWidth="650.0" spacing="80.0">
+                        <children>
+                            <Button fx:id="iBtLogin" mnemonicParsing="false" onAction="#iBtLoginLogin" prefHeight="25.0" prefWidth="131.0" text="Войти" />
+                            <Button fx:id="iBtCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtLoginCancel" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
+                        </children>
+                        <padding>
+                            <Insets left="5.0" top="5.0" />
+                        </padding>
+                    </HBox>
+                </children>
+                <opaqueInsets>
+                    <Insets left="5.0" />
+                </opaqueInsets>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+            </VBox>
+        </center>
+    </BorderPane>
+</StackPane>
