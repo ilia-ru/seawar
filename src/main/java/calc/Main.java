@@ -16,7 +16,7 @@ public class Main extends Application {
         System.out.println("params.get(0) " + params.size());
 */
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Калькулятор");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
     }

@@ -2,10 +2,9 @@ package calc;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 
 import java.sql.*;
 import java.util.List;
@@ -16,24 +15,57 @@ public class Controller {
     public Button iBtn;
     public Button iBtnHide;
     public TabPane iTabPane;
-    public Tab iCVintra;
-    public Tab iTabArhive;
+    public BorderPane iAscPane;
     public Tab iTabSym;
+    public Tab iTabArhive;
+    public Tab iTabPriznak;
+    public Tab iTabStudent;
+    public Tab iTabUsers;
 
     public void initialize() {
-        iTabSym.setOnSelectionChanged(event -> {  //
-            System.out.println("setOnSelectionChanged");
+
+        iTabSym.setOnSelectionChanged(event -> {  // Пришли на этот таб
+            System.out.println("setOnSelectionChanged " + event);
+            Tab t;
+            t = (Tab) event.getSource();
+            Label ll = (Label) t.getGraphic();
+            if (t.isSelected()) {  //Говорит тот, к кому пришел фокус
+                System.out.println("setOnSelectionChanged " + event + " - " + ll.getText());
+            }
+        });
+        iTabArhive.setOnSelectionChanged(event -> {  //
+            Tab t;
+            t = (Tab) event.getSource();
+            Label ll = (Label) t.getGraphic();
+            if (t.isSelected()) {  //Говорит тот, к кому пришел фокус
+                System.out.println("iTabArhive setOnSelectionChanged " + t.isSelected() + " - " + t.getText() + " - " + ll.isDisable());
+                if (ll.isDisable()) { // Нет прав - ничего не делаем
+                    System.out.println("Нету прав");
+
+                    event.consume();
+                }
+            }
+        });
+        iTabPriznak.setOnSelectionChanged(event -> {  //
+            Tab t;
+            t = (Tab) event.getSource();
+            if (t.isSelected()) {  //Говорит тот, к кому пришел фокус
+                System.out.println("iCVintra setOnSelectionChanged " + t.isSelected() + " - " + t.getText());
+            }
 
         });
-        iTabSym.setOnCloseRequest(event -> {  //
-            System.out.println("setOnCloseRequest");
+
+
+        // Ловим переходы на скрытые вкладки чтобы спросить пароль
+ /*       iTabPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            System.out.println("iTabPane "  + " - " + event);
+            if (event.getTarget().getClass().getName().compareTo("Label") == 0) {  // Заголовок таб-вкладки - Label
+           //     if ()
+                iAscPane.setVisible(true);
+            }
 
         });
-
-        iTabPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {  // Ловим переходы на скрытые вкладки
-            System.out.println("iTabPane " + event);
-
-        });
+*/
 
     }
 
@@ -46,6 +78,7 @@ public class Controller {
 
     public void iBtLoginLogin(ActionEvent actionEvent) {  // Авторизация - входим
         System.out.println("Login - ok");
+        iAscPane.setVisible(false);
         //iCVintra.
     }
 
