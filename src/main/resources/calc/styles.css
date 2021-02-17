@@ -1,0 +1,20 @@
+.label {
+    -fx-font-size: 14;
+    -fx-font-name: Arial;
+}
+
+.H1 {
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    padding-left: 5px;
+}
+
+.combo-box {
+    -fx-font-size: 14;
+    -fx-font-name: Arial;
+}
+
+.button {
+    -fx-font-size: 14;
+    -fx-font-name: Arial;
+}

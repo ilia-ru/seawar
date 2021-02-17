@@ -1,71 +1,108 @@
 package calc;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 
 import java.sql.*;
 import java.util.List;
+
+import static calc.Main.priznaki;
 
 public class Controller {
 
     @FXML
     public Button iBtn;
     public Button iBtnHide;
-    public TabPane iTabPane;
     public BorderPane iAscPane;
-    public Tab iTabSym;
-    public Tab iTabArhive;
-    public Tab iTabPriznak;
-    public Tab iTabStudent;
-    public Tab iTabUsers;
+    public MenuBar iMainMenu;
+//    public TableView iTblPrizn;
+    public Pane iTblPane;
+    public HBox iHBoxMenu;
+    public VBox iCalcQEPane;
+    public VBox iStudentPane;
+    public StackPane iStackPane;
+
+
+
+    private class TopMenu {
+        private MenuBar menu;
+
+        public TopMenu() {
+            menu = new MenuBar();
+
+            Label ll = new Label("Симуляционный калькулятор");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("Симуляционный калькулятор " + event);
+                //iCalcQEPane.setVisible(false);
+                iCalcQEPane.toFront();
+            });
+            Menu mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+            ll = new Label("CVintra");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("CVintra " + event);
+            });
+            mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+            ll = new Label("Расчет доверительных интервалов");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("Расчет доверительных интервалов " + event);
+            });
+            mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+            ll = new Label("Архив");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("Архив " + event);
+            });
+            mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+            ll = new Label("Признаки");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("Признаки " + event);
+            });
+            mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+            ll = new Label("Критерии Стьюдента");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("Критерии Стьюдента " + event);
+                iStudentPane.toFront();
+
+            });
+            mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+            ll = new Label("Пользователи");
+            ll.setOnMouseClicked(event -> {
+                System.out.println("Пользователи " + event);
+            });
+            mi = new Menu("", ll);
+            menu.getMenus().add(mi);
+
+        }
+
+        public MenuBar getMenu() {
+            return menu;
+        };
+    }
 
     public void initialize() {
+        TopMenu t = new TopMenu();
+        iHBoxMenu.getChildren().add(t.getMenu());
 
-        iTabSym.setOnSelectionChanged(event -> {  // Пришли на этот таб
-            System.out.println("setOnSelectionChanged " + event);
-            Tab t;
-            t = (Tab) event.getSource();
-            Label ll = (Label) t.getGraphic();
-            if (t.isSelected()) {  //Говорит тот, к кому пришел фокус
-                System.out.println("setOnSelectionChanged " + event + " - " + ll.getText());
-            }
-        });
-        iTabArhive.setOnSelectionChanged(event -> {  //
-            Tab t;
-            t = (Tab) event.getSource();
-            Label ll = (Label) t.getGraphic();
-            if (t.isSelected()) {  //Говорит тот, к кому пришел фокус
-                System.out.println("iTabArhive setOnSelectionChanged " + t.isSelected() + " - " + t.getText() + " - " + ll.isDisable());
-                if (ll.isDisable()) { // Нет прав - ничего не делаем
-                    System.out.println("Нету прав");
-
-                    event.consume();
-                }
-            }
-        });
-        iTabPriznak.setOnSelectionChanged(event -> {  //
-            Tab t;
-            t = (Tab) event.getSource();
-            if (t.isSelected()) {  //Говорит тот, к кому пришел фокус
-                System.out.println("iCVintra setOnSelectionChanged " + t.isSelected() + " - " + t.getText());
-            }
-
-        });
-
-
-        // Ловим переходы на скрытые вкладки чтобы спросить пароль
- /*       iTabPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            System.out.println("iTabPane "  + " - " + event);
-            if (event.getTarget().getClass().getName().compareTo("Label") == 0) {  // Заголовок таб-вкладки - Label
-           //     if ()
-                iAscPane.setVisible(true);
-            }
-
-        });
-*/
+        priznaki = new Priznaki();
+        priznaki.createListFromSQL("");
+        ListView lv = priznaki.getListView();
+//        lv.setMaxHeight(50);
+        iTblPane.getChildren().add(0, lv);
 
     }
 
@@ -87,6 +124,20 @@ public class Controller {
         //iCVintra.
     }
 
+    // Расчет Симуляц. калькулятора
+    public void iBtnCalcEqGoAction(ActionEvent actionEvent) {
+        System.out.println("aaaaaaaa");
+        ObservableList<Priznaki.PriznakEQ> ol = priznaki.getList();
+        System.out.println("222222 " + ol);
+        for (Priznaki.PriznakEQ pr: ol) {
+            System.out.println("ПРизнак " + pr.getName() + " - " + pr.getBalls());
+
+
+        }
+
+
+    }
+
     public void iBtnAction(ActionEvent actionEvent) {
         System.out.println("aaaaaaaa");
 
@@ -96,7 +147,7 @@ public class Controller {
         Connection conn = null;
         try {
             conn = DriverManager
-                    .getConnection("jdbc:hsqldb:file:/d:/_temp/_2/cached;ifexists=true",
+                    .getConnection("jdbc:hsqldb:file:/d:\\_work\\ilia\\_java\\calc_eq\\src\\main\\db\\cached;ifexists=true",
                             "user", "111");
         } catch (SQLException throwables) {
             throwables.printStackTrace();

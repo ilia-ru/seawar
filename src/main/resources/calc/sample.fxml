@@ -2,130 +2,153 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane prefHeight="429.0" prefWidth="787.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="calc.Controller">
-      <TabPane fx:id="iTabPane" prefHeight="337.0" prefWidth="743.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-        <tabs>
-          <Tab fx:id="iTabSym">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+<StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"  xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="calc.Controller">
+    <Pane fx:id="iFonPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(100, 100, 100, 0.7);" visible="false" />
+   <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+      <children>
+      <HBox fx:id="iHBoxMenu" prefWidth="787.0">
+         <children>
+            <MenuBar fx:id="iMainMenu" />
+         </children>
+         <VBox.margin>
+            <Insets bottom="2.0" />
+         </VBox.margin>
+      </HBox>
+      <StackPane fx:id="iStackPane">
+         <VBox fx:id="iStudentPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+            <children>
+               <Label prefHeight="17.0" prefWidth="403.0" text="Критерии Стьюдента" />
+            </children>
+         </VBox>
+         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+            <children>
+               <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0">
                   <children>
-                     <HBox prefHeight="100.0" prefWidth="200.0" />
-                     <Label layoutX="50.0" layoutY="100.0" prefHeight="59.0" prefWidth="202.0" text="Label" />
+                     <VBox prefHeight="603.0" prefWidth="383.0">
+                        <children>
+                           <Label alignment="CENTER" prefHeight="17.0" prefWidth="388.0" text="Признаки" />
+                           <Pane fx:id="iTblPane" maxHeight="1.7976931348623157E308" maxWidth="600.0" prefWidth="600.0" />
+                        </children>
+                     </VBox>
+                     <VBox prefHeight="427.0" prefWidth="399.0">
+                        <children>
+                              <Label alignment="CENTER" prefHeight="17.0" prefWidth="406.0" text="Расчет" textAlignment="CENTER" />
+                           <Button fx:id="iBtnCalcEqGo" mnemonicParsing="false" onAction="#iBtnCalcEqGoAction" text="Рассчитать" />
+                              <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="399.0" spacing="10.0">
+                                 <children>
+                                    <Label text="Дизайн 2х2х2" />
+                                    <Label fx:id="iSumBalls2" style="-fx-border-color: #999999; -fx-border-width: 1;" text="Сумма баллов">
+                                       <padding>
+                                          <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label layoutX="10.0" layoutY="10.0" text="баллов" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="49.0" prefWidth="399.0" spacing="10.0">
+                                 <children>
+                                    <RadioButton mnemonicParsing="false" />
+                                    <Label text="Мощность" />
+                                    <Label prefHeight="24.0" prefWidth="138.0" text="Эквив" />
+                                    <Button mnemonicParsing="false" text="Алгоритм" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="49.0" prefWidth="399.0" spacing="10.0">
+                                 <children>
+                                    <RadioButton mnemonicParsing="false" />
+                                    <Label text="Мощность" />
+                                    <Label prefHeight="24.0" prefWidth="138.0" text="Эквив" />
+                                    <Button mnemonicParsing="false" text="Алгоритм" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" prefHeight="56.0" prefWidth="399.0" spacing="10.0">
+                                 <children>
+                                    <Label text="Дизайн 2х2х2" />
+                                    <Label fx:id="iSumBalls21" style="-fx-border-color: #999999; -fx-border-width: 1;" text="Сумма баллов">
+                                       <padding>
+                                          <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label layoutX="10.0" layoutY="10.0" text="баллов" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="49.0" prefWidth="399.0" spacing="10.0">
+                                 <children>
+                                    <RadioButton mnemonicParsing="false" />
+                                    <Label text="Мощность" />
+                                    <Label prefHeight="24.0" prefWidth="138.0" text="Эквив" />
+                                    <Button mnemonicParsing="false" text="Алгоритм" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="157.0" prefHeight="49.0" prefWidth="399.0" spacing="10.0">
+                                 <children>
+                                    <RadioButton mnemonicParsing="false" />
+                                    <Label text="Мощность" />
+                                    <Label prefHeight="24.0" prefWidth="138.0" text="Эквив" />
+                                    <Button mnemonicParsing="false" text="Алгоритм" />
+                                 </children>
+                              </HBox>
+                              <ImageView fitHeight="252.0" fitWidth="397.0" pickOnBounds="true" preserveRatio="true" />
+                        </children>
+                     </VBox>
                   </children>
-                  </AnchorPane>
-            </content>
-            <graphic>
-               <Label text="Симуляционный калькулятор" />
-            </graphic>
-          </Tab>
-          <Tab fx:id="iCVintra" closable="false">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                        <children>
-                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
-                        </children>
-                    </AnchorPane>
-                </content>
-            <graphic>
-               <Label text="CVintra" />
-            </graphic>
-          </Tab>
-            <Tab closable="false">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                        <children>
-                            <Button layoutX="361.0" layoutY="50.0" mnemonicParsing="false" text="Button" />
-                        </children>
-                    </AnchorPane>
-                </content>
-            <graphic>
-               <Label text="Расчет доверительных интервалов" />
-            </graphic>
-            </Tab>
-            <Tab fx:id="iTabArhive" closable="false">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            <graphic>
-               <Label disable="true" text="Архив" />
-            </graphic>
-            </Tab>
-            <Tab fx:id="iTabPriznak" closable="false">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            <graphic>
-               <Label disable="true" text="Признаки" />
-            </graphic>
-            </Tab>
-            <Tab fx:id="iTabStudent" closable="false">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            <graphic>
-               <Label disable="true" text="Критерии Стьюдента" />
-            </graphic>
-            </Tab>
-            <Tab fx:id="iTabUsers" closable="false">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                </content>
-            <graphic>
-               <Label disable="true" text="Пользователи" />
-            </graphic>
-            </Tab>
-        </tabs>
-      </TabPane>
-    <BorderPane fx:id="iAscPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(100, 100, 100, 0.7);" visible="false" StackPane.alignment="CENTER">
-        <center>
-            <VBox maxHeight="200.0" maxWidth="400.0" prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #eeeeee; -fx-border-color: #808080; -fx-border-width: 2;" BorderPane.alignment="CENTER">
-                <children>
-                    <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
-                        <children>
-                            <Label text="Авторизация">
+                  </HBox>
+            </children>
+         </VBox>
+      </StackPane>
+      </children>
+   </VBox>
+ <BorderPane fx:id="iAscPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: rgba(100, 100, 100, 0.7);" visible="false" StackPane.alignment="CENTER">
+     <center>
+          <VBox maxHeight="200.0" maxWidth="400.0" prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #eeeeee; -fx-border-color: #808080; -fx-border-width: 2;" BorderPane.alignment="CENTER">
+             <children>
+                 <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                     <children>
+                         <Label text="Авторизация">
                             </Label>
-                        </children>
-                        <padding>
-                            <Insets left="5.0" top="5.0" />
-                        </padding>
-                    </HBox>
-                    <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
-                        <children>
-                            <Label text="Логин" />
-                            <TextField fx:id="iLogin" prefHeight="25.0" prefWidth="200.0" />
-                        </children>
-                        <padding>
-                            <Insets left="5.0" top="5.0" />
-                        </padding>
-                    </HBox>
-                    <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
-                        <children>
-                            <Label text="Пароль" />
-                            <TextField fx:id="iPassword" prefWidth="200.0" />
-                        </children>
-                        <padding>
-                            <Insets left="5.0" top="5.0" />
-                        </padding>
-                    </HBox>
-                    <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="80.0">
-                        <children>
-                            <Button fx:id="iBtLogin" mnemonicParsing="false" onAction="#iBtLoginLogin" prefHeight="25.0" prefWidth="131.0" text="Войти" />
-                            <Button fx:id="iBtCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtLoginCancel" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
-                        </children>
-                        <padding>
-                            <Insets left="5.0" top="5.0" />
-                        </padding>
-                    </HBox>
-                </children>
-                <opaqueInsets>
-                    <Insets left="5.0" />
-                </opaqueInsets>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </padding>
-            </VBox>
-        </center>
-    </BorderPane>
+                     </children>
+                     <padding>
+                         <Insets left="5.0" top="5.0" />
+                     </padding>
+                 </HBox>
+                 <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                     <children>
+                         <Label text="Логин" />
+                         <TextField fx:id="iLogin" prefHeight="25.0" prefWidth="200.0" />
+                     </children>
+                     <padding>
+                         <Insets left="5.0" top="5.0" />
+                     </padding>
+                 </HBox>
+                 <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                     <children>
+                         <Label text="Пароль" />
+                         <TextField fx:id="iPassword" prefWidth="200.0" />
+                     </children>
+                     <padding>
+                         <Insets left="5.0" top="5.0" />
+                     </padding>
+                 </HBox>
+                 <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="80.0">
+                     <children>
+                         <Button fx:id="iBtLogin" mnemonicParsing="false" onAction="#iBtLoginLogin" prefHeight="25.0" prefWidth="131.0" text="Войти" />
+                         <Button fx:id="iBtCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtLoginCancel" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
+                     </children>
+                     <padding>
+                         <Insets left="5.0" top="5.0" />
+                     </padding>
+                 </HBox>
+             </children>
+             <opaqueInsets>
+                 <Insets left="5.0" />
+             </opaqueInsets>
+             <padding>
+                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+             </padding>
+         </VBox>
+     </center>
+ </BorderPane>
 </StackPane>
