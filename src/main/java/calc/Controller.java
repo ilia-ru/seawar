@@ -4,6 +4,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.sql.*;
@@ -25,6 +27,7 @@ public class Controller {
     public VBox iStudentPane;
     public VBox iPriznakiPane;
     public StackPane iStackPane;
+    public ImageView iImgAlgoritm;
 
 
 
@@ -111,6 +114,7 @@ public class Controller {
         lvEdit.setPrefWidth(450);
         iListPane.getChildren().add(0, lvEdit);
 
+ //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
 
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 

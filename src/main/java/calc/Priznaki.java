@@ -13,14 +13,15 @@ import javafx.scene.layout.HBox;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 public class Priznaki extends KSQL {
 
 //    TableView<PriznakEQ> table = null;; // Таблица для показа на экране
     ListView<PriznakEQ> listView = null;; // Таблица для показа на экране
     private ObservableList<PriznakEQ> oPriznaki = null; // Список студентов
-    Image EQ_IMG_OK = new Image("add.png");
-    Image EQ_IMG_ERROR = new Image("del.png");
+    Image EQ_IMG_OK = new Image("eq_img_ok.png");
+    Image EQ_IMG_ERROR = new Image("eq_img_error.png");
     Image EQ_IMG_DELETE = new Image("del.png");
     public final double EMPTY_DOUBLE_VALUE = 10^12; // Для обозначения пустых значений в полях ввода признаков
 
@@ -138,6 +139,19 @@ public class Priznaki extends KSQL {
 
                 this.inputVal = EMPTY_DOUBLE_VALUE;
                 iInputVal = new TextField("");
+// Форматтер для ввода только чисел в TextField iInputVal
+                UnaryOperator<TextFormatter.Change> iInputValfilter = change -> {
+                    String text = change.getText();
+                    if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+                    if (text.matches("[0-9.]*")) {
+                        if ((text.compareTo(".") == 0) && iInputVal.getText().contains(".")) { return null; }  // вторую точку вводят
+                        return change;
+                    }
+                    return null;
+                };
+                TextFormatter<String> iInputValFormatter = new TextFormatter<>(iInputValfilter);
+                iInputVal.setTextFormatter(iInputValFormatter);
+
                 iInputVal.setPrefWidth(50);
                 iInputVal.setAlignment(Pos.CENTER_RIGHT);
                 iInputVal.textProperty().addListener(  // расчет баллов
@@ -146,19 +160,19 @@ public class Priznaki extends KSQL {
                             if (newValue != null && newValue.compareTo("") > 0) { // Что-то введено
                                 this.inputVal = Double.valueOf(newValue);
                                 if (this.inputVal >= minVal && this.inputVal < maxVal) {
+                                    this.balls = this.inputVal.intValue() + 2;
+                                    this.iBalls.setText(String.valueOf(this.balls));
                                     this.IV.setImage(EQ_IMG_OK);
                                 } else {  // Выход данных за интервал
+                                    this.balls = 0;
+                                    this.iBalls.setText("");
                                     this.IV.setImage(EQ_IMG_ERROR);
                                 }
-                                this.balls = this.inputVal.intValue() + 2;
-                                this.iBalls.setText(String.valueOf(this.balls));
                             } else {  // Поле пустое - гасим индикатор и не используем в расчете этот признак
                                 this.inputVal = EMPTY_DOUBLE_VALUE;
                                 this.IV.setImage(null);
                             }
-
                         });
-
                 this.getChildren().add(iInputVal);
 
                 this.maxVal = maxVal;

@@ -98,7 +98,7 @@
                                     <Button mnemonicParsing="false" text="Алгоритм" />
                                  </children>
                               </HBox>
-                              <ImageView fitHeight="252.0" fitWidth="361.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="iImgAlgoritm" fitHeight="252.0" fitWidth="488.0" pickOnBounds="true" preserveRatio="true" />
                         </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
