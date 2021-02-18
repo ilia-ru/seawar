@@ -36,7 +36,7 @@ public class Controller {
 
             Label ll = new Label("Симуляционный калькулятор");
             ll.setOnMouseClicked(event -> {
-                System.out.println("Симуляционный калькулятор " + event);
+//                System.out.println("Симуляционный калькулятор " + event);
                 //iCalcQEPane.setVisible(false);
                 iCalcQEPane.toFront();
             });
@@ -66,7 +66,7 @@ public class Controller {
 
             ll = new Label("Признаки");
             ll.setOnMouseClicked(event -> {
-                System.out.println("Признаки " + event);
+ //               System.out.println("Признаки " + event);
                 iPriznakiPane.toFront();
             });
             mi = new Menu("", ll);
@@ -101,12 +101,14 @@ public class Controller {
 
         priznaki = new Priznaki();
         priznaki.createFromSQL("");
-        ListView lv = priznaki.getListView();
-//        lv.setMaxHeight(50);
+        ListView lv =  new ListView();
+        lv.setItems(priznaki.getListEQ());  // Список признаков для calc_eq
+        lv.setPrefWidth(450);
         iTblPane.getChildren().add(0, lv);
 
         ListView lvEdit = new ListView();
-        lvEdit.setItems(priznaki.getList());  // Список для редактирвоания признаков
+        lvEdit.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
+        lvEdit.setPrefWidth(450);
         iListPane.getChildren().add(0, lvEdit);
 
 
