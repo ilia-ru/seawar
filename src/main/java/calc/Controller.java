@@ -4,11 +4,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 import java.sql.*;
-import java.util.List;
 
 import static calc.Main.priznaki;
 
@@ -21,9 +19,11 @@ public class Controller {
     public MenuBar iMainMenu;
 //    public TableView iTblPrizn;
     public Pane iTblPane;
+    public Pane iListPane;
     public HBox iHBoxMenu;
     public VBox iCalcQEPane;
     public VBox iStudentPane;
+    public VBox iPriznakiPane;
     public StackPane iStackPane;
 
 
@@ -67,6 +67,7 @@ public class Controller {
             ll = new Label("Признаки");
             ll.setOnMouseClicked(event -> {
                 System.out.println("Признаки " + event);
+                iPriznakiPane.toFront();
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
@@ -99,10 +100,17 @@ public class Controller {
         iHBoxMenu.getChildren().add(t.getMenu());
 
         priznaki = new Priznaki();
-        priznaki.createListFromSQL("");
+        priznaki.createFromSQL("");
         ListView lv = priznaki.getListView();
 //        lv.setMaxHeight(50);
         iTblPane.getChildren().add(0, lv);
+
+        ListView lvEdit = new ListView();
+        lvEdit.setItems(priznaki.getList());  // Список для редактирвоания признаков
+        iListPane.getChildren().add(0, lvEdit);
+
+
+        iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
     }
 

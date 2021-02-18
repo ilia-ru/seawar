@@ -9,6 +9,10 @@
     padding-left: 5px;
 }
 
+.H2 {
+    -fx-font-weight: bold;
+    -fx-background-color: white;
+}
 .combo-box {
     -fx-font-size: 14;
     -fx-font-name: Arial;

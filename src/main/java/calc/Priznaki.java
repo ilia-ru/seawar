@@ -12,16 +12,84 @@ import javafx.scene.layout.HBox;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Priznaki extends KSQL {
 
-    TableView<PriznakEQ> table = null;; // Таблица для показа на экране
+//    TableView<PriznakEQ> table = null;; // Таблица для показа на экране
     ListView<PriznakEQ> listView = null;; // Таблица для показа на экране
     private ObservableList<PriznakEQ> oPriznaki = null; // Список студентов
     Image EQ_IMG_OK = new Image("add.png");
     Image EQ_IMG_ERROR = new Image("del.png");
     public final double EMPTY_DOUBLE_VALUE = 10^12; // Для обозначения пустых значений в полях ввода признаков
+
+    HashMap<Long, pMapItem> pMap;  // Массив признаков
+
+    public class pInterval {  // Один интервал из описания признака
+        private long id;
+        private double val;
+        private int balls;  // Баллы - храним введенное на cqlc_eq, чтобы обновлять страницу
+
+        public pInterval(long id, double val, int balls) {
+            this.id = id;
+            this.val = val;
+            this.balls = balls;
+        }
+
+        public long getId() {
+            return id;
+        }
+        public void setId(long id) {
+            this.id = id;
+        }
+        public double getVal() {
+            return val;
+        }
+        public void setVal(double val) {
+            this.val = val;
+        }
+        public int getBalls() {
+            return balls;
+        }
+        public void setBalls(int balls) {
+            this.balls = balls;
+        }
+    }
+
+    public class pMapItem {  // Элемент массива признаков
+        private String name;  // Название признака
+        private ArrayList<pInterval> pMapIntervals;  // Массив интервалов
+
+        public pMapItem(String name) {
+            this.name = name;
+            pMapIntervals = new ArrayList<>();
+        }
+
+        public Double minVal() {  // Начало диапазона (Массив сортирован)
+            if (pMapIntervals == null || pMapIntervals.size() == 0) return EMPTY_DOUBLE_VALUE;
+            return pMapIntervals.get(0).getVal();
+        }
+
+        public Double maxVal() {  // Конец диапазона (Массив сортирован)
+            if (pMapIntervals == null || pMapIntervals.size() == 0) return EMPTY_DOUBLE_VALUE;
+            return pMapIntervals.get(pMapIntervals.size()-1).getVal();
+        }
+
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public ArrayList<pInterval> getpMapIntervals() {
+            return pMapIntervals;
+        }
+        public void setpMapIntervals(ArrayList<pInterval> pMapIntervals) {
+            this.pMapIntervals = pMapIntervals;
+        }
+    }
 
     public class PriznakEQ extends HBox {  // Одна строка - признак, на странице Калькулятора эквив.
 
@@ -91,6 +159,7 @@ public class Priznaki extends KSQL {
 //            this.IV = null;  //***** Вставлять серый индикатор
 
             this.setSpacing(5);
+            this.setAlignment(Pos.CENTER_LEFT);
 //            this.setPadding(new Insets(0, 5, 0, 0));
 
         }
@@ -144,12 +213,14 @@ public class Priznaki extends KSQL {
 //        this.table = new TableView<PriznakEQ>();
         this.listView = new ListView<PriznakEQ>();
         this.listView.setPrefWidth(450);
+        pMap = new HashMap<>();
     }
 
+/*
     public TableView<PriznakEQ> getTableView() {  // заполняет table данными из списка и возвращает ее
 //        table.setItems(this.getListSQL(""));
         table.setItems(this.oPriznaki);
-/*        table.setOnMouseClicked((new EventHandler<MouseEvent>() {
+        table.setOnMouseClicked((new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {  // редактирование данных студента
                 if(event.getButton().name().equals("PRIMARY"))  // по левой кнопке мыши
                 {
@@ -158,10 +229,9 @@ public class Priznaki extends KSQL {
             }
         }));
 
- */
         return table;
     }
-
+*/
     public ListView<PriznakEQ> getListView() {  // заполняет table данными из списка и возвращает ее
         return listView;
     }
@@ -183,9 +253,46 @@ public class Priznaki extends KSQL {
     }
 */
 
-    public ObservableList<PriznakEQ> createListFromSQL(String where) { // Создает из БД и возвращает список студентов
-        ResultSet rs = this.ksqlSELECT("SELECT ID, NAME, MINVAL, MAXVAL FROM PUBLIC.PUBLIC.PR;"+" "+where); // where - фильтры
+    public ObservableList<PriznakEQ> createFromSQL(String where) { // Создает из БД и возвращает список студентов
+  //      ResultSet rs = this.ksqlSELECT("SELECT ID, NAME, MINVAL, MAXVAL FROM PUBLIC.PUBLIC.PR;"+" "+where); // where - фильтры
+        ResultSet rs = this.ksqlSELECT("SELECT ID, NAME FROM PUBLIC.PUBLIC.PRIZNAKI"+" "+where); // where - фильтры
+        if (rs != null) {
+            try {
+                while (rs.next()) {  // Признаки
+                    pMap.put(rs.getLong("ID"), new pMapItem(rs.getString("NAME")));
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+            // Формируем Интервалы для каждого признака
+//            for (Map.Entry priznak: pMap.entrySet()) {
+            rs = this.ksqlSELECT("SELECT ID, PRIZNAK, VAL, BALLS FROM PUBLIC.PUBLIC.PRIZ_INTERVAL" +
+                    //                      " WHERE PRIZNAK="+priznak.getKey()+
+                    " ORDER BY VAL;");
+            if (rs != null) {
+                try {
+                    while (rs.next()) {
+                        pMap.get(rs.getLong("PRIZNAK")).pMapIntervals
+                                .add(new pInterval(rs.getLong("id"),
+                                        rs.getDouble("VAL"),
+                                        rs.getInt("BALLS")));
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }
+            
+
+
+  //      HashMap<Integer, pMapItem> pMap;  // Массив признаков
+
+//        public class pMapItem {  // Элемент массива признаков
+
+
 //        ObservableList<Student> oStudents = null;
+        rs = this.ksqlSELECT("SELECT ID, NAME, MINVAL, MAXVAL FROM PUBLIC.PUBLIC.PR;"+" "+where); // where - фильтры
         List<PriznakEQ> priznaki = new ArrayList<>();
         if (rs != null) {
             try {
