@@ -39,7 +39,10 @@ public class Controller {
     public TextField iPrFastTo;
     public TextField iPrFastCount;
     public HBox iPrIntervalsList;
+    public VBox iPrCreateEditPane;
 
+    ListView lvPrEdit;
+    ListView lvPI;
 
 
     private class TopMenu {
@@ -120,12 +123,29 @@ public class Controller {
         lv.setPrefWidth(450);
         iTblPane.getChildren().add(0, lv);
 
-        ListView lvEdit = new ListView();
-        lvEdit.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
-        lvEdit.setPrefWidth(450);
-        iListPane.getChildren().add(0, lvEdit);
+        lvPrEdit = new ListView();
+        lvPrEdit.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
+        lvPrEdit.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
+//            System.out.println("lll" + obj + " " + oldValue + " " + newValue);
+            clearPrEditPane();
+            Priznaki.PriznakPR p = (Priznaki.PriznakPR) newValue;
+            Priznaki.PMapItem pm = priznaki.copyToPMapTmp(p.getPid());
+            iPrPriznakName.setText(pm.getName());
+            // Заполняем список  -- Оригинал!!!!! Научить копировать!!!
+            lvPI.setItems(pm.getListPI());  // Список
+            iPrIntervalsList.getChildren().clear();
+            iPrIntervalsList.getChildren().add(0, lvPI);
+            iPrCreateEditPane.setVisible(true);  // Чтобы не бросалась в глаза до поры
+        });
+        lvPrEdit.setPrefWidth(450);
+        iListPane.getChildren().add(0, lvPrEdit);
 
  //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
+
+        iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
+
+        lvPI = new ListView();
+        lvPI.setPrefWidth(500);
 
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);
@@ -142,13 +162,54 @@ public class Controller {
 
     // Быстрое создание признака
     public void iBtFastCreatePriznakAction(ActionEvent actionEvent) {
-        Priznaki.PMapItem pm = priznaki.addPriznakToMap(iPrPriznakName.getText(), Double.valueOf(iPrFastFrom.getText()),
+        Priznaki.PMapItem pm = priznaki.getPMapTmp();
+        pm.fastIntervalFill(Double.valueOf(iPrFastFrom.getText()),
                 Double.valueOf(iPrFastTo.getText()), Integer.valueOf(iPrFastCount.getText()));
-        ListView lvPI = new ListView();
-        lvPI.setItems(pm.getListPI());  // Список признаков для редактирвоания признаков
-        lvPI.setPrefWidth(450);
+    //    lvPI = new ListView();
+        lvPI.setItems(pm.getListPI());  // Список
         iPrIntervalsList.getChildren().clear();
         iPrIntervalsList.getChildren().add(0, lvPI);
+    }
+
+    public void iBtnPrNewSaveAction(ActionEvent actionEvent) {  // Сохранение нового признака или после редактирования
+        if (iPrPriznakName.getText().compareTo("") == 0) { // Не введено название признака
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Введите название признака");
+            alert.setTitle("Внимание");
+            alert.setHeaderText("Введите название признака");
+            alert.show();
+        } else if (priznaki.getPMapTmp().getPMapIntervals().size() <= 2) { // Интервалы не введены
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Интервалы признака не введены, или вввдены неверно");
+            alert.setTitle("Внимание");
+            alert.setHeaderText("Введите интервалы");
+            alert.show();
+        } else {  // Все хорошо
+            // Сохраняем в БД
+            priznaki.getPMapTmp().setName(iPrPriznakName.getText());  // Добавляем имя признака
+            priznaki.addPriznak(200l, priznaki.getPMapTmp());  // Пишем в мапу
+            lvPrEdit.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
+            iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
+        }
+    }
+
+    public void iBtnPRCreateEditCancelAction(ActionEvent actionEvent) {  // Отказ от сохранения
+        iPrCreateEditPane.setVisible(false);
+    }
+
+    public void clearPrEditPane() {  // Чистим поля в панели
+        iPrPriznakName.setText("");
+        iPrFastFrom.setText("");
+        iPrFastTo.setText("");
+        iPrFastCount.setText("");
+        lvPI.getItems().clear();
+        iPrIntervalsList.getChildren().clear();
+        iPrIntervalsList.getChildren().add(0, lvPI);
+    }
+
+    public void iBtnPRCreatePR(ActionEvent actionEvent) {  // Создаем новый признак
+        Priznaki.PMapItem pm = priznaki.newPMapTmp("");
+        // Чистим поля перед открытием
+        clearPrEditPane();
+        iPrCreateEditPane.setVisible(true);
     }
 
 

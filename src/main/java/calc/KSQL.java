@@ -7,7 +7,7 @@ import java.sql.*;
 import static calc.Main.connSQL;
 
 // Работа с БД SQL
-public class KSQL extends TableView {
+public class KSQL {
     private String DBName;
 
     public int ksqlDELETE(String query) {  // Выполняем запрос DELETE

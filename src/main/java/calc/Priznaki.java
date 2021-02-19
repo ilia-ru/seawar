@@ -1,6 +1,7 @@
 package calc;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -18,14 +19,45 @@ import static java.lang.Double.NaN;
 public class Priznaki extends KSQL {
 
     ListView<PriznakEQ> listView = null;; // Таблица для показа на экране
-//    private ObservableList<PriznakEQ> oPriznaki = null; // Список студентов
     Image EQ_IMG_OK = new Image("eq_img_ok.png");
     Image EQ_IMG_ERROR = new Image("eq_img_error.png");
     Image EQ_IMG_DELETE = new Image("del.png");
-    public final int DATA_OK = 1; // Данные для признака в интервале и что-то введено
+    public final int DATA_OK = 1;    // Данные для признака в интервале и что-то введено
     public final int DATA_EMPTY = 2; // Данные не введены - поле пустое (важно, т.к. 0 - это тоже значение)
-    public final int DATA_OUT = 3; // Значение за диапазоном min-max
-    private PriznakiMap priznakiMap;
+    public final int DATA_OUT = 3;   // Значение за диапазоном min-max
+    private PriznakiMap priznakiMap; // Мапа всех признаков и их интервалов
+    private PMapItem pMapTmp;        // Временный PMapItem для редактирования и ввода признаков
+
+    public void addPriznak(Long id, PMapItem p) {  // Добаление признака в мапу
+        priznakiMap.put(id, p);
+        // id вынес в параметры, чтобы не ошибаться. Чтобы каждый раз помнить, что надо id
+    }
+
+    public PMapItem getPriznak(Long id) {  // Берем признак их мапы
+        return priznakiMap.get(id);
+    }
+
+    // Создает (new) и возвращает временный PMapItem для нужностей
+    // Ибо чистить - ошибки будут, а сборщик мусора не ошибается
+    public PMapItem newPMapTmp(String name) {
+        pMapTmp = new PMapItem(name);
+        return this.pMapTmp;
+    }
+
+    // Возвращает временный PMapItem для нужностей
+    public PMapItem getPMapTmp() {
+        return this.pMapTmp;
+    }
+
+    // КОпируем указанный pMapItem во временный объект
+    public PMapItem copyToPMapTmp(Long id){
+        this.pMapTmp = new PMapItem(priznakiMap.get(id).getName());
+        this.pMapTmp.setTmpId(priznakiMap.get(id).getTmpId());
+        this.pMapTmp.setDataValid(priznakiMap.get(id).getDataValid());
+//        this.pMapTmp.setPMapIntervals(priznakiMap.get(id).getPMapIntervals());   --- надо циклом
+        this.pMapTmp = priznakiMap.get(id);
+        return this.pMapTmp;
+    }
 
     // Мапа всех признаков и их интервалов
     public class PriznakiMap {
@@ -66,10 +98,11 @@ public class Priznaki extends KSQL {
 */
     }
 
-    public class PMapItem {   // Элемент массива признаков
-        private String name;  // Название признака
+    public class PMapItem {      // Элемент массива признаков
+        private Long tmpId = 0l; // Временный id для редактирования признака
+        private String name;     // Название признака
         private Double inputVal; // Введенное значение для признака
-        private int dataValid;// Флаг - статус введенных данных DATA_OK, DATA_EMPTY, DATA_OUT
+        private int dataValid;   // Флаг - статус введенных данных DATA_OK, DATA_EMPTY, DATA_OUT
 
         private ArrayList<PInterval> pMapIntervals;  // Массив интервалов
 
@@ -77,6 +110,20 @@ public class Priznaki extends KSQL {
             this.name = name;
             this.dataValid = DATA_EMPTY;  // Сначала ничего не введено
             pMapIntervals = new ArrayList<>();
+        }
+
+        // Формирует список интервалов по началу, концу и кол-ву шагов и добавляет в данный PMapItem
+        public void fastIntervalFill(Double from, Double to, int count) {
+            Double step, val;
+            val = from;
+            step = (to - from) / (count); // Кол-во интервалов +1, Отдельная строка чтобы указать max
+            this.pMapIntervals.clear();   // Очищаем от прежних безобразий
+ //  System.out.println(step);
+            for(int i=0;i<=count;i++) {
+ //               System.out.println("--" + i + " val " + val);
+                this.pMapIntervals.add(new PInterval(i, val, 0));
+                val += step;
+            }
         }
 
         // Возвращает список интервалов для ввода/ред-ния признаков
@@ -107,6 +154,12 @@ public class Priznaki extends KSQL {
             return pMapIntervals.get(pMapIntervals.size()-1).getVal();
         }
 
+        public Long getTmpId() {
+            return tmpId;
+        }
+        public void setTmpId(Long tmpId) {
+            this.tmpId = tmpId;
+        }
         public String getName() {
             return name;
         }
@@ -191,7 +244,11 @@ public class Priznaki extends KSQL {
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
 
-            iBallVal = new TextField(String.valueOf(pi.getBall()));
+            if (pi.getBall() > 0) {
+                iBallVal = new TextField(String.valueOf(pi.getBall()));
+            } else {
+                iBallVal = new TextField("");
+            }
 // Форматтер для ввода только чисел в TextField iBallVal
             UnaryOperator<TextFormatter.Change> iBallValFilter = change -> {
                 String text = change.getText();
@@ -465,20 +522,20 @@ public class Priznaki extends KSQL {
     }
 
     public class PriznakPR extends HBox {  // Одна строка - признак, на странице Признаки
-        private Long id;
+        private Long pid;
 
  //       private String name;
         private ImageView IV; // Кнопка "Удалить"
 
-        public PriznakPR(Long id) {
-            this.id = id;
-            Label ll = new Label(id.toString());
+        public PriznakPR(Long pid) {
+            this.pid = pid;
+            Label ll = new Label(pid.toString());
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
 
           //  this.name = name;
-            ll = new Label(priznakiMap.getName(id));
+            ll = new Label(priznakiMap.getName(pid));
             ll.setPrefWidth(150);
             ll.setMaxWidth(150);
             ll.setAlignment(Pos.CENTER_LEFT);
@@ -488,7 +545,7 @@ public class Priznaki extends KSQL {
             this.IV.setFitWidth(20);
             this.IV.setFitHeight(20);
             IV.setOnMouseClicked(event -> {  // Удаление признака
-                         System.out.println("delete " + this.id);
+                         System.out.println("delete " + this.pid);
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                         "\"Признак\" будет удален без возможности восстановления");
                 alert.setTitle("Удаление данных");
@@ -498,7 +555,7 @@ public class Priznaki extends KSQL {
                         new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
-                    System.out.println("delete 2 " + this.id);
+                    System.out.println("delete 2 " + this.pid);
                 }
             });
             this.getChildren().add(IV);
@@ -506,13 +563,16 @@ public class Priznaki extends KSQL {
             this.setSpacing(5);
             this.setAlignment(Pos.CENTER_LEFT);
 //            this.setPadding(new Insets(0, 5, 0, 0));
+
+        //    this.addEventFilter();
+
         }
 
-        public Long get1Id() {
-            return id;
+        public Long getPid() {
+            return pid;
         }
-        public void setId(Long id) {
-            this.id = id;
+        public void setPid(Long pid) {
+            this.pid = pid;
         }
 /*        public String getName() {
             return name;
@@ -532,15 +592,15 @@ public class Priznaki extends KSQL {
 
     // Возвращает список в виде EQ для модуля calc_eq
     public ObservableList<PriznakEQ> getListEQ() {
-    List<PriznakEQ> pr = new ArrayList<>();
-    PMapItem pm;
-    for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {  //******
-        pm = (PMapItem) priznak.getValue();
-        pr.add(new PriznakEQ((Long) priznak.getKey()));
+        List<PriznakEQ> pr = new ArrayList<>();
+        PMapItem pm;
+        for (Map.Entry priznak : priznakiMap.dataMap.entrySet()) {  //******
+            pm = (PMapItem) priznak.getValue();
+            pr.add(new PriznakEQ((Long) priznak.getKey()));
+        }
+        ObservableList<PriznakEQ> opr = FXCollections.observableArrayList(pr);
+        return opr;
     }
-    ObservableList<PriznakEQ> opr = FXCollections.observableArrayList(pr);
-    return opr;
-}
 
     // Возвращает список в виде PR для модуля Признаки
     public ObservableList<PriznakPR> getListPR() {
@@ -552,20 +612,7 @@ public class Priznaki extends KSQL {
         return opr;
     }
 
-    public PMapItem addPriznakToMap(String name, Double from, Double to, int count) {
-        PMapItem p =  new PMapItem(name);
-        Double step, val;
-        val = from;
-        step = (to - from) / (count); // Кол-во интервалов +1, чтобы указать max
-    System.out.println(step);
-        for(int i=0;i<=count;i++) {
-            System.out.println("--" + i + " val " + val);
-            p.pMapIntervals.add(new PInterval(i, val, 0));
-            val += step;
-        }
-        priznakiMap.put(155l, p);
-        return p;
-    }
+//    public PMapItem addPriznakToMap(String name, Double from, Double to, int count) {
 
     public void createFromSQL(String where) { // Создает из БД и мапу признаков
         ResultSet rs = this.ksqlSELECT("SELECT ID, NAME FROM PUBLIC.PUBLIC.PRIZNAKI ORDER BY NAME");
@@ -596,6 +643,7 @@ public class Priznaki extends KSQL {
             }
         }
     }
+
     public Integer calcBalls2(boolean needMessage) {  // Подсчет кол-ва баллов для 2*2*2
         // needMessage , чтобы вызывать из calcBalls4 не повторяя сообщения об ошибках, т.к. расчет на тех же данных и ошибки те-же
         PMapItem pm;
