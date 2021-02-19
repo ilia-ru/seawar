@@ -6,8 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 import java.sql.ResultSet;
@@ -28,44 +26,6 @@ public class Priznaki extends KSQL {
     public final int DATA_EMPTY = 2; // Данные не введены - поле пустое (важно, т.к. 0 - это тоже значение)
     public final int DATA_OUT = 3; // Значение за диапазоном min-max
     private PriznakiMap priznakiMap;
-
-    public Integer calcBalls2() {  // Подсчет кол-ва баллов для 2*2*2
-        PMapItem pm;
-        int balls = 0;
-        boolean isDataInput = false; // Есть признаки с введенными значениями - их посчитали
-        for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {
-            pm = (PMapItem) priznak.getValue();
-            // с DATA_EMPTY -  введеныы интервалы - пропускаем
-            if (pm.getDataValid() == DATA_OK) {  // Суммируем баллы по признакам, где введено значение
-                balls += pm.getBall();
-                isDataInput = true;
-            } else if (pm.getDataValid() == DATA_OUT) {  // Выход за границы - сигналим и прерываем расчет
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "В признаке \"" + pm.getName() + "\" значение выходит за границы диапазона данных. Исправьте введенное значение и повторите расчет.");
-                alert.setTitle("Внимание");
-                alert.setHeaderText("Ошибка во входных данных");
-                alert.show();
-                return null;
-            }
-        }
-        if (!isDataInput) { // Нет введенных данных - сигналим
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Не введены исходные данные. Введите данные и повторите расчет");
-            alert.setTitle("Внимание");
-            alert.setHeaderText("Ошибка во входных данных");
-            alert.show();
-            return null;
-        }
-        return balls;
-    }
-
-    public Integer calcBalls4() {  // Подсчет кол-ва баллов для 2*2*4
-        Integer balls2 = calcBalls2();
-        Long d;
-        if (balls2 != null) {  // (AI5*-0,896+5,04)+AI5
-            d = Math.round(Double.valueOf(balls2)*(-0.896)+5.04+Double.valueOf(balls2));
-            return  d.intValue();
-        }
-        return null;
-    }
 
     // Мапа всех признаков и их интервалов
     public class PriznakiMap {
@@ -117,6 +77,21 @@ public class Priznaki extends KSQL {
             this.name = name;
             this.dataValid = DATA_EMPTY;  // Сначала ничего не введено
             pMapIntervals = new ArrayList<>();
+        }
+
+        // Возвращает список интервалов для ввода/ред-ния признаков
+        public ObservableList<PIntervalPR> getListPI() {
+            boolean isFirst;
+            List<PIntervalPR> pr = new ArrayList<>();
+            if (pMapIntervals.size() >= 2) {  // Элементов в массиве должно быть >=2, чтобы описать концы интервала
+                isFirst = true;  // В первом интервале 2 поля для ввода, в остальных - по 1
+                pr.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), isFirst));
+                for (int i = 2; i < pMapIntervals.size(); i++) {
+                    pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false));
+                }
+            }
+            ObservableList<PIntervalPR> opr = FXCollections.observableArrayList(pr);
+            return opr;
         }
 
         public String toString() {
@@ -171,6 +146,177 @@ public class Priznaki extends KSQL {
             return null; // Вызод за диапазон. Тут не может быть, но увы
         }
     }
+
+    //***********
+    public class PIntervalPR extends HBox {  // Строка для таблицы (List) интервалов для ввода/правки
+        private TextField iInputVal, iBallVal;
+        private ImageView IV; // Кнопка "Удалить"
+
+        public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst) {
+            Label ll = new Label(String.valueOf(pi.getId()));
+            ll.setPrefWidth(25);
+            ll.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(ll);
+
+            // Первое поле ввода
+            if (isFirst) {
+                iInputVal = new TextField(String.valueOf(pi.getVal()));
+ //               iInputVal.setTextFormatter(iInputValFormatter);
+
+                iInputVal.setPrefWidth(50);
+                iInputVal.setAlignment(Pos.CENTER_RIGHT);
+                this.getChildren().add(iInputVal);
+            } else { // Не первый интервал  - не даем вводить
+                ll = new Label(String.valueOf(pi.getVal()));
+                ll.setPrefWidth(50);
+                ll.setAlignment(Pos.CENTER_RIGHT);
+                this.getChildren().add(ll);
+            }
+
+            ll = new Label("≤ X <");
+//            ll.setPrefWidth(25);
+            ll.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(ll);
+
+            // Второе поле ввода
+            iInputVal = new TextField(String.valueOf(pi2.getVal()));
+//            iInputVal.setTextFormatter(iInputValFormatter);
+
+            iInputVal.setPrefWidth(50);
+            iInputVal.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(iInputVal);
+
+            ll = new Label(" балл:");
+//            ll.setPrefWidth(25);
+            ll.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(ll);
+
+            iBallVal = new TextField(String.valueOf(pi.getBall()));
+// Форматтер для ввода только чисел в TextField iBallVal
+            UnaryOperator<TextFormatter.Change> iBallValFilter = change -> {
+                String text = change.getText();
+                if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+                if (text.matches("[0-9.]*")) {
+                    if ((text.compareTo(".") == 0) && iBallVal.getText().contains(".")) { return null; }  // вторую точку вводят
+                    return change;
+                }
+                return null;
+            };
+            TextFormatter<String> iBallValFormatter = new TextFormatter<>(iBallValFilter);
+            iBallVal.setTextFormatter(iBallValFormatter);
+
+            iBallVal.setPrefWidth(50);
+            iBallVal.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(iBallVal);
+
+            this.IV = new ImageView(EQ_IMG_DELETE);
+            this.IV.setFitWidth(20);
+            this.IV.setFitHeight(20);
+            IV.setOnMouseClicked(event -> {  // Удаление признака
+                System.out.println("delete " + pi.getId());
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                        "\"Интервал\" будет удален без возможности восстановления");
+                alert.setTitle("Удаление данных");
+                alert.setHeaderText("Подтвердите удаление интервала");
+                alert.getButtonTypes().clear();
+                alert.getButtonTypes().addAll(new ButtonType("Удалить", ButtonBar.ButtonData.OK_DONE),
+                        new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
+                    System.out.println("delete 2 " + pi.getId());
+                }
+            });
+            this.getChildren().add(IV);
+
+            this.setSpacing(5);
+            this.setAlignment(Pos.CENTER_LEFT);
+//            this.setPadding(new Insets(0, 5, 0, 0));
+        }
+
+        public PIntervalPR(PInterval pi, boolean isFirst) {
+            Label ll = new Label(String.valueOf(pi.getId()));
+            ll.setPrefWidth(25);
+            ll.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(ll);
+
+            if (isFirst) {  // Первый интервал
+                iInputVal = new TextField(String.valueOf(pi.getVal()));
+// Форматтер для ввода только чисел в TextField iInputVal
+                UnaryOperator<TextFormatter.Change> iInputValfilter = change -> {
+                    String text = change.getText();
+                    if (text.compareTo(",") == 0) {
+                        text = ".";
+                        change.setText(".");
+                    }
+                    if (text.matches("[0-9.]*")) {
+                        if ((text.compareTo(".") == 0) && iInputVal.getText().contains(".")) {
+                            return null;
+                        }  // вторую точку вводят
+                        return change;
+                    }
+                    return null;
+                };
+                TextFormatter<String> iInputValFormatter = new TextFormatter<>(iInputValfilter);
+                iInputVal.setTextFormatter(iInputValFormatter);
+
+                iInputVal.setPrefWidth(50);
+                iInputVal.setAlignment(Pos.CENTER_RIGHT);
+                this.getChildren().add(iInputVal);
+            } else { // Остальные интервалы  - не даем вводить
+                ll = new Label(String.valueOf(pi.getVal()));
+                ll.setPrefWidth(50);
+                ll.setAlignment(Pos.CENTER_RIGHT);
+                this.getChildren().add(ll);
+            }
+
+            ll = new Label("≤ X <");
+            ll.setPrefWidth(25);
+            ll.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(ll);
+
+            iBallVal = new TextField(String.valueOf(pi.getBall()));
+// Форматтер для ввода только чисел в TextField iBallVal
+            UnaryOperator<TextFormatter.Change> iBallValFilter = change -> {
+                String text = change.getText();
+                if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+                if (text.matches("[0-9.]*")) {
+                    if ((text.compareTo(".") == 0) && iBallVal.getText().contains(".")) { return null; }  // вторую точку вводят
+                    return change;
+                }
+                return null;
+            };
+            TextFormatter<String> iBallValFormatter = new TextFormatter<>(iBallValFilter);
+            iBallVal.setTextFormatter(iBallValFormatter);
+
+            iBallVal.setPrefWidth(50);
+            iBallVal.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(iBallVal);
+
+            this.IV = new ImageView(EQ_IMG_DELETE);
+            this.IV.setFitWidth(20);
+            this.IV.setFitHeight(20);
+            IV.setOnMouseClicked(event -> {  // Удаление признака
+                System.out.println("delete " + pi.getId());
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                        "\"Интервал\" будет удален без возможности восстановления");
+                alert.setTitle("Удаление данных");
+                alert.setHeaderText("Подтвердите удаление интервала");
+                alert.getButtonTypes().clear();
+                alert.getButtonTypes().addAll(new ButtonType("Удалить", ButtonBar.ButtonData.OK_DONE),
+                        new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
+                    System.out.println("delete 2 " + pi.getId());
+                }
+            });
+            this.getChildren().add(IV);
+
+            this.setSpacing(5);
+            this.setAlignment(Pos.CENTER_LEFT);
+//            this.setPadding(new Insets(0, 5, 0, 0));
+        }
+    }
+    //*************
 
     public class PInterval {  // Один интервал из описания признака
         private long id;
@@ -379,29 +525,11 @@ public class Priznaki extends KSQL {
 
     public Priznaki() {
         super();
-        // Таблица
-//        this.table = new TableView<PriznakEQ>();
         this.listView = new ListView<PriznakEQ>();
         priznakiMap = new PriznakiMap();  // Все признаки с их интервалами
 
     }
 
-/*
-    public TableView<PriznakEQ> getTableView() {  // заполняет table данными из списка и возвращает ее
-//        table.setItems(this.getListSQL(""));
-        table.setItems(this.oPriznaki);
-        table.setOnMouseClicked((new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent event) {  // редактирование данных студента
-                if(event.getButton().name().equals("PRIMARY"))  // по левой кнопке мыши
-                {
-                    System.out.println("getClass "+event.getTarget().getClass().getName());
-                }
-            }
-        }));
-
-        return table;
-    }
-*/
     // Возвращает список в виде EQ для модуля calc_eq
     public ObservableList<PriznakEQ> getListEQ() {
     List<PriznakEQ> pr = new ArrayList<>();
@@ -413,11 +541,6 @@ public class Priznaki extends KSQL {
     ObservableList<PriznakEQ> opr = FXCollections.observableArrayList(pr);
     return opr;
 }
-/*    public ListView<PriznakEQ> getListEQ() {
-        return listView;
-    }
-
- */
 
     // Возвращает список в виде PR для модуля Признаки
     public ObservableList<PriznakPR> getListPR() {
@@ -429,10 +552,20 @@ public class Priznaki extends KSQL {
         return opr;
     }
 
-/*    public ObservableList<PriznakEQ> getList() { // Возвращает список студентов
-            return oPriznaki;
+    public PMapItem addPriznakToMap(String name, Double from, Double to, int count) {
+        PMapItem p =  new PMapItem(name);
+        Double step, val;
+        val = from;
+        step = (to - from) / (count); // Кол-во интервалов +1, чтобы указать max
+    System.out.println(step);
+        for(int i=0;i<=count;i++) {
+            System.out.println("--" + i + " val " + val);
+            p.pMapIntervals.add(new PInterval(i, val, 0));
+            val += step;
+        }
+        priznakiMap.put(155l, p);
+        return p;
     }
-*/
 
     public void createFromSQL(String where) { // Создает из БД и мапу признаков
         ResultSet rs = this.ksqlSELECT("SELECT ID, NAME FROM PUBLIC.PUBLIC.PRIZNAKI ORDER BY NAME");
@@ -462,5 +595,47 @@ public class Priznaki extends KSQL {
                 }
             }
         }
+    }
+    public Integer calcBalls2(boolean needMessage) {  // Подсчет кол-ва баллов для 2*2*2
+        // needMessage , чтобы вызывать из calcBalls4 не повторяя сообщения об ошибках, т.к. расчет на тех же данных и ошибки те-же
+        PMapItem pm;
+        int balls = 0;
+        boolean isDataInput = false; // Есть признаки с введенными значениями - их посчитали
+        for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {
+            pm = (PMapItem) priznak.getValue();
+            // с DATA_EMPTY -  введеныы интервалы - пропускаем
+            if (pm.getDataValid() == DATA_OK) {  // Суммируем баллы по признакам, где введено значение
+                balls += pm.getBall();
+                isDataInput = true;
+            } else if (pm.getDataValid() == DATA_OUT) {  // Выход за границы - сигналим и прерываем расчет
+                if (needMessage) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "В признаке \"" + pm.getName() + "\" значение выходит за границы диапазона данных. Исправьте введенное значение и повторите расчет.");
+                    alert.setTitle("Внимание");
+                    alert.setHeaderText("Ошибка во входных данных");
+                    alert.show();
+                }
+                return null;
+            }
+        }
+        if (!isDataInput) { // Нет введенных данных - сигналим
+            if (needMessage) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Не введены исходные данные. Введите данные и повторите расчет");
+                alert.setTitle("Внимание");
+                alert.setHeaderText("Ошибка во входных данных");
+                alert.show();
+            }
+            return null;
+        }
+        return balls;
+    }
+
+    public Integer calcBalls4() {  // Подсчет кол-ва баллов для 2*2*4
+        Integer balls2 = calcBalls2(false);
+        Long d;
+        if (balls2 != null) {  // (AI5*-0,896+5,04)+AI5
+            d = Math.round(Double.valueOf(balls2)*(-0.896)+5.04+Double.valueOf(balls2));
+            return  d.intValue();
+        }
+        return null;
     }
 }

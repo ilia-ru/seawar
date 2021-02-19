@@ -13,6 +13,10 @@
     -fx-font-weight: bold;
     -fx-background-color: white;
 }
+
+.H3 {
+    -fx-font-weight: bold;
+}
 .combo-box {
     -fx-font-size: 14;
     -fx-font-name: Arial;
@@ -21,4 +25,9 @@
 .button {
     -fx-font-size: 14;
     -fx-font-name: Arial;
+}
+.btn_bold {
+    -fx-font-size: 14;
+    -fx-font-name: Arial;
+    -fx-font-weight: bold;
 }

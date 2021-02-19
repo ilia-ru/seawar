@@ -30,6 +30,15 @@ public class Controller {
     public ImageView iImgAlgoritm;
     public Label iSumBalls2;
     public Label iSumBalls4;
+    public Label iResTxt2_80;
+    public Label iResTxt2_90;
+    public Label iResTxt4_80;
+    public Label iResTxt4_90;
+    public TextField iPrPriznakName;
+    public TextField iPrFastFrom;
+    public TextField iPrFastTo;
+    public TextField iPrFastCount;
+    public HBox iPrIntervalsList;
 
 
 
@@ -121,6 +130,7 @@ public class Controller {
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
+//        iPriznakiPane.toFront();
 
     }
 
@@ -128,6 +138,17 @@ public class Controller {
     public void iBtHideAction(ActionEvent actionEvent) {
         System.out.println("aaaaaaaa");
         //iCVintra.
+    }
+
+    // Быстрое создание признака
+    public void iBtFastCreatePriznakAction(ActionEvent actionEvent) {
+        Priznaki.PMapItem pm = priznaki.addPriznakToMap(iPrPriznakName.getText(), Double.valueOf(iPrFastFrom.getText()),
+                Double.valueOf(iPrFastTo.getText()), Integer.valueOf(iPrFastCount.getText()));
+        ListView lvPI = new ListView();
+        lvPI.setItems(pm.getListPI());  // Список признаков для редактирвоания признаков
+        lvPI.setPrefWidth(450);
+        iPrIntervalsList.getChildren().clear();
+        iPrIntervalsList.getChildren().add(0, lvPI);
     }
 
 
@@ -144,16 +165,61 @@ public class Controller {
 
     // Расчет Симуляц. калькулятора
     public void iBtnCalcEqGoAction(ActionEvent actionEvent) {
-   //     System.out.println("aaaaaaaa");
-        Integer i = priznaki.calcBalls2();
+        //     System.out.println("aaaaaaaa");
+        Integer sumBalls = priznaki.calcBalls2(true);
         iSumBalls2.setText(""); // Очищаем поле
-        if (i != null) {
-            iSumBalls2.setText(String.valueOf(i));
+        if (sumBalls != null) {
+            iSumBalls2.setText(String.valueOf(sumBalls));
+//        =ЕСЛИ(AI5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AI5>=3;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
+            if (sumBalls <= -6) {
+                iResTxt2_80.setText("ЛП НЕэквивалентные");
+                iResTxt2_80.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+            } else if (sumBalls >= 3) {
+                iResTxt2_80.setText("ЛП эквивалентные");
+                iResTxt2_80.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+            } else {
+                iResTxt2_80.setText("НЕ ИНФОРМАТИВНО");
+                iResTxt2_80.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+            }
+//=ЕСЛИ(AI5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AI5>=5;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
+            if (sumBalls <= -6) {
+                iResTxt2_90.setText("ЛП НЕэквивалентные");
+                iResTxt2_90.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+            } else if (sumBalls >= 5) {
+                iResTxt2_90.setText("ЛП эквивалентные");
+                iResTxt2_90.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+            } else {
+                iResTxt2_90.setText("НЕ ИНФОРМАТИВНО");
+                iResTxt2_90.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+            }
         }
-        i = priznaki.calcBalls4();
+
+        sumBalls = priznaki.calcBalls4();
         iSumBalls4.setText(""); // Очищаем поле
-        if (i != null) {
-            iSumBalls4.setText(String.valueOf(i));
+        if (sumBalls != null) {
+            iSumBalls4.setText(String.valueOf(sumBalls));
+//=ЕСЛИ(AM5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AM5>=3;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
+            if (sumBalls <= -6) {
+                iResTxt4_80.setText("ЛП НЕэквивалентные");
+                iResTxt4_80.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+            } else if (sumBalls >= 3) {
+                iResTxt4_80.setText("ЛП эквивалентные");
+                iResTxt4_80.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+            } else {
+                iResTxt4_80.setText("НЕ ИНФОРМАТИВНО");
+                iResTxt4_80.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+            }
+//=ЕСЛИ(AM5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AM5>=5;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
+            if (sumBalls <= -6) {
+                iResTxt4_90.setText("ЛП НЕэквивалентные");
+                iResTxt4_90.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+            } else if (sumBalls >= 5) {
+                iResTxt4_90.setText("ЛП эквивалентные");
+                iResTxt4_90.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+            } else {
+                iResTxt4_90.setText("НЕ ИНФОРМАТИВНО");
+                iResTxt4_90.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+            }
         }
     }
 
@@ -216,7 +282,21 @@ public class Controller {
 
     }
 
+    public void iBtnAlg1Action(ActionEvent actionEvent) {
+        iImgAlgoritm.setImage(new Image("alg1.png"));
+    }
 
+    public void iBtnAlg2Action(ActionEvent actionEvent) {
+        iImgAlgoritm.setImage(new Image("alg2.png"));
+    }
+
+    public void iBtnAlg3Action(ActionEvent actionEvent) {
+        iImgAlgoritm.setImage(new Image("alg3.png"));
+    }
+
+    public void iBtnAlg4Action(ActionEvent actionEvent) {
+        iImgAlgoritm.setImage(new Image("alg4.png"));
+    }
 
 
 }
