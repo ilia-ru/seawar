@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="calc.Controller">
    <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
@@ -47,10 +48,13 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="399.0" spacing="10.0">
                                  <children>
                                     <Label text="Дизайн 2х2х2" />
-                                    <Label fx:id="iSumBalls2" style="-fx-border-color: #999999; -fx-border-width: 1;" text="Сумма баллов">
+                                    <Label fx:id="iSumBalls2" prefWidth="70.0" style="-fx-border-color: #999999; -fx-border-width: 1;" text="Сумма баллов">
                                        <padding>
                                           <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
                                        </padding>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
                                     </Label>
                                     <Label layoutX="10.0" layoutY="10.0" text="баллов" />
                                  </children>
@@ -74,7 +78,7 @@
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" prefHeight="56.0" prefWidth="399.0" spacing="10.0">
                                  <children>
                                     <Label text="Дизайн 2х2х2" />
-                                    <Label fx:id="iSumBalls21" style="-fx-border-color: #999999; -fx-border-width: 1;" text="Сумма баллов">
+                                    <Label fx:id="iSumBalls4" prefWidth="70.0" style="-fx-border-color: #999999; -fx-border-width: 1;" text="Сумма баллов">
                                        <padding>
                                           <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
                                        </padding>
@@ -111,7 +115,7 @@
                   </HBox>
             </children>
          </VBox>
-          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox prefWidth="1000.0">
                       <children>

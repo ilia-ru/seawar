@@ -28,6 +28,8 @@ public class Controller {
     public VBox iPriznakiPane;
     public StackPane iStackPane;
     public ImageView iImgAlgoritm;
+    public Label iSumBalls2;
+    public Label iSumBalls4;
 
 
 
@@ -116,6 +118,8 @@ public class Controller {
 
  //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
 
+        iPriznakiPane.setVisible(true);
+        iCalcQEPane.setVisible(true);
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
     }
@@ -140,16 +144,17 @@ public class Controller {
 
     // Расчет Симуляц. калькулятора
     public void iBtnCalcEqGoAction(ActionEvent actionEvent) {
-        System.out.println("aaaaaaaa");
-        ObservableList<Priznaki.PriznakEQ> ol = priznaki.getList();
-        System.out.println("222222 " + ol);
-        for (Priznaki.PriznakEQ pr: ol) {
-            System.out.println("ПРизнак " + pr.getName() + " - " + pr.getBalls());
-
-
+   //     System.out.println("aaaaaaaa");
+        Integer i = priznaki.calcBalls2();
+        iSumBalls2.setText(""); // Очищаем поле
+        if (i != null) {
+            iSumBalls2.setText(String.valueOf(i));
         }
-
-
+        i = priznaki.calcBalls4();
+        iSumBalls4.setText(""); // Очищаем поле
+        if (i != null) {
+            iSumBalls4.setText(String.valueOf(i));
+        }
     }
 
     public void iBtnAction(ActionEvent actionEvent) {

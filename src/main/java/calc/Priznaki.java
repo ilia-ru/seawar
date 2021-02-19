@@ -15,27 +15,172 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
+import static java.lang.Double.NaN;
+
 public class Priznaki extends KSQL {
 
-//    TableView<PriznakEQ> table = null;; // Таблица для показа на экране
     ListView<PriznakEQ> listView = null;; // Таблица для показа на экране
-    private ObservableList<PriznakEQ> oPriznaki = null; // Список студентов
+//    private ObservableList<PriznakEQ> oPriznaki = null; // Список студентов
     Image EQ_IMG_OK = new Image("eq_img_ok.png");
     Image EQ_IMG_ERROR = new Image("eq_img_error.png");
     Image EQ_IMG_DELETE = new Image("del.png");
-    public final double EMPTY_DOUBLE_VALUE = 10^12; // Для обозначения пустых значений в полях ввода признаков
+    public final int DATA_OK = 1; // Данные для признака в интервале и что-то введено
+    public final int DATA_EMPTY = 2; // Данные не введены - поле пустое (важно, т.к. 0 - это тоже значение)
+    public final int DATA_OUT = 3; // Значение за диапазоном min-max
+    private PriznakiMap priznakiMap;
 
-    HashMap<Long, PMapItem> pMap;  // Массив признаков
+    public Integer calcBalls2() {  // Подсчет кол-ва баллов для 2*2*2
+        PMapItem pm;
+        int balls = 0;
+        boolean isDataInput = false; // Есть признаки с введенными значениями - их посчитали
+        for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {
+            pm = (PMapItem) priznak.getValue();
+            // с DATA_EMPTY -  введеныы интервалы - пропускаем
+            if (pm.getDataValid() == DATA_OK) {  // Суммируем баллы по признакам, где введено значение
+                balls += pm.getBall();
+                isDataInput = true;
+            } else if (pm.getDataValid() == DATA_OUT) {  // Выход за границы - сигналим и прерываем расчет
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "В признаке \"" + pm.getName() + "\" значение выходит за границы диапазона данных. Исправьте введенное значение и повторите расчет.");
+                alert.setTitle("Внимание");
+                alert.setHeaderText("Ошибка во входных данных");
+                alert.show();
+                return null;
+            }
+        }
+        if (!isDataInput) { // Нет введенных данных - сигналим
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Не введены исходные данные. Введите данные и повторите расчет");
+            alert.setTitle("Внимание");
+            alert.setHeaderText("Ошибка во входных данных");
+            alert.show();
+            return null;
+        }
+        return balls;
+    }
+
+    public Integer calcBalls4() {  // Подсчет кол-ва баллов для 2*2*4
+        Integer balls2 = calcBalls2();
+        Long d;
+        if (balls2 != null) {  // (AI5*-0,896+5,04)+AI5
+            d = Math.round(Double.valueOf(balls2)*(-0.896)+5.04+Double.valueOf(balls2));
+            return  d.intValue();
+        }
+        return null;
+    }
+
+    // Мапа всех признаков и их интервалов
+    public class PriznakiMap {
+        private HashMap<Long, PMapItem> dataMap;  // Массив признаков
+        // name, data_status, pInterval - массив интервалов
+
+        public PriznakiMap() {
+            dataMap = new HashMap<>();  // Массив признаков
+        }
+
+        public void put(Long i, PMapItem p) { // Помещаем строку данных в мапу
+            dataMap.put(i, p);
+        }
+        public PMapItem get(Long i) { // Берем строку данных в мапу
+            return dataMap.get(i);
+        }
+
+        public String getName(Long i) {
+            return dataMap.get(i).getName();
+        }
+        public void setName(Long i, String name) {
+            dataMap.get(i).setName(name);
+        }
+
+/*        public int getDataValid(Long i) {// Флаг - статус введенных данных DATA_OK, DATA_EMPTY, DATA_OUT
+            return dataMap.get(i).getDataValid();
+        }
+        public void setDataValid(Long i, int dataValid) {// Флаг - статус введенных данных DATA_OK, DATA_EMPTY, DATA_OUT
+            dataMap.get(i).setDataValid(dataValid);
+        }
+
+        public ArrayList<PInterval> getPMapIntervals(Long i) {// Массив интервалов признака
+            return dataMap.get(i).getPMapIntervals();
+        }
+        public void setPMapIntervals(Long i, ArrayList<PInterval> intervals) {// Массив интервалов признака
+            dataMap.get(i).setPMapIntervals(intervals);
+        }
+*/
+    }
+
+    public class PMapItem {   // Элемент массива признаков
+        private String name;  // Название признака
+        private Double inputVal; // Введенное значение для признака
+        private int dataValid;// Флаг - статус введенных данных DATA_OK, DATA_EMPTY, DATA_OUT
+
+        private ArrayList<PInterval> pMapIntervals;  // Массив интервалов
+
+        public PMapItem(String name) {
+            this.name = name;
+            this.dataValid = DATA_EMPTY;  // Сначала ничего не введено
+            pMapIntervals = new ArrayList<>();
+        }
+
+        public String toString() {
+            return this.name;
+        }
+        public Double minVal() {  // Начало диапазона (Массив сортирован)
+            if (pMapIntervals == null || pMapIntervals.size() == 0) return NaN;
+            return pMapIntervals.get(0).getVal();
+        }
+
+        public Double maxVal() {  // Конец диапазона (Массив сортирован)
+            if (pMapIntervals == null || pMapIntervals.size() == 0) return NaN;
+            return pMapIntervals.get(pMapIntervals.size()-1).getVal();
+        }
+
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public int getDataValid() {
+            return dataValid;
+        }
+        public void setDataValid(int dataValid) {
+            this.dataValid = dataValid;
+        }
+        public ArrayList<PInterval> getPMapIntervals() {
+            return pMapIntervals;
+        }
+        public void setPMapIntervals(ArrayList<PInterval> pMapIntervals) {
+            this.pMapIntervals = pMapIntervals;
+        }
+
+        public Double getInputVal() {
+            return inputVal;
+        }
+
+        public void setInputVal(Double inputVal) {
+            this.inputVal = inputVal;
+        }
+
+        public Integer getBall() {  // Возвращаем балл для заданного (ранее введенного) inputVal
+            Double prevVal = minVal();
+            for (PInterval pi: getPMapIntervals()) {
+                if (inputVal >= prevVal && inputVal < pi.val) {
+                    return pi.ball;
+                } else {
+                    prevVal = pi.val;
+                }
+            }
+            return null; // Вызод за диапазон. Тут не может быть, но увы
+        }
+    }
 
     public class PInterval {  // Один интервал из описания признака
         private long id;
         private double val;
-        private int balls;  // Баллы - храним введенное на cqlc_eq, чтобы обновлять страницу
+        private int ball;  // Баллы - храним введенное на cqlc_eq, чтобы обновлять страницу
 
-        public PInterval(long id, double val, int balls) {
+        public PInterval(long id, double val, int ball) {
             this.id = id;
             this.val = val;
-            this.balls = balls;
+            this.ball = ball;
         }
 
         public long getId() {
@@ -50,94 +195,51 @@ public class Priznaki extends KSQL {
         public void setVal(double val) {
             this.val = val;
         }
-        public int getBalls() {
-            return balls;
+        public int getBall() {
+            return ball;
         }
-        public void setBalls(int balls) {
-            this.balls = balls;
-        }
-    }
-
-    public class PMapItem {  // Элемент массива признаков
-        private String name;  // Название признака
-        private ArrayList<PInterval> pMapIntervals;  // Массив интервалов
-
-        public PMapItem(String name) {
-            this.name = name;
-            pMapIntervals = new ArrayList<>();
-        }
-
-        public String toString() {
-            return this.name;
-        }
-        public Double minVal() {  // Начало диапазона (Массив сортирован)
-            if (pMapIntervals == null || pMapIntervals.size() == 0) return EMPTY_DOUBLE_VALUE;
-            return pMapIntervals.get(0).getVal();
-        }
-
-        public Double maxVal() {  // Конец диапазона (Массив сортирован)
-            if (pMapIntervals == null || pMapIntervals.size() == 0) return EMPTY_DOUBLE_VALUE;
-            return pMapIntervals.get(pMapIntervals.size()-1).getVal();
-        }
-
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public ArrayList<PInterval> getpMapIntervals() {
-            return pMapIntervals;
-        }
-        public void setpMapIntervals(ArrayList<PInterval> pMapIntervals) {
-            this.pMapIntervals = pMapIntervals;
+        public void setBall(int ball) {
+            this.ball = ball;
         }
     }
 
     public class PriznakEQ extends HBox {  // Одна строка - признак, на странице Калькулятора эквив.
 
         private Long id;
-        private String name;
-        private Double minVal;
-        private Double inputVal;  // Введенное значение
+//        private String name;
+ //       private Double minVal;
+//        private Double inputVal;  // Введенное значение
         private TextField iInputVal;
-        private double maxVal;
-        private int balls;  // Баллы
+  //      private Double maxVal;
+//        private int balls;  // Баллы
         private Label iBalls;
         private ImageView IV; // Индикатор: не введено/используется/ошибка (выход за диапазон)
 //        private HBox listItem;
 
-        public PriznakEQ(Long id, String name, //
-                         double minVal,
-                         double maxVal) {
+        public PriznakEQ(Long id) {
             this.id = id;
             Label ll = new Label(id.toString());
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
 
-            this.name = name;
-            ll = new Label(name);
+            ll = new Label(priznakiMap.getName(id));
             ll.setPrefWidth(150);
             ll.setMaxWidth(150);
             ll.setAlignment(Pos.CENTER_LEFT);
             this.getChildren().add(ll);
 
-            if ((minVal == EMPTY_DOUBLE_VALUE) || (minVal == maxVal)) {  // Список интервалов пуст - не даем вводить
-                ll = new Label("Введите интервалы этого признака");  // или введена одна строка
+            // Список интервалов пуст, или введена одна строка  интервалах - не даем вводить
+            if ((priznakiMap.get(id).minVal().isNaN()) || (priznakiMap.get(id).minVal() == priznakiMap.get(id).maxVal())) {
+                ll = new Label("Интервалы признака не введены");
                 this.getChildren().add(ll);
             } else {
-                this.minVal = minVal;
-                if (minVal == EMPTY_DOUBLE_VALUE) {
-                    ll = new Label("");
-                } else {
-                    ll = new Label(String.valueOf(minVal));
-                }
+                ll = new Label(String.valueOf(priznakiMap.get(id).minVal()) + "≤");
                 ll.setPrefWidth(50);
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(ll);
 
-                this.inputVal = EMPTY_DOUBLE_VALUE;
+                priznakiMap.get(id).setInputVal(0.0);
                 iInputVal = new TextField("");
 // Форматтер для ввода только чисел в TextField iInputVal
                 UnaryOperator<TextFormatter.Change> iInputValfilter = change -> {
@@ -158,34 +260,33 @@ public class Priznaki extends KSQL {
                         (observable, oldValue, newValue) -> {
                             // System.out.println("observable " + observable);
                             if (newValue != null && newValue.compareTo("") > 0) { // Что-то введено
-                                this.inputVal = Double.valueOf(newValue);
-                                if (this.inputVal >= minVal && this.inputVal < maxVal) {
-                                    this.balls = this.inputVal.intValue() + 2;
-                                    this.iBalls.setText(String.valueOf(this.balls));
+                                priznakiMap.get(id).setInputVal(Double.valueOf(newValue));
+                                // В диапазоне?
+                                if (priznakiMap.get(id).getInputVal() >= priznakiMap.get(id).minVal()
+                                        && priznakiMap.get(id).getInputVal() < priznakiMap.get(id).maxVal()) {
+                                    //priznakiMap.get(id).getBall();
+                                    this.iBalls.setText(String.valueOf(priznakiMap.get(id).getBall()));
+                                    priznakiMap.get(id).setDataValid(DATA_OK);
                                     this.IV.setImage(EQ_IMG_OK);
                                 } else {  // Выход данных за интервал
-                                    this.balls = 0;
                                     this.iBalls.setText("");
+                                    priznakiMap.get(id).setDataValid(DATA_OUT);
                                     this.IV.setImage(EQ_IMG_ERROR);
                                 }
                             } else {  // Поле пустое - гасим индикатор и не используем в расчете этот признак
-                                this.inputVal = EMPTY_DOUBLE_VALUE;
+                                priznakiMap.get(id).setInputVal(0.0);
+                                this.iBalls.setText("");
+                                priznakiMap.get(id).setDataValid(DATA_EMPTY);
                                 this.IV.setImage(null);
                             }
                         });
                 this.getChildren().add(iInputVal);
 
-                this.maxVal = maxVal;
-                if (maxVal == EMPTY_DOUBLE_VALUE) {
-                    ll = new Label("");
-                } else {
-                    ll = new Label(String.valueOf(maxVal));
-                }
+                ll = new Label("< "+String.valueOf(priznakiMap.get(id).maxVal()));
                 ll.setPrefWidth(50);
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(ll);
 
-                this.balls = 0;
                 iBalls = new Label("");
                 iBalls.setPrefWidth(50);
                 this.getChildren().add(iBalls);
@@ -207,58 +308,31 @@ public class Priznaki extends KSQL {
             return listItem;
         }
 */
-        public Long get1111Id() {
+        public Long getEQd() {
             return id;
         }
-        public void setId(Long id) {
+        public void setEQId(Long id) {
             this.id = id;
         }
-        public String getName() {
-            return name;
-        }
-        public void setName(String userName) {
-            this.name = userName;
-        }
-        public double getMinVal() {
-            return minVal;
-        }
-        public void setMinVal(double minVal) {
-            this.minVal = minVal;
-        }
-        public double getMaxVal() {
-            return maxVal;
-        }
-        public void setMaxVal(double maxVal) {
-            this.maxVal = maxVal;
-        }
-        public Double getInputVal() {
-            return inputVal;
-        }
-        public void setInputVal(Double inputVal) {
-            this.inputVal = inputVal;
-        }
-
-        public int getBalls() { return balls; }
-        public void setBalls(int balls) { this.balls = balls; }
-
         public ImageView getIV() { return IV; }
         public void setIV(ImageView IV) { this.IV = IV; }
     }
 
     public class PriznakPR extends HBox {  // Одна строка - признак, на странице Признаки
         private Long id;
-        private String name;
+
+ //       private String name;
         private ImageView IV; // Кнопка "Удалить"
 
-        public PriznakPR(Long id, String name) {
+        public PriznakPR(Long id) {
             this.id = id;
             Label ll = new Label(id.toString());
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
 
-            this.name = name;
-            ll = new Label(name);
+          //  this.name = name;
+            ll = new Label(priznakiMap.getName(id));
             ll.setPrefWidth(150);
             ll.setMaxWidth(150);
             ll.setAlignment(Pos.CENTER_LEFT);
@@ -294,12 +368,13 @@ public class Priznaki extends KSQL {
         public void setId(Long id) {
             this.id = id;
         }
-        public String getName() {
+/*        public String getName() {
             return name;
         }
         public void setName(String name) {
             this.name = name;
         }
+*/
     }
 
     public Priznaki() {
@@ -307,7 +382,8 @@ public class Priznaki extends KSQL {
         // Таблица
 //        this.table = new TableView<PriznakEQ>();
         this.listView = new ListView<PriznakEQ>();
-        pMap = new HashMap<>();
+        priznakiMap = new PriznakiMap();  // Все признаки с их интервалами
+
     }
 
 /*
@@ -330,9 +406,9 @@ public class Priznaki extends KSQL {
     public ObservableList<PriznakEQ> getListEQ() {
     List<PriznakEQ> pr = new ArrayList<>();
     PMapItem pm;
-    for (Map.Entry priznak: pMap.entrySet()) {
+    for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {  //******
         pm = (PMapItem) priznak.getValue();
-        pr.add(new PriznakEQ((Long) priznak.getKey(), pm.getName(), pm.minVal(), pm.maxVal()));
+        pr.add(new PriznakEQ((Long) priznak.getKey()));
     }
     ObservableList<PriznakEQ> opr = FXCollections.observableArrayList(pr);
     return opr;
@@ -346,38 +422,37 @@ public class Priznaki extends KSQL {
     // Возвращает список в виде PR для модуля Признаки
     public ObservableList<PriznakPR> getListPR() {
         List<PriznakPR> pr = new ArrayList<>();
-        for (Map.Entry priznak: pMap.entrySet()) {
-            pr.add(new PriznakPR((Long) priznak.getKey(), priznak.getValue().toString()));
+        for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {
+            pr.add(new PriznakPR((Long) priznak.getKey()));
         }
         ObservableList<PriznakPR> opr = FXCollections.observableArrayList(pr);
         return opr;
     }
 
-    public ObservableList<PriznakEQ> getList() { // Возвращает список студентов
+/*    public ObservableList<PriznakEQ> getList() { // Возвращает список студентов
             return oPriznaki;
     }
+*/
 
-    public ObservableList<PriznakEQ> createFromSQL(String where) { // Создает из БД и возвращает список студентов
-  //      ResultSet rs = this.ksqlSELECT("SELECT ID, NAME, MINVAL, MAXVAL FROM PUBLIC.PUBLIC.PR;"+" "+where); // where - фильтры
+    public void createFromSQL(String where) { // Создает из БД и мапу признаков
         ResultSet rs = this.ksqlSELECT("SELECT ID, NAME FROM PUBLIC.PUBLIC.PRIZNAKI ORDER BY NAME");
         if (rs != null) {
             try {
                 while (rs.next()) {  // Признаки
-                    pMap.put(rs.getLong("ID"), new PMapItem(rs.getString("NAME")));
+                    priznakiMap.put(rs.getLong("ID"), new PMapItem(rs.getString("NAME")));
                 }
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
 
             // Формируем Интервалы для каждого признака
-//            for (Map.Entry priznak: pMap.entrySet()) {
             rs = this.ksqlSELECT("SELECT ID, PRIZNAK, VAL, BALLS FROM PUBLIC.PUBLIC.PRIZ_INTERVAL" +
                     //                      " WHERE PRIZNAK="+priznak.getKey()+
                     " ORDER BY VAL;");
             if (rs != null) {
                 try {
                     while (rs.next()) {
-                        pMap.get(rs.getLong("PRIZNAK")).pMapIntervals
+                        priznakiMap.get(rs.getLong("PRIZNAK")).pMapIntervals
                                 .add(new PInterval(rs.getLong("id"),
                                         rs.getDouble("VAL"),
                                         rs.getInt("BALLS")));
@@ -387,33 +462,5 @@ public class Priznaki extends KSQL {
                 }
             }
         }
-            
-
-
-  //      HashMap<Integer, pMapItem> pMap;  // Массив признаков
-
-//        public class pMapItem {  // Элемент массива признаков
-
-
-//        ObservableList<Student> oStudents = null;
-        rs = this.ksqlSELECT("SELECT ID, NAME, MINVAL, MAXVAL FROM PUBLIC.PUBLIC.PR;"+" "+where); // where - фильтры
-        List<PriznakEQ> priznaki = new ArrayList<>();
-        if (rs != null) {
-            try {
-                while (rs.next()) {
-                    priznaki.add(new PriznakEQ( //
-                            rs.getLong("id"),
-                            rs.getString("name"),
-                            rs.getDouble("minVal"),
-                            rs.getDouble("maxVal")));
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
-        oPriznaki = FXCollections.observableArrayList(priznaki);
-        listView.setItems(this.oPriznaki);
-        return oPriznaki;
     }
-
 }
