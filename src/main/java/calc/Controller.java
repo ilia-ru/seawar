@@ -19,7 +19,7 @@ public class Controller {
     public Button iBtnHide;
     public BorderPane iAscPane;
     public MenuBar iMainMenu;
-//    public TableView iTblPrizn;
+    //    public TableView iTblPrizn;
     public Pane iTblPane;
     public Pane iListPane;
     public HBox iHBoxMenu;
@@ -41,8 +41,9 @@ public class Controller {
     public HBox iPrIntervalsList;
     public VBox iPrCreateEditPane;
 
-    ListView lvPrEdit;
-    ListView lvPI;
+    ListView lvEQ;      // Для EQ
+    ListView lvPrEdit;  // Для PR
+    ListView lvPI;      // Для интервалов
 
 
     private class TopMenu {
@@ -83,7 +84,7 @@ public class Controller {
 
             ll = new Label("Признаки");
             ll.setOnMouseClicked(event -> {
- //               System.out.println("Признаки " + event);
+                //               System.out.println("Признаки " + event);
                 iPriznakiPane.toFront();
             });
             mi = new Menu("", ll);
@@ -109,7 +110,9 @@ public class Controller {
 
         public MenuBar getMenu() {
             return menu;
-        };
+        }
+
+        ;
     }
 
     public void initialize() {
@@ -118,29 +121,30 @@ public class Controller {
 
         priznaki = new Priznaki();
         priznaki.createFromSQL("");
-        ListView lv =  new ListView();
-        lv.setItems(priznaki.getListEQ());  // Список признаков для calc_eq
-        lv.setPrefWidth(450);
-        iTblPane.getChildren().add(0, lv);
+        lvEQ = new ListView();
+        lvEQ.setItems(priznaki.getListEQ());  // Список признаков для calc_eq
+        lvEQ.setPrefWidth(450);
+        iTblPane.getChildren().add(0, lvEQ);
 
         lvPrEdit = new ListView();
         lvPrEdit.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
         lvPrEdit.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
-//            System.out.println("lll" + obj + " " + oldValue + " " + newValue);
-            clearPrEditPane();
-            Priznaki.PriznakPR p = (Priznaki.PriznakPR) newValue;
-            Priznaki.PMapItem pm = priznaki.copyToPMapTmp(p.getPid());
-            iPrPriznakName.setText(pm.getName());
-            // Заполняем список  -- Оригинал!!!!! Научить копировать!!!
-            lvPI.setItems(pm.getListPI());  // Список
-            iPrIntervalsList.getChildren().clear();
-            iPrIntervalsList.getChildren().add(0, lvPI);
-            iPrCreateEditPane.setVisible(true);  // Чтобы не бросалась в глаза до поры
+            System.out.println("lll" + obj + " " + oldValue + " " + newValue);
+            if (newValue != null) { //
+                clearPrEditPane();
+                Priznaki.PriznakPR p = (Priznaki.PriznakPR) newValue;
+                Priznaki.PMapItem pm = priznaki.copyToPMapTmp(p.getPid());
+                iPrPriznakName.setText(pm.getName());
+                lvPI.setItems(pm.getListPI());
+                iPrIntervalsList.getChildren().clear();
+                iPrIntervalsList.getChildren().add(0, lvPI);
+                iPrCreateEditPane.setVisible(true);
+            }
         });
         lvPrEdit.setPrefWidth(450);
         iListPane.getChildren().add(0, lvPrEdit);
 
- //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
+        //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
 
         iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
 
@@ -154,39 +158,58 @@ public class Controller {
 
     }
 
-
     public void iBtHideAction(ActionEvent actionEvent) {
         System.out.println("aaaaaaaa");
         //iCVintra.
     }
 
-    // Быстрое создание признака
+    // Быстрое создание интервалов
     public void iBtFastCreatePriznakAction(ActionEvent actionEvent) {
-        Priznaki.PMapItem pm = priznaki.getPMapTmp();
-        pm.fastIntervalFill(Double.valueOf(iPrFastFrom.getText()),
-                Double.valueOf(iPrFastTo.getText()), Integer.valueOf(iPrFastCount.getText()));
-    //    lvPI = new ListView();
-        lvPI.setItems(pm.getListPI());  // Список
-        iPrIntervalsList.getChildren().clear();
-        iPrIntervalsList.getChildren().add(0, lvPI);
+        if (iPrFastFrom.getText().compareTo("") == 0) { iPrFastFrom.setText("0"); }
+        if (iPrFastTo.getText().compareTo("") == 0) { iPrFastTo.setText("0"); }
+        if (iPrFastCount.getText().compareTo("") == 0) { iPrFastCount.setText("10"); }
+
+        if (iPrFastFrom.getText().compareTo("") == 0 || iPrFastTo.getText().compareTo("") == 0 ||
+                iPrFastCount.getText().compareTo("") == 0 ||
+                Double.valueOf(iPrFastFrom.getText()) >= Double.valueOf(iPrFastTo.getText()) ||
+                Integer.valueOf(iPrFastCount.getText()) <=0) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Условия на данные: \n1. Введите \"Min\", \"Max\" и \"Кол-во\"\n"+
+                    "2. Должно быть: Min < Max, Кол-во > 0\n"+
+                    "Введите корректные данные");
+            alert.setTitle("Внимание");
+            alert.setHeaderText("Некорректно введены данные");
+            alert.show();
+        } else {
+            Priznaki.PMapItem pm = priznaki.getPMapTmp();
+            pm.fastIntervalFill(Double.valueOf(iPrFastFrom.getText()),
+                    Double.valueOf(iPrFastTo.getText()), Integer.valueOf(iPrFastCount.getText()));
+            //    lvPI = new ListView();
+            lvPI.setItems(pm.getListPI());  // Список
+            iPrIntervalsList.getChildren().clear();
+            iPrIntervalsList.getChildren().add(0, lvPI);
+        }
     }
 
-    public void iBtnPrNewSaveAction(ActionEvent actionEvent) {  // Сохранение нового признака или после редактирования
+    // Сохранение нового признака или после редактирования
+    public void iBtnPrNewSaveAction(ActionEvent actionEvent) {
         if (iPrPriznakName.getText().compareTo("") == 0) { // Не введено название признака
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Введите название признака");
             alert.setTitle("Внимание");
             alert.setHeaderText("Введите название признака");
             alert.show();
-        } else if (priznaki.getPMapTmp().getPMapIntervals().size() <= 2) { // Интервалы не введены
+        } else if (priznaki.getPMapTmp().getPMapIntervals().size() < 2) { // Интервалы не введены
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Интервалы признака не введены, или вввдены неверно");
             alert.setTitle("Внимание");
             alert.setHeaderText("Введите интервалы");
             alert.show();
         } else {  // Все хорошо
-            // Сохраняем в БД
             priznaki.getPMapTmp().setName(iPrPriznakName.getText());  // Добавляем имя признака
-            priznaki.addPriznak(200l, priznaki.getPMapTmp());  // Пишем в мапу
+            // Сохраняем баллы с экрана во временный PMapItem
+            ObservableList<Priznaki.PIntervalPR> opr = (ObservableList<Priznaki.PIntervalPR>) lvPI.getItems();
+            // Сохраняем в мапу и БД
+            priznaki.addPriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
             lvPrEdit.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
+            lvEQ.setItems(priznaki.getListEQ());      // Обновляем список признаков на экране
             iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
         }
     }

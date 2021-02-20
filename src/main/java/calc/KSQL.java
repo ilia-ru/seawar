@@ -51,10 +51,10 @@ public class KSQL {
             PreparedStatement statement = connSQL.prepareStatement(query);
             rows = statement.executeUpdate();
             if(rows > 0) {
-                statement = connSQL.prepareStatement("SELECT last_insert_id() as last_id");
+                statement = connSQL.prepareStatement("CALL IDENTITY();");
                 ResultSet rs = statement.executeQuery();
                 rs.next();
-                return rs.getLong("last_id");
+                return rs.getLong("@p0");
             }
             return -1;
         }
@@ -70,7 +70,7 @@ public class KSQL {
             System.out.println("Нет соединения с сервером БД (" + e.getSQLState() + ")");
         }*/
         catch (SQLException e){
-            System.out.println("e2= " + e.getMessage());
+          //  System.out.println("e2= " + e.getMessage());
             System.out.println("e2= " + e);
         }
 //        System.out.println("query is ready");

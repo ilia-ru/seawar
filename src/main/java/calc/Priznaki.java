@@ -19,6 +19,8 @@ import static java.lang.Double.NaN;
 public class Priznaki extends KSQL {
 
     ListView<PriznakEQ> listView = null;; // Таблица для показа на экране
+    ObservableList<PriznakPR> obsPR;  // СПисок для ListView в ред-нии признаков
+    ObservableList<PriznakEQ> obsEQ;  // СПисок для ListView в EQ
     Image EQ_IMG_OK = new Image("eq_img_ok.png");
     Image EQ_IMG_ERROR = new Image("eq_img_error.png");
     Image EQ_IMG_DELETE = new Image("del.png");
@@ -28,7 +30,63 @@ public class Priznaki extends KSQL {
     private PriznakiMap priznakiMap; // Мапа всех признаков и их интервалов
     private PMapItem pMapTmp;        // Временный PMapItem для редактирования и ввода признаков
 
-    public void addPriznak(Long id, PMapItem p) {  // Добаление признака в мапу
+    // Добаление признака в мапу и в БД
+    public Long addPriznak(PMapItem p, ObservableList<Priznaki.PIntervalPR> intervals) {  // Возвращаем id новой записи в БД
+        String q = "INSERT INTO PUBLIC.PUBLIC.PRIZNAKI (NAME) VALUES('" + p.getName() + "');";
+//        System.out.println("q " + q);
+        Long newId = this.ksqlINSERT(q);  // Кладем признак в БД
+        Long iId;
+        if (newId >=0) { // Добавляем интервалы
+            // Значения берем из list, который был на экране
+            pMapTmp.getPMapIntervals().clear();  // чистим на всякий случай
+            PIntervalPR pi  = intervals.get(0);  // Первый интервал В нем 2 значения
+            q = "INSERT INTO PUBLIC.PUBLIC.PRIZ_INTERVAL (PRIZNAK, VAL, BALLS) VALUES(" +
+                    newId +","+ pi.getInputValLeft() +"," + pi.getIBallVal() +");";
+            System.out.println("q " + q);
+            iId = this.ksqlINSERT(q);  // Кладем интервал в БД
+            pMapTmp.getPMapIntervals().add(new PInterval(iId, pi.getInputValLeft(), pi.getIBallVal()));
+            // Первый интервал положили выше, т.к. там 2 значения. Теперь остальные
+            for(int i=0;i<intervals.size();i++) {
+                pi = intervals.get(i);  // Снова с начала, но теперь правые поля
+                q = "INSERT INTO PUBLIC.PUBLIC.PRIZ_INTERVAL (PRIZNAK, VAL, BALLS) VALUES(" +
+                        newId + "," + pi.getInputVal() + "," + pi.getIBallVal() + ");";
+                System.out.println("q " + q);
+                iId = this.ksqlINSERT(q);  // Кладем интервал в БД
+                pMapTmp.getPMapIntervals().add(new PInterval(iId, pi.getInputVal(), pi.getIBallVal()));
+            }
+            p.setTmpId(newId);
+            priznakiMap.put(newId, p);    // Кладем признак в мапу
+            p = new PMapItem("");   // Разрываем связь м-ду p и мапой
+            //obsEQ = getListEQ();          // Обновляем признаки в eq
+        }
+        return newId;
+    }
+
+    // Удаление признака из мапы и в БД
+    public int deletePriznak(PriznakPR p) {
+        String q = "DELETE FROM PUBLIC.PUBLIC.PRIZNAKI WHERE ID=" + p.getPid() + ";";
+//        System.out.println("q " + q);
+        int newId = this.ksqlDELETE(q);  // Удаляем признак в БД
+        if (newId >=0) {  // Удачно удалилось
+            System.out.println("newId " + newId);
+            priznakiMap.del(p.getPid());    // Удаляем признак из мапы
+            obsPR.remove(p);
+            // Удаляем интервалы в БД
+            q = "DELETE FROM PUBLIC.PUBLIC.PRIZ_INTERVAL WHERE PRIZNAK=" + p.getPid() + ";";
+        System.out.println("q " + q);
+            int newId2 = this.ksqlDELETE(q);  // Удаляем признак в БД
+            for(int i=0;i<obsEQ.size();i++) {  // Убираем удаленный элемент из EQ
+                if (obsEQ.get(i).getEQid() == p.getPid()) {
+                    obsEQ.remove(i);
+                    break;
+                }
+            }
+        }
+        return newId;
+    }
+
+    // Изменение существующего признака в мапе и в БД
+    public void changePriznak(Long id, PMapItem p) {
         priznakiMap.put(id, p);
         // id вынес в параметры, чтобы не ошибаться. Чтобы каждый раз помнить, что надо id
     }
@@ -41,6 +99,7 @@ public class Priznaki extends KSQL {
     // Ибо чистить - ошибки будут, а сборщик мусора не ошибается
     public PMapItem newPMapTmp(String name) {
         pMapTmp = new PMapItem(name);
+        pMapTmp.setTmpId(-1l);  // Не имеет соответствия в БД
         return this.pMapTmp;
     }
 
@@ -54,7 +113,10 @@ public class Priznaki extends KSQL {
         this.pMapTmp = new PMapItem(priznakiMap.get(id).getName());
         this.pMapTmp.setTmpId(priznakiMap.get(id).getTmpId());
         this.pMapTmp.setDataValid(priznakiMap.get(id).getDataValid());
-//        this.pMapTmp.setPMapIntervals(priznakiMap.get(id).getPMapIntervals());   --- надо циклом
+        this.pMapTmp.getPMapIntervals().clear();  // Очищаем и копируем
+        for (PInterval p: priznakiMap.get(id).getPMapIntervals()) {
+            this.pMapTmp.getPMapIntervals().add(p);
+        }
         this.pMapTmp = priznakiMap.get(id);
         return this.pMapTmp;
     }
@@ -66,6 +128,10 @@ public class Priznaki extends KSQL {
 
         public PriznakiMap() {
             dataMap = new HashMap<>();  // Массив признаков
+        }
+
+        public void del(Long id) { // Удаляем строку
+            dataMap.remove(id);
         }
 
         public void put(Long i, PMapItem p) { // Помещаем строку данных в мапу
@@ -116,10 +182,10 @@ public class Priznaki extends KSQL {
         public void fastIntervalFill(Double from, Double to, int count) {
             Double step, val;
             val = from;
-            step = (to - from) / (count); // Кол-во интервалов +1, Отдельная строка чтобы указать max
+            step = (to - from) / (count);
             this.pMapIntervals.clear();   // Очищаем от прежних безобразий
  //  System.out.println(step);
-            for(int i=0;i<=count;i++) {
+            for(int i=0;i<=count;i++) { // Кол-во интервалов +1, Отдельная строка чтобы указать max
  //               System.out.println("--" + i + " val " + val);
                 this.pMapIntervals.add(new PInterval(i, val, 0));
                 val += step;
@@ -188,37 +254,56 @@ public class Priznaki extends KSQL {
         }
 
         public Integer getBall() {  // Возвращаем балл для заданного (ранее введенного) inputVal
+            // Баллы хранятся в строке интервала, описывающего правую границу. Значение из первой строки интервалов игнорируется.
+            PInterval pi;
             Double prevVal = minVal();
-            for (PInterval pi: getPMapIntervals()) {
+            for (int i=1;i<getPMapIntervals().size();i++) {  // Со второй строки
+                pi = getPMapIntervals().get(i);
                 if (inputVal >= prevVal && inputVal < pi.val) {
                     return pi.ball;
                 } else {
                     prevVal = pi.val;
                 }
             }
-            return null; // Вызод за диапазон. Тут не может быть, но увы
+            return null; // Выход за диапазон. Тут не может быть, но увы
         }
     }
 
     //***********
     public class PIntervalPR extends HBox {  // Строка для таблицы (List) интервалов для ввода/правки
-        private TextField iInputVal, iBallVal;
+        private TextField iInputVal, iInputValLeft, iBallVal;
         private ImageView IV; // Кнопка "Удалить"
+
+        public Double getInputValLeft() {
+            if (iInputValLeft.getText().compareTo("") == 0) { return 0.0; }
+            return Double.valueOf(iInputValLeft.getText());
+        }
+
+        public Double getInputVal() {
+            if (iInputVal.getText().compareTo("") == 0) { return 0.0; }
+            return Double.valueOf(iInputVal.getText());
+        }
+
+        public Integer getIBallVal() {
+            if (iBallVal.getText().compareTo("") == 0) { return 0; }
+            return Integer.valueOf(iBallVal.getText());
+        }
 
         public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst) {
             Label ll = new Label(String.valueOf(pi.getId()));
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
+            ll.setVisible(false);
             this.getChildren().add(ll);
 
             // Первое поле ввода
             if (isFirst) {
-                iInputVal = new TextField(String.valueOf(pi.getVal()));
+                iInputValLeft = new TextField(String.valueOf(pi.getVal()));
  //               iInputVal.setTextFormatter(iInputValFormatter);
 
-                iInputVal.setPrefWidth(50);
-                iInputVal.setAlignment(Pos.CENTER_RIGHT);
-                this.getChildren().add(iInputVal);
+                iInputValLeft.setPrefWidth(50);
+                iInputValLeft.setAlignment(Pos.CENTER_RIGHT);
+                this.getChildren().add(iInputValLeft);
             } else { // Не первый интервал  - не даем вводить
                 ll = new Label(String.valueOf(pi.getVal()));
                 ll.setPrefWidth(50);
@@ -244,17 +329,19 @@ public class Priznaki extends KSQL {
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
 
-            if (pi.getBall() > 0) {
+/*            if (pi.getBall() > 0) {
                 iBallVal = new TextField(String.valueOf(pi.getBall()));
             } else {
                 iBallVal = new TextField("");
             }
+
+ */
+            iBallVal = new TextField(String.valueOf(pi2.getBall()));
 // Форматтер для ввода только чисел в TextField iBallVal
             UnaryOperator<TextFormatter.Change> iBallValFilter = change -> {
                 String text = change.getText();
                 if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
-                if (text.matches("[0-9.]*")) {
-                    if ((text.compareTo(".") == 0) && iBallVal.getText().contains(".")) { return null; }  // вторую точку вводят
+                if (text.matches("[0-9-]*")) {  // integer
                     return change;
                 }
                 return null;
@@ -305,7 +392,7 @@ public class Priznaki extends KSQL {
                         text = ".";
                         change.setText(".");
                     }
-                    if (text.matches("[0-9.]*")) {
+                    if (text.matches("[0-9.-]*")) {
                         if ((text.compareTo(".") == 0) && iInputVal.getText().contains(".")) {
                             return null;
                         }  // вторую точку вводят
@@ -336,7 +423,7 @@ public class Priznaki extends KSQL {
             UnaryOperator<TextFormatter.Change> iBallValFilter = change -> {
                 String text = change.getText();
                 if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
-                if (text.matches("[0-9.]*")) {
+                if (text.matches("[0-9.-]*")) {
                     if ((text.compareTo(".") == 0) && iBallVal.getText().contains(".")) { return null; }  // вторую точку вводят
                     return change;
                 }
@@ -352,7 +439,7 @@ public class Priznaki extends KSQL {
             this.IV = new ImageView(EQ_IMG_DELETE);
             this.IV.setFitWidth(20);
             this.IV.setFitHeight(20);
-            IV.setOnMouseClicked(event -> {  // Удаление признака
+            IV.setOnMouseClicked(event -> {  // Удаление интервала
                 System.out.println("delete " + pi.getId());
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                         "\"Интервал\" будет удален без возможности восстановления");
@@ -448,7 +535,7 @@ public class Priznaki extends KSQL {
                 UnaryOperator<TextFormatter.Change> iInputValfilter = change -> {
                     String text = change.getText();
                     if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
-                    if (text.matches("[0-9.]*")) {
+                    if (text.matches("[0-9.-]*")) {
                         if ((text.compareTo(".") == 0) && iInputVal.getText().contains(".")) { return null; }  // вторую точку вводят
                         return change;
                     }
@@ -511,7 +598,7 @@ public class Priznaki extends KSQL {
             return listItem;
         }
 */
-        public Long getEQd() {
+        public Long getEQid() {
             return id;
         }
         public void setEQId(Long id) {
@@ -549,13 +636,14 @@ public class Priznaki extends KSQL {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                         "\"Признак\" будет удален без возможности восстановления");
                 alert.setTitle("Удаление данных");
-                alert.setHeaderText("Подтвердите удаление \"Признака\"");
+                alert.setHeaderText("Подтвердите удаление признака \""+priznakiMap.getName(pid)+"\"");
                 alert.getButtonTypes().clear();
                 alert.getButtonTypes().addAll(new ButtonType("Удалить", ButtonBar.ButtonData.OK_DONE),
                         new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
                     System.out.println("delete 2 " + this.pid);
+                    deletePriznak(this);  // Удаляем в БД и мапе
                 }
             });
             this.getChildren().add(IV);
@@ -564,8 +652,11 @@ public class Priznaki extends KSQL {
             this.setAlignment(Pos.CENTER_LEFT);
 //            this.setPadding(new Insets(0, 5, 0, 0));
 
-        //    this.addEventFilter();
-
+            /*            this.setOnMouseClicked(event -> {
+                System.out.println("lll " + this.getPid() + event);
+                Controller.prOpenEditPane(this.getPid());
+            });
+*/
         }
 
         public Long getPid() {
@@ -598,8 +689,8 @@ public class Priznaki extends KSQL {
             pm = (PMapItem) priznak.getValue();
             pr.add(new PriznakEQ((Long) priznak.getKey()));
         }
-        ObservableList<PriznakEQ> opr = FXCollections.observableArrayList(pr);
-        return opr;
+        obsEQ = FXCollections.observableArrayList(pr);
+        return obsEQ;
     }
 
     // Возвращает список в виде PR для модуля Признаки
@@ -608,8 +699,8 @@ public class Priznaki extends KSQL {
         for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {
             pr.add(new PriznakPR((Long) priznak.getKey()));
         }
-        ObservableList<PriznakPR> opr = FXCollections.observableArrayList(pr);
-        return opr;
+        obsPR = FXCollections.observableArrayList(pr);
+        return obsPR;
     }
 
 //    public PMapItem addPriznakToMap(String name, Double from, Double to, int count) {
@@ -627,15 +718,16 @@ public class Priznaki extends KSQL {
 
             // Формируем Интервалы для каждого признака
             rs = this.ksqlSELECT("SELECT ID, PRIZNAK, VAL, BALLS FROM PUBLIC.PUBLIC.PRIZ_INTERVAL" +
-                    //                      " WHERE PRIZNAK="+priznak.getKey()+
                     " ORDER BY VAL;");
             if (rs != null) {
                 try {
                     while (rs.next()) {
-                        priznakiMap.get(rs.getLong("PRIZNAK")).pMapIntervals
-                                .add(new PInterval(rs.getLong("id"),
-                                        rs.getDouble("VAL"),
-                                        rs.getInt("BALLS")));
+                        if (priznakiMap.get(rs.getLong("PRIZNAK")) != null) {  // висят интервалы без признаков
+                            priznakiMap.get(rs.getLong("PRIZNAK")).pMapIntervals
+                                    .add(new PInterval(rs.getLong("id"),
+                                            rs.getDouble("VAL"),
+                                            rs.getInt("BALLS")));
+                        }
                     }
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
@@ -646,6 +738,7 @@ public class Priznaki extends KSQL {
 
     public Integer calcBalls2(boolean needMessage) {  // Подсчет кол-ва баллов для 2*2*2
         // needMessage , чтобы вызывать из calcBalls4 не повторяя сообщения об ошибках, т.к. расчет на тех же данных и ошибки те-же
+        // Баллы хранятся в строке интервала, описывающего правую границу. Значение из первой строки интервалов игнорируется.
         PMapItem pm;
         int balls = 0;
         boolean isDataInput = false; // Есть признаки с введенными значениями - их посчитали

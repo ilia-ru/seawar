@@ -174,15 +174,15 @@
                                        <children>
                                                 <Label alignment="CENTER" prefHeight="17.0" prefWidth="477.0" styleClass="H3" text="Быстрый ввод признака" />
                                        </children></HBox>
-                                    <HBox prefHeight="100.0" prefWidth="200.0" spacing="12.0">
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
                                        <children>
                                           <Label text="Min" />
-                                          <TextField fx:id="iPrFastFrom" prefHeight="25.0" prefWidth="65.0" />
+                                          <TextField fx:id="iPrFastFrom" prefHeight="25.0" prefWidth="60.0" />
                                           <Label layoutX="10.0" layoutY="10.0" text="Max" />
-                                          <TextField fx:id="iPrFastTo" layoutX="36.0" layoutY="10.0" prefHeight="25.0" prefWidth="65.0" />
+                                          <TextField fx:id="iPrFastTo" layoutX="36.0" layoutY="10.0" prefHeight="25.0" prefWidth="60.0" />
                                           <Label layoutX="119.0" layoutY="10.0" text="Кол-во" />
-                                          <TextField fx:id="iPrFastCount" layoutX="147.0" layoutY="10.0" prefHeight="25.0" prefWidth="49.0" />
-                                          <Button mnemonicParsing="false" onAction="#iBtFastCreatePriznakAction" prefHeight="25.0" prefWidth="131.0" text="Создать признак" />
+                                          <TextField fx:id="iPrFastCount" layoutX="147.0" layoutY="10.0" prefHeight="25.0" prefWidth="45.0" />
+                                          <Button mnemonicParsing="false" onAction="#iBtFastCreatePriznakAction" prefHeight="25.0" prefWidth="145.0" text="Создать интервалы" />
                                        </children>
                                     </HBox>
                                       </children>
