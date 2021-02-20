@@ -44,79 +44,76 @@
                      <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="530.0">
                         <children>
                               <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H1" text="Расчет" textAlignment="CENTER" />
-                           <Button id="btn_bold" fx:id="iBtnCalcEqGo" mnemonicParsing="false" onAction="#iBtnCalcEqGoAction" prefHeight="25.0" prefWidth="168.0" style="-fx-font-weight: bold;" text="Рассчитать">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font></Button>
                               <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
                                  <children>
                                     <Label styleClass="H3" text="Дизайн 2х2х2" />
-                                    <Label fx:id="iSumBalls2" prefWidth="70.0" style="-fx-border-color: #999999; -fx-border-width: 1;" styleClass="H3">
-                                       <padding>
-                                          <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
-                                       </padding>
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="10.0" layoutY="10.0" text="баллов" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
                                  <children>
-                                    <RadioButton mnemonicParsing="false">
+                                    <RadioButton fx:id="iPower1" mnemonicParsing="false" toggleGroup="$radioBtn">
+                                        <toggleGroup>
+                                            <ToggleGroup fx:id="radioBtn" />
+                                        </toggleGroup>
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
                                     <Label text="Мощность 80%" />
                                     <Label fx:id="iResTxt2_80" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
-                                    <Button fx:id="iBtnAlg1" mnemonicParsing="false" onAction="#iBtnAlg1Action" text="Алгоритм" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="33.0" prefWidth="399.0" spacing="10.0">
                                  <children>
-                                    <RadioButton mnemonicParsing="false">
+                                    <RadioButton fx:id="iPower2" mnemonicParsing="false" toggleGroup="$radioBtn">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
                                     <Label text="Мощность 90%" />
                                     <Label fx:id="iResTxt2_90" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
-                                    <Button fx:id="iBtnAlg2" mnemonicParsing="false" onAction="#iBtnAlg2Action" text="Алгоритм" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" prefHeight="33.0" prefWidth="399.0" spacing="10.0">
-                                 <children>
-                                    <Label styleClass="H3" text="Дизайн 2х2х4" />
-                                    <Label fx:id="iSumBalls4" prefWidth="70.0" style="-fx-border-color: #999999; -fx-border-width: 1;" styleClass="H3">
-                                       <padding>
-                                          <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
-                                       </padding>
-                                    </Label>
-                                    <Label layoutX="10.0" layoutY="10.0" text="баллов" />
-                                 </children>
+                                    <Label prefHeight="17.0" prefWidth="277.0" styleClass="H3" text="Дизайн 2х2х4" />
+                              <Button id="btn_bold" fx:id="iBtnCalcEqGo" mnemonicParsing="false" onAction="#iBtnCalcEqGoAction" prefHeight="25.0" prefWidth="168.0" style="-fx-font-weight: bold;" text="Рассчитать">
+                                    <font>
+                                       <Font name="System Bold" size="12.0" />
+                                    </font>
+                                    <HBox.margin>
+                                       <Insets />
+                                    </HBox.margin>
+                                 </Button>
+                                       <HBox.margin>
+                                          <Insets left="200.0" />
+                                       </HBox.margin>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="33.0" prefWidth="329.0" spacing="10.0">
                                  <children>
-                                    <RadioButton mnemonicParsing="false">
+                                    <RadioButton fx:id="iPower3" mnemonicParsing="false" toggleGroup="$radioBtn">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
                                     <Label text="Мощность 80%" />
                                     <Label fx:id="iResTxt4_80" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
-                                    <Button fx:id="iBtnAlg3" mnemonicParsing="false" onAction="#iBtnAlg3Action" text="Алгоритм" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="157.0" prefHeight="33.0" prefWidth="399.0" spacing="10.0">
                                  <children>
-                                    <RadioButton mnemonicParsing="false">
+                                    <RadioButton fx:id="iPower4" mnemonicParsing="false" toggleGroup="$radioBtn">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
                                     <Label text="Мощность 90%" />
                                     <Label fx:id="iResTxt4_90" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
-                                    <Button fx:id="iBtnAlg4" mnemonicParsing="false" onAction="#iBtnAlg4Action" text="Алгоритм" />
                                  </children>
-                              </HBox>
+                                  <Label fx:id="iSumBalls" prefWidth="70.0" style="-fx-border-color: #999999; -fx-border-width: 1;" styleClass="H3">
+                                      <padding>
+                                          <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+                                      </padding>
+                                      <font>
+                                          <Font name="System Bold" size="12.0" />
+                                      </font>
+                                  </Label>
+                                  <Label layoutX="10.0" layoutY="10.0" text="баллов" /></HBox>
                               <ImageView fx:id="iImgAlgoritm" fitHeight="349.0" fitWidth="521.0" pickOnBounds="true" preserveRatio="true">
                                  <VBox.margin>
                                     <Insets top="10.0" />
@@ -133,7 +130,7 @@
                   </HBox>
             </children>
          </VBox>
-          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox prefWidth="1000.0">
                       <children>

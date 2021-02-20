@@ -112,7 +112,8 @@ public class KSQL {
        if(connSQL == null) { // Еще нет коннекта - создаем. connSQL - глобальная
             try {
                 connSQL = DriverManager
-                        .getConnection("jdbc:hsqldb:file:/d:\\_work\\ilia\\_java\\calc_eq\\docs\\db\\cached;ifexists=true",
+                        .getConnection("jdbc:hsqldb:file:.\\db\\cached;ifexists=true",
+//                        .getConnection("jdbc:hsqldb:file:/d:\\_work\\ilia\\_java\\calc_eq\\docs\\db\\cached;ifexists=true",
                                 "user", "111");
             }
             catch (SQLSyntaxErrorException e) {

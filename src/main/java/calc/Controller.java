@@ -28,12 +28,15 @@ public class Controller {
     public VBox iPriznakiPane;
     public StackPane iStackPane;
     public ImageView iImgAlgoritm;
-    public Label iSumBalls2;
-    public Label iSumBalls4;
+    public Label iSumBalls;
     public Label iResTxt2_80;
     public Label iResTxt2_90;
     public Label iResTxt4_80;
     public Label iResTxt4_90;
+    public RadioButton iPower1;
+    public RadioButton iPower2;
+    public RadioButton iPower3;
+    public RadioButton iPower4;
     public TextField iPrPriznakName;
     public TextField iPrFastFrom;
     public TextField iPrFastTo;
@@ -250,62 +253,91 @@ public class Controller {
     // Расчет Симуляц. калькулятора
     public void iBtnCalcEqGoAction(ActionEvent actionEvent) {
         //     System.out.println("aaaaaaaa");
-        Integer sumBalls = priznaki.calcBalls2(true);
-        iSumBalls2.setText(""); // Очищаем поле
-        if (sumBalls != null) {
-            iSumBalls2.setText(String.valueOf(sumBalls));
+        iSumBalls.setText(""); // Очищаем поля
+        iResTxt2_80.setText("");
+        iResTxt2_80.setStyle("");
+        iResTxt2_90.setText("");
+        iResTxt2_90.setStyle("");
+        iResTxt4_80.setText("");
+        iResTxt4_80.setStyle("");
+        iResTxt4_90.setText("");
+        iResTxt4_90.setStyle("");
 //        =ЕСЛИ(AI5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AI5>=3;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
-            if (sumBalls <= -6) {
-                iResTxt2_80.setText("ЛП НЕэквивалентные");
-                iResTxt2_80.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
-            } else if (sumBalls >= 3) {
-                iResTxt2_80.setText("ЛП эквивалентные");
-                iResTxt2_80.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
-            } else {
-                iResTxt2_80.setText("НЕ ИНФОРМАТИВНО");
-                iResTxt2_80.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+        if (iPower1.isSelected()) {
+            Integer sumBalls = priznaki.calcBalls2(true);
+            if (sumBalls != null) {
+                iSumBalls.setText(String.valueOf(sumBalls));
+                if (sumBalls <= -6) {
+                    iResTxt2_80.setText("ЛП НЕэквивалентные");
+                    iResTxt2_80.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+                } else if (sumBalls >= 3) {
+                    iResTxt2_80.setText("ЛП эквивалентные");
+                    iResTxt2_80.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+                } else {
+                    iResTxt2_80.setText("НЕ ИНФОРМАТИВНО");
+                    iResTxt2_80.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+                }
+                iImgAlgoritm.setImage(new Image("alg1.png"));
             }
+        }
 //=ЕСЛИ(AI5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AI5>=5;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
-            if (sumBalls <= -6) {
-                iResTxt2_90.setText("ЛП НЕэквивалентные");
-                iResTxt2_90.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
-            } else if (sumBalls >= 5) {
-                iResTxt2_90.setText("ЛП эквивалентные");
-                iResTxt2_90.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
-            } else {
-                iResTxt2_90.setText("НЕ ИНФОРМАТИВНО");
-                iResTxt2_90.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+        if (iPower2.isSelected()) {
+            Integer sumBalls = priznaki.calcBalls2(true);
+            if (sumBalls != null) {
+                iSumBalls.setText(String.valueOf(sumBalls));
+                if (sumBalls <= -6) {
+                    iResTxt2_90.setText("ЛП НЕэквивалентные");
+                    iResTxt2_90.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+                } else if (sumBalls >= 5) {
+                    iResTxt2_90.setText("ЛП эквивалентные");
+                    iResTxt2_90.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+                } else {
+                    iResTxt2_90.setText("НЕ ИНФОРМАТИВНО");
+                    iResTxt2_90.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+                }
+                iImgAlgoritm.setImage(new Image("alg2.png"));
             }
         }
 
-        sumBalls = priznaki.calcBalls4();
-        iSumBalls4.setText(""); // Очищаем поле
-        if (sumBalls != null) {
-            iSumBalls4.setText(String.valueOf(sumBalls));
+        if (iPower3.isSelected()) {
+            Integer sumBalls = priznaki.calcBalls4();
+            if (sumBalls != null) {
+                iSumBalls.setText(String.valueOf(sumBalls));
 //=ЕСЛИ(AM5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AM5>=3;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
-            if (sumBalls <= -6) {
-                iResTxt4_80.setText("ЛП НЕэквивалентные");
-                iResTxt4_80.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
-            } else if (sumBalls >= 3) {
-                iResTxt4_80.setText("ЛП эквивалентные");
-                iResTxt4_80.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
-            } else {
-                iResTxt4_80.setText("НЕ ИНФОРМАТИВНО");
-                iResTxt4_80.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+                if (sumBalls <= -6) {
+                    iResTxt4_80.setText("ЛП НЕэквивалентные");
+                    iResTxt4_80.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+                } else if (sumBalls >= 3) {
+                    iResTxt4_80.setText("ЛП эквивалентные");
+                    iResTxt4_80.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+                } else {
+                    iResTxt4_80.setText("НЕ ИНФОРМАТИВНО");
+                    iResTxt4_80.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+                }
+                iImgAlgoritm.setImage(new Image("alg3.png"));
             }
+        }
+
+        if (iPower4.isSelected()) {
+            Integer sumBalls = priznaki.calcBalls4();
+            if (sumBalls != null) {
 //=ЕСЛИ(AM5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AM5>=5;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
-            if (sumBalls <= -6) {
-                iResTxt4_90.setText("ЛП НЕэквивалентные");
-                iResTxt4_90.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
-            } else if (sumBalls >= 5) {
-                iResTxt4_90.setText("ЛП эквивалентные");
-                iResTxt4_90.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
-            } else {
-                iResTxt4_90.setText("НЕ ИНФОРМАТИВНО");
-                iResTxt4_90.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+                iSumBalls.setText(String.valueOf(sumBalls));
+                if (sumBalls <= -6) {
+                    iResTxt4_90.setText("ЛП НЕэквивалентные");
+                    iResTxt4_90.setStyle("-fx-background-color: #f8a75b; -fx-text-fill: red;");
+                } else if (sumBalls >= 5) {
+                    iResTxt4_90.setText("ЛП эквивалентные");
+                    iResTxt4_90.setStyle("-fx-background-color: #75ff9c; -fx-text-fill: black;");
+                } else {
+                    iResTxt4_90.setText("НЕ ИНФОРМАТИВНО");
+                    iResTxt4_90.setStyle("-fx-background-color: #dddddd; -fx-text-fill: black;");
+                }
+                iImgAlgoritm.setImage(new Image("alg4.png"));
             }
         }
     }
+
 
     public void iBtnAction(ActionEvent actionEvent) {
         System.out.println("aaaaaaaa");

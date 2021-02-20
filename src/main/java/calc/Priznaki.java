@@ -744,7 +744,7 @@ public class Priznaki extends KSQL {
         boolean isDataInput = false; // Есть признаки с введенными значениями - их посчитали
         for (Map.Entry priznak: priznakiMap.dataMap.entrySet()) {
             pm = (PMapItem) priznak.getValue();
-            // с DATA_EMPTY -  введеныы интервалы - пропускаем
+            // с DATA_EMPTY -  введены интервалы - пропускаем
             if (pm.getDataValid() == DATA_OK) {  // Суммируем баллы по признакам, где введено значение
                 balls += pm.getBall();
                 isDataInput = true;
@@ -771,7 +771,7 @@ public class Priznaki extends KSQL {
     }
 
     public Integer calcBalls4() {  // Подсчет кол-ва баллов для 2*2*4
-        Integer balls2 = calcBalls2(false);
+        Integer balls2 = calcBalls2(true);
         Long d;
         if (balls2 != null) {  // (AI5*-0,896+5,04)+AI5
             d = Math.round(Double.valueOf(balls2)*(-0.896)+5.04+Double.valueOf(balls2));
