@@ -21,6 +21,7 @@ public class Priznaki extends KSQL {
     ListView<PriznakEQ> listView = null;; // Таблица для показа на экране
     ObservableList<PriznakPR> obsPR;  // СПисок для ListView в ред-нии признаков
     ObservableList<PriznakEQ> obsEQ;  // СПисок для ListView в EQ
+    ObservableList<PIntervalPR> obsPI;  // СПисок для ListView интервалов
     Image EQ_IMG_OK = new Image("eq_img_ok.png");
     Image EQ_IMG_ERROR = new Image("eq_img_error.png");
     Image EQ_IMG_DELETE = new Image("del.png");
@@ -229,8 +230,8 @@ public class Priznaki extends KSQL {
                     pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false));
                 }
             }
-            ObservableList<PIntervalPR> opr = FXCollections.observableArrayList(pr);
-            return opr;
+            obsPI = FXCollections.observableArrayList(pr);
+            return obsPI;
         }
 
         public String toString() {
@@ -315,12 +316,18 @@ public class Priznaki extends KSQL {
             return Integer.valueOf(iBallVal.getText());
         }
 
+        public void setLabMin(String str) {
+            Label lll;
+            lll = (Label) this.getChildren().get(1);
+            lll.setText(str);
+        }
+
         public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst) {
-            Label ll = new Label(String.valueOf(pi.getId()));
+            Label ll = new Label(String.valueOf(pi2.getId()));
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
-            ll.setVisible(false);
-            this.getChildren().add(ll);
+      //****      ll.setVisible(false);
+            this.getChildren().add(0, ll);
 
             // Первое поле ввода
             if (isFirst) {
@@ -329,12 +336,13 @@ public class Priznaki extends KSQL {
 
                 iInputValLeft.setPrefWidth(50);
                 iInputValLeft.setAlignment(Pos.CENTER_RIGHT);
-                this.getChildren().add(iInputValLeft);
+                this.getChildren().add(1, iInputValLeft);
             } else { // Не первый интервал  - не даем вводить
                 ll = new Label(String.valueOf(pi.getVal()));
+                ll.setId("iLabMin");
                 ll.setPrefWidth(50);
                 ll.setAlignment(Pos.CENTER_RIGHT);
-                this.getChildren().add(ll);
+                this.getChildren().add(1, ll);
             }
 
             ll = new Label("≤ X <");
@@ -379,24 +387,34 @@ public class Priznaki extends KSQL {
             iBallVal.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(iBallVal);
 
-            this.IV = new ImageView(EQ_IMG_DELETE);
-            this.IV.setFitWidth(20);
-            this.IV.setFitHeight(20);
-            IV.setOnMouseClicked(event -> {  // Удаление признака
-                System.out.println("delete " + pi.getId());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                        "\"Интервал\" будет удален без возможности восстановления");
-                alert.setTitle("Удаление данных");
-                alert.setHeaderText("Подтвердите удаление интервала");
-                alert.getButtonTypes().clear();
-                alert.getButtonTypes().addAll(new ButtonType("Удалить", ButtonBar.ButtonData.OK_DONE),
-                        new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
-                    System.out.println("delete 2 " + pi.getId());
-                }
-            });
-            this.getChildren().add(IV);
+            if (!isFirst) {  // Первый интервал не удаляем. Признак без интервалов не имеет смысла
+                this.IV = new ImageView(EQ_IMG_DELETE);
+                this.IV.setFitWidth(20);
+                this.IV.setFitHeight(20);
+                PIntervalPR hb = this;
+                IV.setOnMouseClicked(event -> {  // Удаление признака
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                            "\"Интервал\" будет удален без возможности восстановления");
+                    alert.setTitle("Удаление данных");
+                    alert.setHeaderText("Подтвердите удаление интервала");
+                    alert.getButtonTypes().clear();
+                    alert.getButtonTypes().addAll(new ButtonType("Удалить", ButtonBar.ButtonData.OK_DONE),
+                            new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
+                        // Удаляем в pMapTmp. В мапе и БД не нужно. Там обновится при сохранении признака
+                        pMapTmp.getPMapIntervals().remove(pi2);
+    //                    obsPI.
+                        int i = obsPI.indexOf(hb);  // Исправить интервалы вокруг удаленного
+                        Double d = obsPI.get(i - 1).getInputVal();
+                        obsPI.remove(hb);  // И обновляем список для ListView
+                        if (i < obsPI.size()) {  // У последнего не нужно
+                            obsPI.get(i).setLabMin(d.toString());
+                        }
+                    }
+                });
+                this.getChildren().add(IV);
+            }
 
             this.setSpacing(5);
             this.setAlignment(Pos.CENTER_LEFT);

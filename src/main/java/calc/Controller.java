@@ -45,7 +45,7 @@ public class Controller {
     public VBox iPrCreateEditPane;
 
     ListView lvEQ;      // Для EQ
-    ListView lvPR;  // Для PR
+    ListView lvPR;      // Для PR
     ListView lvPI;      // Для интервалов
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
