@@ -2,25 +2,24 @@ package calc;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 //import java.time.LocalDate;
 
 public class CalcArc extends KSQL {
 
     TableView<CalcRecord> tableArc = null;; // Таблица для показа на экране
-    ObservableList<CalcRecord> obsPR;  // СПисок для ListView в ред-нии признаков
+    ObservableList<CalcRecord> obsCR;  // СПисок для TableView - список расчетов
+    ObservableList<PriznakArc> obsPR;  // СПисок для ListView - список признаков
 
     public CalcArc() {
         super();
@@ -32,6 +31,7 @@ public class CalcArc extends KSQL {
     public TableView<CalcRecord> getTableArc() {
         return tableArc;
     }
+
 
     public class CalcRecord {  // Одна строка - один расчет
         private Long id;
@@ -64,6 +64,27 @@ public class CalcArc extends KSQL {
         }
     }
 
+    public class PriznakArc extends HBox {  // Одна строка - признак, на странице Признаки
+        public PriznakArc(String name, Integer val) {
+            //  this.name = name;
+            Label ll = new Label(name);
+            ll.setPrefWidth(350);
+            ll.setMaxWidth(350);
+            ll.setAlignment(Pos.CENTER_LEFT);
+            this.getChildren().add(ll);
+
+            ll = new Label(val.toString());
+            ll.setPrefWidth(50);
+            ll.setMaxWidth(50);
+            ll.setAlignment(Pos.CENTER_RIGHT);
+            this.getChildren().add(ll);
+
+            this.setSpacing(5);
+            this.setAlignment(Pos.CENTER_LEFT);
+//            this.setPadding(new Insets(0, 5, 0, 0));
+        }
+    }
+
     // Формирует внешний вид таблицы - список признаков
     public void TableViewDecorate() {
 
@@ -73,17 +94,19 @@ public class CalcArc extends KSQL {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<CalcRecord, java.sql.Date> dataCol //
-                = new TableColumn<>("Дата сохранения");
+                = new TableColumn<>("Сохранено");
         dataCol.setCellValueFactory(new PropertyValueFactory<>("data"));
+        dataCol.setMaxWidth(70);
 
         TableColumn<CalcRecord, String> nameCol //
                 = new TableColumn<>("Название");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setPrefWidth(140);
 
-        this.tableArc.getColumns().addAll(idCol, dataCol, nameCol);
+        this.tableArc.getColumns().addAll(dataCol, nameCol);
     }
 
-    public TableView createFromSQL(String where) { // Создает из БД и мапу признаков
+    public TableView getCalcsFromSQL(String where) { // Создает из БД список расчетов
         ResultSet rs = this.ksqlSELECT("SELECT * FROM PUBLIC.PUBLIC.ARCHIVE ORDER BY DATA,NAME");
         List<CalcRecord> pr = new ArrayList<>();
         if (rs != null) {
@@ -95,8 +118,26 @@ public class CalcArc extends KSQL {
                 throwables.printStackTrace();
             }
         }
-        obsPR = FXCollections.observableArrayList(pr);
-        tableArc.setItems(obsPR);
+        obsCR = FXCollections.observableArrayList(pr);
+        tableArc.setItems(obsCR);
         return tableArc;
+    }
+
+    public ObservableList<PriznakArc> getPRFromSQL(Long arcId) { // Создает из БД список расчетов
+        String q = "SELECT * FROM PUBLIC.PUBLIC.ARCHIVE_PR WHERE ARC_ID=" + arcId + " ORDER BY NAME";
+        ResultSet rs = this.ksqlSELECT(q);
+        System.out.println(q);
+        List<PriznakArc> pr = new ArrayList<>();
+        if (rs != null) {
+            try {
+                while (rs.next()) {
+                    pr.add(new PriznakArc(rs.getString("NAME"), rs.getInt("VAL")));
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        obsPR = FXCollections.observableArrayList(pr);
+        return obsPR;
     }
 }

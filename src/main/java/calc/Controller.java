@@ -9,6 +9,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static calc.Main.priznaki;
@@ -50,10 +52,14 @@ public class Controller {
     public TextField iPrFastCount;
     public HBox iPrIntervalsList;
     public VBox iPrCreateEditPane;
+    public VBox iListPRArc;
 
     ListView lvEQ;      // Для EQ
     ListView lvPR;      // Для PR
     ListView lvPI;      // Для интервалов
+    ListView lvPRArc;   // Для архива
+    TableView tableCalcs;
+    CalcArc calcArc;
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
@@ -89,6 +95,8 @@ public class Controller {
             ll = new Label("Архив");
             ll.setOnMouseClicked(event -> {
                 System.out.println("Архив " + event);
+                tableCalcs = calcArc.getCalcsFromSQL("");
+//                tableCalcs.refresh();
                 iCalcQEArcPane.toFront();
             });
             mi = new Menu("", ll);
@@ -168,18 +176,27 @@ public class Controller {
         lvPI.setPrefWidth(500);
 
         // Архив расчетов
-        CalcArc calcArc = new CalcArc();
+        calcArc = new CalcArc();
  //       CalcArc.getTableArc().setItems();  // Список расчетов
-        TableView ttt = calcArc.createFromSQL("");
-        ttt.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
+        tableCalcs = calcArc.getCalcsFromSQL("");
+        tableCalcs.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
             System.out.println("lll" + obj + " " + oldValue + " " + newValue);
             if (newValue != null) { // Пока фокус не ушел
                 CalcArc.CalcRecord c = (CalcArc.CalcRecord) newValue;
                 iCalcName.setText(c.getName());
-                iCalcDate.setText(c.getData().toString());
+
+                SimpleDateFormat formater = new SimpleDateFormat("dd.MM.yyyy");
+                iCalcDate.setText(formater.format(c.getData().getTime()));
+
+                lvPRArc = new ListView();
+                lvPRArc.setItems(calcArc.getPRFromSQL(c.getId()));  // Список признаков со значениями
+                lvPRArc.setPrefWidth(150);
+//                lvPRArc.setPrefHeight(550);
+                iListPRArc.getChildren().clear();
+                iListPRArc.getChildren().add(lvPRArc);
             }
         });
-        iListArCalcPane.getChildren().add(ttt);
+        iListArCalcPane.getChildren().add(0,tableCalcs);
 
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);

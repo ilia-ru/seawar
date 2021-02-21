@@ -246,7 +246,7 @@
                   </HBox>
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
                       <children>
-                          <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="358.0">
+                          <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="300.0">
                               <children>
                                   <Label alignment="CENTER" prefHeight="17.0" prefWidth="388.0" styleClass="H1" text="Список расчетов" />
                                   <HBox fx:id="iListArCalcPane" maxHeight="1.7976931348623157E308" prefWidth="460.0" />
@@ -255,7 +255,7 @@
                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                               </padding>
                           </VBox>
-                          <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="530.0">
+                          <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="699.0">
                               <children>
                                   <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
                                     <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Название расчета" textAlignment="CENTER" />
@@ -263,9 +263,9 @@
                                       <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Дата сохранения" textAlignment="CENTER" />
                                       <Label fx:id="iCalcDate" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="" textAlignment="CENTER" />
                                   </HBox>
-                                  <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                  <HBox alignment="CENTER_LEFT" prefHeight="595.0" prefWidth="521.0" spacing="10.0">
                                       <children>
-                                          <VBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                          <VBox fx:id="iListPRArc" alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
                                               <children>
                                                   <!-- List признаки-->
                                               </children>
@@ -281,7 +281,7 @@
                                           </VBox>
                                       </children>
                                   </HBox>
-                                  <ImageView fx:id="iImgAlgoritmArc" fitHeight="349.0" fitWidth="521.0" pickOnBounds="true" preserveRatio="true">
+                                  <ImageView fx:id="iImgAlgoritmArc" fitHeight="349.0" fitWidth="680.0" pickOnBounds="true" preserveRatio="true">
                                       <VBox.margin>
                                           <Insets top="10.0" />
                                       </VBox.margin></ImageView>

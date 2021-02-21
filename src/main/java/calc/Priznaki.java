@@ -786,13 +786,15 @@ public class Priznaki extends KSQL {
                     " POWER_VAL_STYLE, BALLS, ALG) VALUES('" + name + "', '" +
                     design + "', '" + power + "', '" + power_val + "', '" + power_val_style + "', " +
                     balls  + ", " + alg + ");";
+        System.out.println(q);
         Long newId = this.ksqlINSERT(q);  // Кладем расчет в БД
         if (newId >= 0) { // Пишем в БД признаки
             // Значения берем из list, который был на экране
             for (PriznakEQ p : obsEQ) {
                 if (priznakiMap.get(p.getEQid()).getDataValid() == DATA_OK) { // Только по валидным признакам
-                    q = "INSERT INTO PUBLIC.PUBLIC.PRIZ_INTERVAL (ARC_ID, NAME, VAL) VALUES(" +
+                    q = "INSERT INTO PUBLIC.PUBLIC.ARCHIVE_PR (ARC_ID, NAME, VAL) VALUES(" +
                             newId + ", '" + priznakiMap.get(p.getEQid()).getName() + "'," + p.iInputVal.getText() + ");";
+                    System.out.println(q);
                     this.ksqlINSERT(q);  // Кладем признаки в БД
                 }
             }
