@@ -101,12 +101,10 @@ public class Priznaki extends KSQL {
 //        System.out.println("q " + q);
         int newId = this.ksqlDELETE(q);  // Удаляем признак в БД
         if (newId >=0) {  // Удачно удалилось
-            System.out.println("newId " + newId);
             priznakiMap.del(p.getPid());    // Удаляем признак из мапы
             obsPR.remove(p);
             // Удаляем интервалы из БД
             q = "DELETE FROM PUBLIC.PUBLIC.PRIZ_INTERVAL WHERE PRIZNAK=" + p.getPid() + ";";
-        System.out.println("q " + q);
             int newId2 = this.ksqlDELETE(q);  // Удаляем интервалы в БД
             for(int i=0;i<obsEQ.size();i++) {  // Убираем удаленный элемент из EQ
                 if (obsEQ.get(i).getEQid() == p.getPid()) {
@@ -651,8 +649,8 @@ public class Priznaki extends KSQL {
 
           //  this.name = name;
             ll = new Label(priznakiMap.getName(pid));
-            ll.setPrefWidth(250);
-            ll.setMaxWidth(250);
+            ll.setPrefWidth(350);
+            ll.setMaxWidth(350);
             ll.setAlignment(Pos.CENTER_LEFT);
             this.getChildren().add(ll);
 

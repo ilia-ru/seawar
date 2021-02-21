@@ -45,7 +45,7 @@ public class Controller {
     public VBox iPrCreateEditPane;
 
     ListView lvEQ;      // Для EQ
-    ListView lvPr;  // Для PR
+    ListView lvPR;  // Для PR
     ListView lvPI;      // Для интервалов
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
@@ -132,9 +132,9 @@ public class Controller {
         iTblPane.getChildren().add(0, lvEQ);
         iTblPane.setPrefHeight(600);
 
-        lvPr = new ListView();
-        lvPr.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
-        lvPr.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
+        lvPR = new ListView();
+        lvPR.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
+        lvPR.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
             System.out.println("lll" + obj + " " + oldValue + " " + newValue);
             if (newValue != null) { //
                 clearPrEditPane();
@@ -147,9 +147,9 @@ public class Controller {
                 iPrCreateEditPane.setVisible(true);
             }
         });
-        lvPr.setPrefWidth(450);
+        lvPR.setPrefWidth(450);
         lvEQ.setPrefHeight(550);
-        iListPane.getChildren().add(0, lvPr);
+        iListPane.getChildren().add(0, lvPR);
         iListPane.setPrefHeight(600);
 
         //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
@@ -211,6 +211,7 @@ public class Controller {
             alert.setHeaderText("Введите интервалы");
             alert.show();
         } else {  // Все хорошо
+            int focus = lvPR.getFocusModel().getFocusedIndex();
             priznaki.getPMapTmp().setName(iPrPriznakName.getText());  // Добавляем имя признака
             // Сохраняем баллы с экрана во временный PMapItem
             ObservableList<Priznaki.PIntervalPR> opr = (ObservableList<Priznaki.PIntervalPR>) lvPI.getItems();
@@ -223,9 +224,13 @@ public class Controller {
                 System.out.println("edit");
                 priznaki.changePriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
             }
-            lvPr.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
+            lvPR.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
             lvEQ.setItems(priznaki.getListEQ());      // Обновляем список признаков на экране
-            iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
+            lvPR.getFocusModel().focus(focus);
+            lvPR.requestFocus();
+
+
+//            iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
         }
     }
 
