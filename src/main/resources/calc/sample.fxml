@@ -49,24 +49,22 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
                                  <children>
-                                    <RadioButton fx:id="iPower1" mnemonicParsing="false" toggleGroup="$radioBtn">
+                                    <RadioButton fx:id="iPower1" mnemonicParsing="false" text="Мощность 80%" toggleGroup="$radioBtn">
                                         <toggleGroup>
                                             <ToggleGroup fx:id="radioBtn" />
                                         </toggleGroup>
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
-                                    <Label text="Мощность 80%" />
                                     <Label fx:id="iResTxt2_80" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="33.0" prefWidth="399.0" spacing="10.0">
                                  <children>
-                                    <RadioButton fx:id="iPower2" mnemonicParsing="false" toggleGroup="$radioBtn">
+                                    <RadioButton fx:id="iPower2" mnemonicParsing="false" text="Мощность 90%" toggleGroup="$radioBtn">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
-                                    <Label text="Мощность 90%" />
                                     <Label fx:id="iResTxt2_90" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
                                  </children>
                               </HBox>
@@ -86,21 +84,19 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="33.0" prefWidth="329.0" spacing="10.0">
                                  <children>
-                                    <RadioButton fx:id="iPower3" mnemonicParsing="false" toggleGroup="$radioBtn">
+                                    <RadioButton fx:id="iPower3" mnemonicParsing="false" text="Мощность 80%" toggleGroup="$radioBtn">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
-                                    <Label text="Мощность 80%" />
                                     <Label fx:id="iResTxt4_80" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="157.0" prefHeight="33.0" prefWidth="399.0" spacing="10.0">
                                  <children>
-                                    <RadioButton fx:id="iPower4" mnemonicParsing="false" toggleGroup="$radioBtn">
+                                    <RadioButton fx:id="iPower4" mnemonicParsing="false" text="Мощность 90%" toggleGroup="$radioBtn">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin></RadioButton>
-                                    <Label text="Мощность 90%" />
                                     <Label fx:id="iResTxt4_90" alignment="CENTER" prefHeight="24.0" prefWidth="138.0" textAlignment="CENTER" />
                                  </children>
                                   <Label fx:id="iSumBalls" prefWidth="70.0" style="-fx-border-color: #999999; -fx-border-width: 1;" styleClass="H3">
@@ -237,6 +233,71 @@
                   </HBox>
               </children>
           </VBox>
+
+
+          <!--  ********* -->
+          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+              <children>
+                  <HBox prefWidth="1000.0" visible="true">
+                      <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Архив расчетов" />
+                  </HBox>
+                  <HBox prefWidth="1000.0" visible="true">
+                    <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Сюда фильтр" />
+                  </HBox>
+                  <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
+                      <children>
+                          <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="358.0">
+                              <children>
+                                  <Label alignment="CENTER" prefHeight="17.0" prefWidth="388.0" styleClass="H1" text="Список расчетов" />
+                                  <HBox fx:id="iListArCalcPane" maxHeight="1.7976931348623157E308" prefWidth="460.0" />
+                              </children>
+                              <padding>
+                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                              </padding>
+                          </VBox>
+                          <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="530.0">
+                              <children>
+                                  <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Название расчета" textAlignment="CENTER" />
+                                      <Label fx:id="iCalcName" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="" textAlignment="CENTER" />
+                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Дата сохранения" textAlignment="CENTER" />
+                                      <Label fx:id="iCalcDate" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="" textAlignment="CENTER" />
+                                  </HBox>
+                                  <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                      <children>
+                                          <VBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                              <children>
+                                                  <!-- List признаки-->
+                                              </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                              <children>
+                                                  <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                                      <children>
+                                                          <!-- дизайн...-->
+                                                      </children>
+                                                  </HBox>
+                                              </children>
+                                          </VBox>
+                                      </children>
+                                  </HBox>
+                                  <ImageView fx:id="iImgAlgoritmArc" fitHeight="349.0" fitWidth="521.0" pickOnBounds="true" preserveRatio="true">
+                                      <VBox.margin>
+                                          <Insets top="10.0" />
+                                      </VBox.margin></ImageView>
+                              </children>
+                              <padding>
+                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                              </padding>
+                          </VBox>
+                      </children>
+                      <VBox.margin>
+                          <Insets />
+                      </VBox.margin>
+                  </HBox>
+              </children>
+          </VBox>
+          <!--  ********* -->
       </StackPane>
       </children>
    </VBox>

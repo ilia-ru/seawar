@@ -26,12 +26,16 @@ public class Controller {
     public HBox iTblPane;
     public Pane iListPane;
     public HBox iHBoxMenu;
+    public HBox iListArCalcPane;
     public VBox iCalcQEPane;
+    public VBox iCalcQEArcPane;
     public VBox iStudentPane;
     public VBox iPriznakiPane;
     public StackPane iStackPane;
     public ImageView iImgAlgoritm;
     public Label iSumBalls;
+    public Label iCalcName;
+    public Label iCalcDate;
     public Label iResTxt2_80;
     public Label iResTxt2_90;
     public Label iResTxt4_80;
@@ -85,6 +89,7 @@ public class Controller {
             ll = new Label("Архив");
             ll.setOnMouseClicked(event -> {
                 System.out.println("Архив " + event);
+                iCalcQEArcPane.toFront();
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
@@ -162,10 +167,26 @@ public class Controller {
         lvPI = new ListView();
         lvPI.setPrefWidth(500);
 
+        // Архив расчетов
+        CalcArc calcArc = new CalcArc();
+ //       CalcArc.getTableArc().setItems();  // Список расчетов
+        TableView ttt = calcArc.createFromSQL("");
+        ttt.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
+            System.out.println("lll" + obj + " " + oldValue + " " + newValue);
+            if (newValue != null) { // Пока фокус не ушел
+                CalcArc.CalcRecord c = (CalcArc.CalcRecord) newValue;
+                iCalcName.setText(c.getName());
+                iCalcDate.setText(c.getData().toString());
+            }
+        });
+        iListArCalcPane.getChildren().add(ttt);
+
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
-//        iPriznakiPane.toFront();
+
+        iListArCalcPane.setVisible(true);
+        iListArCalcPane.toFront();
 
     }
 
@@ -394,7 +415,6 @@ public class Controller {
                 new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
-            System.out.println("Сохраняем");
             String design = "";
             String power = "";
             String power_val = "";
@@ -428,8 +448,6 @@ public class Controller {
                 power_val_style = iResTxt4_90.getStyle(); // Цвет оформления
                 alg = 4;
             }
-
-
             priznaki.saveСalculation(iCalcNameToSave.getText(), design, power, power_val,
                     power_val_style, Integer.valueOf(iSumBalls.getText()), alg);
 
