@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.sql.*;
+import java.util.Optional;
 
 import static calc.Main.priznaki;
 
@@ -17,6 +18,8 @@ public class Controller {
     @FXML
     public Button iBtn;
     public Button iBtnHide;
+    public VBox iVBCalcSave;
+    public TextField iCalcNameToSave;
     public BorderPane iAscPane;
     public MenuBar iMainMenu;
     //    public TableView iTblPrizn;
@@ -269,7 +272,15 @@ public class Controller {
 
     // Расчет Симуляц. калькулятора
     public void iBtnCalcEqGoAction(ActionEvent actionEvent) {
+        boolean calc_ok = false;
         //     System.out.println("aaaaaaaa");
+        if (!(iPower1.isSelected() || iPower2.isSelected() || iPower3.isSelected() || iPower4.isSelected())) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Не введены исходные данные. Введите данные и повторите расчет");
+            alert.setTitle("Внимание");
+            alert.setHeaderText("Ошибка во входных данных");
+            alert.show();
+            return;
+        }
         iSumBalls.setText(""); // Очищаем поля
         iResTxt2_80.setText("");
         iResTxt2_80.setStyle("");
@@ -283,6 +294,7 @@ public class Controller {
         if (iPower1.isSelected()) {
             Integer sumBalls = priznaki.calcBalls2(true);
             if (sumBalls != null) {
+                calc_ok = true;
                 iSumBalls.setText(String.valueOf(sumBalls));
                 if (sumBalls <= -6) {
                     iResTxt2_80.setText("ЛП НЕэквивалентные");
@@ -301,6 +313,7 @@ public class Controller {
         if (iPower2.isSelected()) {
             Integer sumBalls = priznaki.calcBalls2(true);
             if (sumBalls != null) {
+                calc_ok = true;
                 iSumBalls.setText(String.valueOf(sumBalls));
                 if (sumBalls <= -6) {
                     iResTxt2_90.setText("ЛП НЕэквивалентные");
@@ -319,6 +332,7 @@ public class Controller {
         if (iPower3.isSelected()) {
             Integer sumBalls = priznaki.calcBalls4();
             if (sumBalls != null) {
+                calc_ok = true;
                 iSumBalls.setText(String.valueOf(sumBalls));
 //=ЕСЛИ(AM5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AM5>=3;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
                 if (sumBalls <= -6) {
@@ -339,6 +353,7 @@ public class Controller {
             Integer sumBalls = priznaki.calcBalls4();
             if (sumBalls != null) {
 //=ЕСЛИ(AM5<=-6;"ЛП НЕэквивалентные";ЕСЛИ(AM5>=5;"ЛП эквивалентные";"НЕ ИНФОРМАТИВНО"))
+                calc_ok = true;
                 iSumBalls.setText(String.valueOf(sumBalls));
                 if (sumBalls <= -6) {
                     iResTxt4_90.setText("ЛП НЕэквивалентные");
@@ -353,10 +368,80 @@ public class Controller {
                 iImgAlgoritm.setImage(new Image("alg4.png"));
             }
         }
+        // Включаем панель сохранения данных
+        if (calc_ok) {  // Расчет был сделан - выводим панель сохранения
+            iVBCalcSave.setVisible(true);
+        }
     }
 
+    //Сохраняем расчет в БД
+    public void iVBCalcSaveaction(ActionEvent actionEvent) {
+        Alert alert;
+        if (iCalcNameToSave.getText().compareTo("") == 0) {
+            alert = new Alert(Alert.AlertType.INFORMATION, "Введите уникальное название расчета.");
+            alert.setTitle("Информация");
+            alert.setHeaderText("Не введено название расчета");
+            alert.show();
+            return;
+        }
 
-    public void iBtnAction(ActionEvent actionEvent) {
+        alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Сохранение расчета в базу данных");
+        alert.setTitle("Сохранение данных");
+        alert.setHeaderText("Подтвердите сохранение данных");
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(new ButtonType("Сохранить", ButtonBar.ButtonData.OK_DONE),
+                new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
+            System.out.println("Сохраняем");
+            String design = "";
+            String power = "";
+            String power_val = "";
+            String power_val_style = "";
+            int alg = 0;
+            if (iPower1.isSelected()) {
+                design = "2x2x2";
+                power = "Мощность 80%";
+                power_val = iResTxt2_80.getText();
+                power_val_style = iResTxt2_80.getStyle(); // Цвет оформления
+                alg = 1;
+            }
+            if (iPower2.isSelected()) {
+                design = "2x2x2";
+                power = "Мощность 90%";
+                power_val = iResTxt2_90.getText();
+                power_val_style = iResTxt2_90.getStyle(); // Цвет оформления
+                alg = 2;
+            }
+            if (iPower3.isSelected()) {
+                design = "2x2x4";
+                power = "Мощность 80%";
+                power_val = iResTxt4_80.getText();
+                power_val_style = iResTxt4_80.getStyle(); // Цвет оформления
+                alg = 3;
+            }
+            if (iPower4.isSelected()) {
+                design = "2x2x4";
+                power = "Мощность 90%";
+                power_val = iResTxt4_90.getText();
+                power_val_style = iResTxt4_90.getStyle(); // Цвет оформления
+                alg = 4;
+            }
+
+
+            priznaki.saveСalculation(iCalcNameToSave.getText(), design, power, power_val,
+                    power_val_style, Integer.valueOf(iSumBalls.getText()), alg);
+
+            alert = new Alert(Alert.AlertType.INFORMATION, "Расчет сохранен в базу данных. Вы можете просмотреть его на странице \"Архив\"");
+            alert.setTitle("Информация");
+            alert.setHeaderText("Расчет сохранен в базу данных");
+            alert.show();
+
+        }
+    }
+
+        public void iBtnAction(ActionEvent actionEvent) {
         System.out.println("aaaaaaaa");
 
         //String aaa = new String();
@@ -415,21 +500,6 @@ public class Controller {
 
     }
 
-    public void iBtnAlg1Action(ActionEvent actionEvent) {
-        iImgAlgoritm.setImage(new Image("alg1.png"));
-    }
-
-    public void iBtnAlg2Action(ActionEvent actionEvent) {
-        iImgAlgoritm.setImage(new Image("alg2.png"));
-    }
-
-    public void iBtnAlg3Action(ActionEvent actionEvent) {
-        iImgAlgoritm.setImage(new Image("alg3.png"));
-    }
-
-    public void iBtnAlg4Action(ActionEvent actionEvent) {
-        iImgAlgoritm.setImage(new Image("alg4.png"));
-    }
 
 
 }

@@ -1,7 +1,6 @@
 package calc;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -778,6 +777,27 @@ public class Priznaki extends KSQL {
                 }
             }
         }
+    }
+
+    // Сохранение расчета в БД
+    public long saveСalculation(String name, String design, String power, String power_val,
+                                String power_val_style, int balls, int alg) {
+        String q = "INSERT INTO PUBLIC.PUBLIC.ARCHIVE (NAME, DESIGN, POWER, POWER_VAL," +
+                    " POWER_VAL_STYLE, BALLS, ALG) VALUES('" + name + "', '" +
+                    design + "', '" + power + "', '" + power_val + "', '" + power_val_style + "', " +
+                    balls  + ", " + alg + ");";
+        Long newId = this.ksqlINSERT(q);  // Кладем расчет в БД
+        if (newId >= 0) { // Пишем в БД признаки
+            // Значения берем из list, который был на экране
+            for (PriznakEQ p : obsEQ) {
+                if (priznakiMap.get(p.getEQid()).getDataValid() == DATA_OK) { // Только по валидным признакам
+                    q = "INSERT INTO PUBLIC.PUBLIC.PRIZ_INTERVAL (ARC_ID, NAME, VAL) VALUES(" +
+                            newId + ", '" + priznakiMap.get(p.getEQid()).getName() + "'," + p.iInputVal.getText() + ");";
+                    this.ksqlINSERT(q);  // Кладем признаки в БД
+                }
+            }
+        }
+        return newId;
     }
 
     public Integer calcBalls2(boolean needMessage) {  // Подсчет кол-ва баллов для 2*2*2
