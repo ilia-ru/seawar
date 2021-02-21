@@ -20,7 +20,7 @@ public class Controller {
     public BorderPane iAscPane;
     public MenuBar iMainMenu;
     //    public TableView iTblPrizn;
-    public Pane iTblPane;
+    public HBox iTblPane;
     public Pane iListPane;
     public HBox iHBoxMenu;
     public VBox iCalcQEPane;
@@ -45,9 +45,10 @@ public class Controller {
     public VBox iPrCreateEditPane;
 
     ListView lvEQ;      // Для EQ
-    ListView lvPrEdit;  // Для PR
+    ListView lvPr;  // Для PR
     ListView lvPI;      // Для интервалов
 
+    public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
     private class TopMenu {
         private MenuBar menu;
@@ -127,11 +128,13 @@ public class Controller {
         lvEQ = new ListView();
         lvEQ.setItems(priznaki.getListEQ());  // Список признаков для calc_eq
         lvEQ.setPrefWidth(450);
+        lvEQ.setPrefHeight(600);
         iTblPane.getChildren().add(0, lvEQ);
+        iTblPane.setPrefHeight(600);
 
-        lvPrEdit = new ListView();
-        lvPrEdit.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
-        lvPrEdit.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
+        lvPr = new ListView();
+        lvPr.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
+        lvPr.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
             System.out.println("lll" + obj + " " + oldValue + " " + newValue);
             if (newValue != null) { //
                 clearPrEditPane();
@@ -144,8 +147,10 @@ public class Controller {
                 iPrCreateEditPane.setVisible(true);
             }
         });
-        lvPrEdit.setPrefWidth(450);
-        iListPane.getChildren().add(0, lvPrEdit);
+        lvPr.setPrefWidth(450);
+        lvEQ.setPrefHeight(550);
+        iListPane.getChildren().add(0, lvPr);
+        iListPane.setPrefHeight(600);
 
         //       iImgAlgoritm.setImage(new Image("eq_img_error.png"));
 
@@ -209,9 +214,16 @@ public class Controller {
             priznaki.getPMapTmp().setName(iPrPriznakName.getText());  // Добавляем имя признака
             // Сохраняем баллы с экрана во временный PMapItem
             ObservableList<Priznaki.PIntervalPR> opr = (ObservableList<Priznaki.PIntervalPR>) lvPI.getItems();
-            // Сохраняем в мапу и БД
-            priznaki.addPriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
-            lvPrEdit.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
+            // Если == NOT_IN_PMAP - значит добавление т.к. нету ID. Если есть ID - то правка
+            if (priznaki.getPMapTmp().getTmpId() == NOT_IN_PMAP) {  // Добавляем
+                // Сохраняем в мапу и БД
+                System.out.println("add");
+                priznaki.addPriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
+            } else {  // Изменяем
+                System.out.println("edit");
+                priznaki.changePriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
+            }
+            lvPr.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
             lvEQ.setItems(priznaki.getListEQ());      // Обновляем список признаков на экране
             iPrCreateEditPane.setVisible(false);  // Чтобы не бросалась в глаза до поры
         }

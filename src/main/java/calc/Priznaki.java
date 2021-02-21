@@ -27,10 +27,12 @@ public class Priznaki extends KSQL {
     public final int DATA_OK = 1;    // Данные для признака в интервале и что-то введено
     public final int DATA_EMPTY = 2; // Данные не введены - поле пустое (важно, т.к. 0 - это тоже значение)
     public final int DATA_OUT = 3;   // Значение за диапазоном min-max
+    public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
     private PriznakiMap priznakiMap; // Мапа всех признаков и их интервалов
     private PMapItem pMapTmp;        // Временный PMapItem для редактирования и ввода признаков
 
     // Добаление признака в мапу и в БД
+    // intervals нужно, чтобы взять из формы ввода новые значения
     public Long addPriznak(PMapItem p, ObservableList<Priznaki.PIntervalPR> intervals) {  // Возвращаем id новой записи в БД
         String q = "INSERT INTO PUBLIC.PUBLIC.PRIZNAKI (NAME) VALUES('" + p.getName() + "');";
 //        System.out.println("q " + q);
@@ -57,9 +59,40 @@ public class Priznaki extends KSQL {
             p.setTmpId(newId);
             priznakiMap.put(newId, p);    // Кладем признак в мапу
             p = new PMapItem("");   // Разрываем связь м-ду p и мапой
-            //obsEQ = getListEQ();          // Обновляем признаки в eq
         }
         return newId;
+    }
+
+    // Изменение существующего признака в мапе и в БД
+    // intervals нужно, чтобы взять из формы ввода новые значения
+    public void changePriznak(PMapItem p, ObservableList<Priznaki.PIntervalPR> intervals) {
+        String q = "UPDATE PUBLIC.PUBLIC.PRIZNAKI SET NAME='" + p.getName() + "' WHERE ID=" + p.getTmpId() + ";";
+        Long count = this.ksqlUPDATE(q);  // Изменяем признак в БД
+        Long iId;
+        if (count >= 0) {
+            // Удаляем старые интервалы
+            q = "DELETE FROM PUBLIC.PUBLIC.PRIZ_INTERVAL WHERE PRIZNAK=" + p.getTmpId() + ";";
+            this.ksqlDELETE(q);  // Удаляем интервалы в БД
+
+            // Сохраняем новые интервалы
+            // Значения интервалов берем из list, который был на экране и пишем в БД и в pMapTmp
+            // Чтобы потом удобно скопировать pMapTmp в мапу
+            p.getPMapIntervals().clear();  // чистим на всякий случай
+            PIntervalPR pi = intervals.get(0);  // Первый интервал В нем 2 значения
+            q = "INSERT INTO PUBLIC.PUBLIC.PRIZ_INTERVAL (PRIZNAK, VAL, BALLS) VALUES(" +
+                    p.getTmpId() + "," + pi.getInputValLeft() + "," + pi.getIBallVal() + ");";
+            iId = this.ksqlINSERT(q);  // Кладем интервал в БД
+            p.getPMapIntervals().add(new PInterval(iId, pi.getInputValLeft(), pi.getIBallVal()));
+            // Первый интервал положили выше, т.к. там 2 значения. Теперь остальные
+            for (int i = 0; i < intervals.size(); i++) {
+                pi = intervals.get(i);  // Снова с начала, но теперь правые поля
+                q = "INSERT INTO PUBLIC.PUBLIC.PRIZ_INTERVAL (PRIZNAK, VAL, BALLS) VALUES(" +
+                        p.getTmpId() + "," + pi.getInputVal() + "," + pi.getIBallVal() + ");";
+                iId = this.ksqlINSERT(q);  // Кладем интервал в БД
+                p.getPMapIntervals().add(new PInterval(iId, pi.getInputVal(), pi.getIBallVal()));
+            }
+            priznakiMap.put(p.getTmpId(), p);  // Заменяем значение в мапе
+        }
     }
 
     // Удаление признака из мапы и в БД
@@ -71,10 +104,10 @@ public class Priznaki extends KSQL {
             System.out.println("newId " + newId);
             priznakiMap.del(p.getPid());    // Удаляем признак из мапы
             obsPR.remove(p);
-            // Удаляем интервалы в БД
+            // Удаляем интервалы из БД
             q = "DELETE FROM PUBLIC.PUBLIC.PRIZ_INTERVAL WHERE PRIZNAK=" + p.getPid() + ";";
         System.out.println("q " + q);
-            int newId2 = this.ksqlDELETE(q);  // Удаляем признак в БД
+            int newId2 = this.ksqlDELETE(q);  // Удаляем интервалы в БД
             for(int i=0;i<obsEQ.size();i++) {  // Убираем удаленный элемент из EQ
                 if (obsEQ.get(i).getEQid() == p.getPid()) {
                     obsEQ.remove(i);
@@ -85,13 +118,7 @@ public class Priznaki extends KSQL {
         return newId;
     }
 
-    // Изменение существующего признака в мапе и в БД
-    public void changePriznak(Long id, PMapItem p) {
-        priznakiMap.put(id, p);
-        // id вынес в параметры, чтобы не ошибаться. Чтобы каждый раз помнить, что надо id
-    }
-
-    public PMapItem getPriznak(Long id) {  // Берем признак их мапы
+    public PMapItem getPriznak(Long id) {  // Берем признак из мапы
         return priznakiMap.get(id);
     }
 
@@ -99,7 +126,6 @@ public class Priznaki extends KSQL {
     // Ибо чистить - ошибки будут, а сборщик мусора не ошибается
     public PMapItem newPMapTmp(String name) {
         pMapTmp = new PMapItem(name);
-        pMapTmp.setTmpId(-1l);  // Не имеет соответствия в БД
         return this.pMapTmp;
     }
 
@@ -111,13 +137,13 @@ public class Priznaki extends KSQL {
     // КОпируем указанный pMapItem во временный объект
     public PMapItem copyToPMapTmp(Long id){
         this.pMapTmp = new PMapItem(priznakiMap.get(id).getName());
-        this.pMapTmp.setTmpId(priznakiMap.get(id).getTmpId());
+        this.pMapTmp.setTmpId(id);
         this.pMapTmp.setDataValid(priznakiMap.get(id).getDataValid());
         this.pMapTmp.getPMapIntervals().clear();  // Очищаем и копируем
-        for (PInterval p: priznakiMap.get(id).getPMapIntervals()) {
-            this.pMapTmp.getPMapIntervals().add(p);
+        for (PInterval pi: priznakiMap.get(id).getPMapIntervals()) {
+            this.pMapTmp.getPMapIntervals().add(new PInterval(pi.getId(), pi.getVal(), pi.getBall()));
         }
-        this.pMapTmp = priznakiMap.get(id);
+//        this.pMapTmp = priznakiMap.get(id);
         return this.pMapTmp;
     }
 
@@ -173,6 +199,7 @@ public class Priznaki extends KSQL {
         private ArrayList<PInterval> pMapIntervals;  // Массив интервалов
 
         public PMapItem(String name) {
+            tmpId = NOT_IN_PMAP;  // Такого нет в мапе. Например при создании признака, id ще нет
             this.name = name;
             this.dataValid = DATA_EMPTY;  // Сначала ничего не введено
             pMapIntervals = new ArrayList<>();
@@ -187,6 +214,7 @@ public class Priznaki extends KSQL {
  //  System.out.println(step);
             for(int i=0;i<=count;i++) { // Кол-во интервалов +1, Отдельная строка чтобы указать max
  //               System.out.println("--" + i + " val " + val);
+                if (i == count) { val = to; } // Обходим ошибку округления, чтобы последний диапазон кончался на "to"
                 this.pMapIntervals.add(new PInterval(i, val, 0));
                 val += step;
             }
@@ -623,8 +651,8 @@ public class Priznaki extends KSQL {
 
           //  this.name = name;
             ll = new Label(priznakiMap.getName(pid));
-            ll.setPrefWidth(150);
-            ll.setMaxWidth(150);
+            ll.setPrefWidth(250);
+            ll.setMaxWidth(250);
             ll.setAlignment(Pos.CENTER_LEFT);
             this.getChildren().add(ll);
 

@@ -10,6 +10,34 @@ import static calc.Main.connSQL;
 public class KSQL {
     private String DBName;
 
+    public long ksqlUPDATE(String query) {  // Выполняем запрос UPDATE. Возвращаем кол-во обработанных строк
+        if(query.equals("")) {
+            return -2;
+        }
+        try {
+            ksqlConnect();  // Если не делали, то сделаем.
+            PreparedStatement statement = connSQL.prepareStatement(query);
+            return statement.executeUpdate();
+
+        }
+        catch (SQLSyntaxErrorException e) {
+            if(e.getSQLState().equals("42S02")) { // Нет таблицы
+                System.out.println("Не найдена таблица ("+e.getMessage()+ ")");
+            }
+            if(e.getSQLState().equals("42000")) { // Нет DB
+                System.out.println("На сервере не найдена БД (" + e.getSQLState() + ")");
+            }
+        }
+/*        catch (CommunicationsException e) {
+            System.out.println("Нет соединения с сервером БД (" + e.getSQLState() + ")");
+        }*/
+        catch (SQLException e){
+            //  System.out.println("e2= " + e.getMessage());
+            System.out.println("e2= " + e);
+        }
+        return -1;
+    }
+
     public int ksqlDELETE(String query) {  // Выполняем запрос DELETE
         int rows = 0;
         if(query.equals("")) {
