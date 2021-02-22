@@ -3,6 +3,11 @@
     -fx-font-name: Arial;
 }
 
+.table-view {
+     -fx-font-size: 14;
+     -fx-font-name: Arial;
+}
+
 .H1 {
     -fx-font-size: 18;
     -fx-font-weight: bold;

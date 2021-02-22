@@ -23,7 +23,7 @@
                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="17.0" prefWidth="1000.0" styleClass="H2" text="Критерии Стьюдента" textAlignment="CENTER" />
             </children>
          </VBox>
-         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
             <children>
                   <HBox prefWidth="1000.0" visible="true">
                         <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Симуляционный калькулятор" />
@@ -173,7 +173,7 @@
                           </VBox>
                           <VBox fx:id="iPrCreateEditPane" maxWidth="-Infinity" prefHeight="603.0" prefWidth="500.0">
                               <children>
-                                  <Label alignment="CENTER" prefHeight="17.0" prefWidth="491.0" styleClass="H1" text="Описание признака" textAlignment="CENTER" />
+                                  <Label fx:id="iPrEditCaption" alignment="CENTER" prefHeight="17.0" prefWidth="491.0" styleClass="H1" text="Описание признака" textAlignment="CENTER" />
                                   <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="399.0" spacing="10.0">
                                       <children>
                                           <Label text="Название признака" />
@@ -242,49 +242,66 @@
                       <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Архив расчетов" />
                   </HBox>
                   <HBox prefWidth="1000.0" visible="true">
-                    <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Сюда фильтр" />
+                      <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Сюда фильтр" />
                   </HBox>
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
                       <children>
-                          <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="300.0">
+                          <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="275.0">
                               <children>
                                   <Label alignment="CENTER" prefHeight="17.0" prefWidth="388.0" styleClass="H1" text="Список расчетов" />
-                                  <HBox fx:id="iListArCalcPane" maxHeight="1.7976931348623157E308" prefWidth="460.0" />
+                                  <HBox fx:id="iListArCalcPane" fillHeight="false" maxHeight="1.7976931348623157E308" prefHeight="685.0" prefWidth="265.0" />
                               </children>
                               <padding>
                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                               </padding>
                           </VBox>
-                          <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="699.0">
+                          <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="699.0" style="-fx-border-color: #aaaaaa; -fx-border-width: 2;">
                               <children>
                                   <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
-                                    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Название расчета" textAlignment="CENTER" />
-                                      <Label fx:id="iCalcName" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="" textAlignment="CENTER" />
-                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Дата сохранения" textAlignment="CENTER" />
-                                      <Label fx:id="iCalcDate" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="" textAlignment="CENTER" />
+                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Сохраненный расчет:" textAlignment="CENTER" />
+                                      <Label fx:id="iCalcName" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H1" text="" textAlignment="CENTER" />
+                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" text="Дата сохранения" textAlignment="CENTER">
+                                          <HBox.margin>
+                                              <Insets left="10.0" />
+                                          </HBox.margin></Label>
+                                      <Label fx:id="iCalcDate" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H1" text="" textAlignment="CENTER" />
                                   </HBox>
-                                  <HBox alignment="CENTER_LEFT" prefHeight="595.0" prefWidth="521.0" spacing="10.0">
+                                  <HBox alignment="CENTER_LEFT" prefHeight="682.0" prefWidth="685.0" spacing="10.0">
                                       <children>
-                                          <VBox fx:id="iListPRArc" alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
-                                              <children>
-                                                  <!-- List признаки-->
-                                              </children>
+                                          <VBox fx:id="iListPRArc" maxHeight="1.7976931348623157E308" prefWidth="490.0" spacing="10.0">
+                                              <!-- List признаки-->
                                           </VBox>
-                                          <VBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
-                                              <children>
-                                                  <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
-                                                      <children>
-                                                          <!-- дизайн...-->
-                                                      </children>
-                                                  </HBox>
-                                              </children>
-                                          </VBox>
+                                                  <VBox prefHeight="33.0" prefWidth="490.0" spacing="10.0">
+                                                      <!-- дизайн...-->
+                                                      <HBox spacing="5.0">
+                                                          <Label maxWidth="1.7976931348623157E308" prefHeight="17.0" text="Дизайн" />
+                                                          <Label fx:id="iArcDesign" maxWidth="1.7976931348623157E308" prefHeight="17.0" text="" />
+                                                      </HBox>
+                                                      <HBox>
+                                                          <Label fx:id="iArcPower" maxWidth="1.7976931348623157E308" prefHeight="17.0" text="Мощность" />
+                                                      </HBox>
+                                                      <HBox spacing="5.0">
+                                                          <Label maxWidth="1.7976931348623157E308" prefHeight="17.0" text="Сумма баллов" />
+                                                          <Label fx:id="iArcBalls" prefHeight="17.0" prefWidth="70.0" style="-fx-border-color: #aaaaaa; -fx-border-width: 1;" text="">
+                                                <padding>
+                                                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                                </padding></Label>
+                                                      </HBox>
+                                                      <HBox>
+                                                          <Label fx:id="iArcPowerVal" maxWidth="1.7976931348623157E308" prefHeight="17.0" text="" />
+                                                      </HBox>
+                                                      <HBox>
+                                                          <ImageView fx:id="iImgAlgoritmArc" fitHeight="251.0" fitWidth="326.0" pickOnBounds="true" preserveRatio="true" />
+                                          <VBox.margin>
+                                             <Insets top="20.0" />
+                                          </VBox.margin>
+                                                      </HBox>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                                  </VBox>
                                       </children>
                                   </HBox>
-                                  <ImageView fx:id="iImgAlgoritmArc" fitHeight="349.0" fitWidth="680.0" pickOnBounds="true" preserveRatio="true">
-                                      <VBox.margin>
-                                          <Insets top="10.0" />
-                                      </VBox.margin></ImageView>
                               </children>
                               <padding>
                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

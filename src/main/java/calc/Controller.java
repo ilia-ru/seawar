@@ -3,14 +3,18 @@ package calc;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static calc.Main.priznaki;
@@ -53,12 +57,19 @@ public class Controller {
     public HBox iPrIntervalsList;
     public VBox iPrCreateEditPane;
     public VBox iListPRArc;
+    public Label iPrEditCaption;
+    public Button iBtnPrNewSave;
+    public ImageView iImgAlgoritmArc;
+    public Label iArcDesign;
+    public Label iArcBalls;
+    public Label iArcPowerVal;
+    public Label iArcPower;
 
     ListView lvEQ;      // Для EQ
     ListView lvPR;      // Для PR
     ListView lvPI;      // Для интервалов
     ListView lvPRArc;   // Для архива
-    TableView tableCalcs;
+    TableView tableCalcs; // Список сохраненных расчетов
     CalcArc calcArc;
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
@@ -97,7 +108,9 @@ public class Controller {
                 System.out.println("Архив " + event);
                 tableCalcs = calcArc.getCalcsFromSQL("");
 //                tableCalcs.refresh();
+                iListArCalcPane.setVisible(true);
                 iCalcQEArcPane.toFront();
+                tableCalcs.requestFocus();
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
@@ -148,12 +161,40 @@ public class Controller {
         iTblPane.getChildren().add(0, lvEQ);
         iTblPane.setPrefHeight(600);
 
+        iImgAlgoritm.setOnMouseClicked(event -> {  // Разворачиваем в отдельное окно
+            //         System.out.println("цштв");
+            Stage window = new Stage();
+            window.setTitle("Алгоритм принятия решений");
+            VBox pane = new VBox();
+            pane.setAlignment(Pos.CENTER);
+            pane.setPadding(new Insets(10.0));
+
+            ImageView img = new ImageView(iImgAlgoritm.getImage());
+            img.setPreserveRatio(true);
+            img.setFitWidth(900);
+            pane.getChildren().add(img);
+            pane.setSpacing(15.0);
+            pane.setStyle("-fx-background-color: white;");
+
+            Button button = new Button("Закрыть окно с рисунком");
+            button.setOnAction(e -> {
+                window.close();
+            });
+            pane.getChildren().add(button);
+
+            Scene scene = new Scene(pane, 1000, 600);
+            window.setScene(scene);
+            window.show();
+        });
+
         lvPR = new ListView();
         lvPR.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
         lvPR.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
             System.out.println("lll" + obj + " " + oldValue + " " + newValue);
             if (newValue != null) { //
                 clearPrEditPane();
+                iPrEditCaption.setText("Редактирование признака");
+                iBtnPrNewSave.setText("Сохранить изменения");
                 Priznaki.PriznakPR p = (Priznaki.PriznakPR) newValue;
                 Priznaki.PMapItem pm = priznaki.copyToPMapTmp(p.getPid());
                 iPrPriznakName.setText(pm.getName());
@@ -179,8 +220,11 @@ public class Controller {
         calcArc = new CalcArc();
  //       CalcArc.getTableArc().setItems();  // Список расчетов
         tableCalcs = calcArc.getCalcsFromSQL("");
+        tableCalcs.setPrefWidth(285);
+        tableCalcs.setMaxWidth(285);
+        tableCalcs.setPrefHeight(1000);
         tableCalcs.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
-            System.out.println("lll" + obj + " " + oldValue + " " + newValue);
+ //           System.out.println("lll" + obj + " " + oldValue + " " + newValue);
             if (newValue != null) { // Пока фокус не ушел
                 CalcArc.CalcRecord c = (CalcArc.CalcRecord) newValue;
                 iCalcName.setText(c.getName());
@@ -189,27 +233,61 @@ public class Controller {
                 iCalcDate.setText(formater.format(c.getData().getTime()));
 
                 lvPRArc = new ListView();
-                lvPRArc.setItems(calcArc.getPRFromSQL(c.getId()));  // Список признаков со значениями
-                lvPRArc.setPrefWidth(150);
-//                lvPRArc.setPrefHeight(550);
+                lvPRArc.setItems(calcArc.getPRFromSQL(c.getPid()));  // Список признаков со значениями
+                lvPRArc.setMaxWidth(350);
+                lvPRArc.setPrefHeight(1000);
+                lvPRArc.setMaxHeight(1000);
                 iListPRArc.getChildren().clear();
                 iListPRArc.getChildren().add(lvPRArc);
+                iListPRArc.setPrefHeight(1000);
+
+                iImgAlgoritmArc.setImage(new Image("alg"+c.getALG()+".png"));
+
+                iArcDesign.setText(c.getDESIGN());
+                iArcPower.setText(c.getPOWER());
+                iArcPowerVal.setText(c.getPOWER_VAL());
+                iArcPowerVal.setStyle(c.getPOWER_VAL_STYLE());
+                iArcBalls.setText(c.getBALLS().toString());
+
             }
         });
         iListArCalcPane.getChildren().add(0,tableCalcs);
 
+        iImgAlgoritmArc.setOnMouseClicked(event -> {  // Разворачиваем в отдельное окно
+   //         System.out.println("цштв");
+            Stage window = new Stage();
+            window.setTitle("Алгоритм принятия решений");
+            VBox pane = new VBox();
+            pane.setAlignment(Pos.CENTER);
+            pane.setPadding(new Insets(10.0));
+
+            ImageView img = new ImageView(iImgAlgoritmArc.getImage());
+            img.setPreserveRatio(true);
+            img.setFitWidth(900);
+            pane.getChildren().add(img);
+            pane.setSpacing(15.0);
+            pane.setStyle("-fx-background-color: white;");
+
+            Button button = new Button("Закрыть окно с рисунком");
+            button.setOnAction(e -> {
+                window.close();
+            });
+            pane.getChildren().add(button);
+
+            Scene scene = new Scene(pane, 1000, 600);
+            window.setScene(scene);
+            window.show();
+        });
+
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);
+        iListArCalcPane.setVisible(true);
+
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
-        iListArCalcPane.setVisible(true);
-        iListArCalcPane.toFront();
+//        iListArCalcPane.setVisible(true);
+//        iListArCalcPane.toFront();
 
-    }
-
-    public void iBtHideAction(ActionEvent actionEvent) {
-        System.out.println("aaaaaaaa");
-        //iCVintra.
     }
 
     // Быстрое создание интервалов
@@ -293,6 +371,8 @@ public class Controller {
         Priznaki.PMapItem pm = priznaki.newPMapTmp("");
         // Чистим поля перед открытием
         clearPrEditPane();
+        iPrEditCaption.setText("Создание нового признака");
+        iBtnPrNewSave.setText("Сохранить новый признак");
         iPrCreateEditPane.setVisible(true);
     }
 
