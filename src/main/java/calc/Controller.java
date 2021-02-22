@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static calc.Main.priznaki;
@@ -64,6 +65,14 @@ public class Controller {
     public Label iArcBalls;
     public Label iArcPowerVal;
     public Label iArcPower;
+    public VBox iUsersPane;
+    public HBox iUsersTable;
+    public Label iUserEditId;
+    public Label iUserEditCaption;
+    public TextField iUserEditName;
+    public TextField iUserEditLastName;
+    public DatePicker iArcDateFrom;
+    public DatePicker iArcDateTo;
 
     ListView lvEQ;      // Для EQ
     ListView lvPR;      // Для PR
@@ -71,6 +80,8 @@ public class Controller {
     ListView lvPRArc;   // Для архива
     TableView tableCalcs; // Список сохраненных расчетов
     CalcArc calcArc;
+    TableView tableUsers; // Список пользователей
+    Users user;           //
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
@@ -105,7 +116,6 @@ public class Controller {
 
             ll = new Label("Архив");
             ll.setOnMouseClicked(event -> {
-                System.out.println("Архив " + event);
                 tableCalcs = calcArc.getCalcsFromSQL("");
 //                tableCalcs.refresh();
                 iListArCalcPane.setVisible(true);
@@ -134,18 +144,15 @@ public class Controller {
 
             ll = new Label("Пользователи");
             ll.setOnMouseClicked(event -> {
-                System.out.println("Пользователи " + event);
+                iUsersPane.toFront();
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
-
         }
 
         public MenuBar getMenu() {
             return menu;
         }
-
-        ;
     }
 
     public void initialize() {
@@ -184,6 +191,9 @@ public class Controller {
 
             Scene scene = new Scene(pane, 1000, 600);
             window.setScene(scene);
+
+//            window.setX(pane.getScene().getWindow().getX()+50);
+//            window.setY(pane.getScene().getWindow().getY()-50);
             window.show();
         });
 
@@ -253,6 +263,28 @@ public class Controller {
         });
         iListArCalcPane.getChildren().add(0,tableCalcs);
 
+        // Пользователи
+        TableView tableUsers; // Список пользователей
+
+        user = new Users();
+        //       CalcArc.getTableArc().setItems();  // Список расчетов
+        tableUsers = user.getUsersFromSQL("");
+        tableUsers.setEditable(true);
+//        tableUsers.setPrefWidth(285);
+//        tableUsers.setMaxWidth(285);
+        tableUsers.setPrefHeight(1000);
+        tableUsers.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
+            //           System.out.println("lll" + obj + " " + oldValue + " " + newValue);
+            if (newValue != null) { // Пока фокус не ушел
+                Users.User c = (Users.User) newValue;
+                iUserEditId.setText(c.getPid().toString());
+                iUserEditName.setText(c.getName());
+                iUserEditLastName.setText(c.getLastName());
+            }
+        });
+        iUsersTable.getChildren().add(0,tableUsers);
+
+// Алгоритм в отдельное окно
         iImgAlgoritmArc.setOnMouseClicked(event -> {  // Разворачиваем в отдельное окно
    //         System.out.println("цштв");
             Stage window = new Stage();
@@ -282,6 +314,7 @@ public class Controller {
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);
         iListArCalcPane.setVisible(true);
+        iUsersPane.setVisible(true);
 
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
@@ -316,6 +349,21 @@ public class Controller {
             iPrIntervalsList.getChildren().add(0, lvPI);
         }
     }
+
+    // Создание нового пользователя
+    public void iBtUserNewAction(ActionEvent actionEvent) {
+        System.out.println("new user");
+
+    }
+
+    // Сохраненные расчеты - включение фильтра
+    public void iBtnArcFilterAction(ActionEvent actionEvent) {
+        LocalDate d1 = iArcDateFrom.getValue();
+        LocalDate d2 = iArcDateTo.getValue();
+        System.out.println("filter " + d1 + " " + d2);
+
+    }
+
 
     // Сохранение нового признака или после редактирования
     public void iBtnPrNewSaveAction(ActionEvent actionEvent) {

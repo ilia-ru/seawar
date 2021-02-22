@@ -220,14 +220,15 @@ public class Priznaki extends KSQL {
 
         // Возвращает список интервалов для ввода/ред-ния признаков
         public ObservableList<PIntervalPR> getListPI() {
-            boolean isFirst;
             List<PIntervalPR> pr = new ArrayList<>();
             if (pMapIntervals.size() >= 2) {  // Элементов в массиве должно быть >=2, чтобы описать концы интервала
-                isFirst = true;  // В первом интервале 2 поля для ввода, в остальных - по 1
-                pr.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), isFirst));
-                for (int i = 2; i < pMapIntervals.size(); i++) {
-                    pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false));
+                // В первом интервале 2 поля для ввода, в остальных - по 1, а в последнем - <=
+                pr.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), true, false));
+                for (int i = 2; i < pMapIntervals.size()-1; i++) {
+                    pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, false));
                 }
+                int i = pMapIntervals.size()-1;
+                pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, true));
             }
             obsPI = FXCollections.observableArrayList(pr);
             return obsPI;
@@ -285,6 +286,14 @@ public class Priznaki extends KSQL {
             Double prevVal = minVal();
             for (int i=1;i<getPMapIntervals().size();i++) {  // Со второй строки
                 pi = getPMapIntervals().get(i);
+                if (i == getPMapIntervals().size() - 1) {  // Последний интервал - берем <=
+                    if (inputVal >= prevVal && inputVal <= pi.val) {
+                        return pi.ball;
+                    } else {
+                        return null;  // Выход за диапазон
+                    }
+                }
+                // Не последний интервал
                 if (inputVal >= prevVal && inputVal < pi.val) {
                     return pi.ball;
                 } else {
@@ -321,11 +330,11 @@ public class Priznaki extends KSQL {
             lll.setText(str);
         }
 
-        public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst) {
+        public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst, boolean isLast) {
             Label ll = new Label(String.valueOf(pi2.getId()));
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
-      //****      ll.setVisible(false);
+            ll.setVisible(false);  // Скрываем ID
             this.getChildren().add(0, ll);
 
             // Первое поле ввода
@@ -344,7 +353,11 @@ public class Priznaki extends KSQL {
                 this.getChildren().add(1, ll);
             }
 
-            ll = new Label("≤ X <");
+            if (isLast) {
+                ll = new Label("≤ X ≤");
+            } else {
+                ll = new Label("≤ X <");
+            }
 //            ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
@@ -596,7 +609,7 @@ public class Priznaki extends KSQL {
                                 priznakiMap.get(id).setInputVal(Double.valueOf(newValue));
                                 // В диапазоне?
                                 if (priznakiMap.get(id).getInputVal() >= priznakiMap.get(id).minVal()
-                                        && priznakiMap.get(id).getInputVal() < priznakiMap.get(id).maxVal()) {
+                                        && priznakiMap.get(id).getInputVal() <= priznakiMap.get(id).maxVal()) {
                                     //priznakiMap.get(id).getBall();
                                     this.iBalls.setText(String.valueOf(priznakiMap.get(id).getBall()));
                                     priznakiMap.get(id).setDataValid(DATA_OK);
@@ -615,7 +628,7 @@ public class Priznaki extends KSQL {
                         });
                 this.getChildren().add(iInputVal);
 
-                ll = new Label("< "+String.valueOf(priznakiMap.get(id).maxVal()));
+                ll = new Label("≤ "+String.valueOf(priznakiMap.get(id).maxVal()));
                 ll.setPrefWidth(50);
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(ll);
