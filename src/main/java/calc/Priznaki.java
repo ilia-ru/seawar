@@ -381,18 +381,35 @@ public class Priznaki extends KSQL {
             ll.setVisible(false);  // Скрываем ID
             this.getChildren().add(0, ll);
 
+            // Форматтер для iInputValLeft
+            UnaryOperator<TextFormatter.Change> iInputValfilter = change -> {
+                String text = change.getText();
+                if (text.compareTo(",") == 0) {
+                    text = ".";
+                    change.setText(".");
+                }
+                if (text.matches("[0-9.-]*")) {
+                    if ((text.compareTo(".") == 0) && iInputValLeft.getText().contains(".")) {
+                        return null;
+                    }  // вторую точку вводят
+                    return change;
+                }
+                return null;
+            };
+            TextFormatter<String> iInputValFormatter = new TextFormatter<>(iInputValfilter);
+
             // Первое поле ввода
             if (isFirst) {
                 iInputValLeft = new TextField(String.valueOf(pi.getVal()));
- //               iInputVal.setTextFormatter(iInputValFormatter);
+                iInputValLeft.setTextFormatter(iInputValFormatter);
 
-                iInputValLeft.setPrefWidth(50);
+                iInputValLeft.setPrefWidth(60);
                 iInputValLeft.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(1, iInputValLeft);
             } else { // Не первый интервал  - не даем вводить
                 ll = new Label(String.valueOf(pi.getVal()));
                 ll.setId("iLabMin");
-                ll.setPrefWidth(50);
+                ll.setPrefWidth(60);
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(1, ll);
             }
@@ -408,12 +425,27 @@ public class Priznaki extends KSQL {
 
             // Второе поле ввода
             iInputVal = new TextField(String.valueOf(pi2.getVal()));
-//            iInputVal.setTextFormatter(iInputValFormatter);
-
-            iInputVal.setPrefWidth(50);
+            iInputVal.setPrefWidth(60);
             iInputVal.setAlignment(Pos.CENTER_RIGHT);
             iInputVal.focusedProperty().addListener((obs, oldVal, newVal) ->
                     System.out.println(newVal));
+            // Форматтер для iInputVal
+            UnaryOperator<TextFormatter.Change> iInputValfilter2 = change -> {
+                String text = change.getText();
+                if (text.compareTo(",") == 0) {
+                    text = ".";
+                    change.setText(".");
+                }
+                if (text.matches("[0-9.-]*")) {
+                    if ((text.compareTo(".") == 0) && iInputVal.getText().contains(".")) {
+                        return null;
+                    }  // вторую точку вводят
+                    return change;
+                }
+                return null;
+            };
+            TextFormatter<String> iInputValFormatter2 = new TextFormatter<>(iInputValfilter2);
+            iInputVal.setTextFormatter(iInputValFormatter2);
             this.getChildren().add(iInputVal);
 
             ll = new Label(" балл:");
