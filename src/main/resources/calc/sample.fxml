@@ -23,23 +23,23 @@
                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="17.0" prefWidth="1000.0" styleClass="H2" text="Критерии Стьюдента" textAlignment="CENTER" />
             </children>
          </VBox>
-         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
+         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
             <children>
                   <HBox prefWidth="1000.0" visible="true">
                         <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Симуляционный калькулятор" />
                   </HBox>
                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
                   <children>
-                     <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefWidth="470.0">
+                     <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefWidth="500.0">
                         <children>
                            <Label alignment="CENTER" prefHeight="17.0" prefWidth="388.0" styleClass="H1" text="Список признаков" />
-                              <HBox fx:id="iTblPane" maxHeight="1.7976931348623157E308" prefWidth="460.0" />
+                              <HBox fx:id="iTblPane" maxHeight="1.7976931348623157E308" prefWidth="480.0" />
                         </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                      </VBox>
-                     <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="530.0">
+                     <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="500.0">
                         <children>
                               <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H1" text="Расчет" textAlignment="CENTER" />
                               <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
@@ -108,7 +108,7 @@
                                       </font>
                                   </Label>
                                   <Label layoutX="10.0" layoutY="10.0" text="баллов" /></HBox>
-                              <ImageView fx:id="iImgAlgoritm" fitHeight="349.0" fitWidth="521.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="iImgAlgoritm" fitHeight="349.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true">
                                  <VBox.margin>
                                     <Insets top="10.0" />
                                  </VBox.margin></ImageView>
@@ -208,7 +208,7 @@
                                        <padding>
                                           <Insets left="5.0" />
                                        </padding></Label>
-                                          <Button alignment="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="152.0" text="Добавить интервал" />
+                                          <Button fx:id="iBtIntervalAdd" alignment="CENTER" mnemonicParsing="false" onAction="#iBtIntervalAddAction" prefHeight="25.0" prefWidth="152.0" text="Добавить интервал" />
                                       </children>
                                  <VBox.margin>
                                     <Insets top="5.0" />
@@ -236,7 +236,7 @@
 
 
           <!--  ********* -->
-          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox prefWidth="1000.0" visible="true">
                       <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Архив расчетов" />

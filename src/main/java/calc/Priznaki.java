@@ -203,6 +203,37 @@ public class Priznaki extends KSQL {
             pMapIntervals = new ArrayList<>();
         }
 
+        // Добавление интервала pMapTmp
+        public void addInterval() {
+            if (pMapIntervals.size() == 0) {
+                pMapIntervals.add(new PInterval(0, 0, 0));
+                pMapIntervals.add(new PInterval(1, 0, 0));
+                obsPI.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), true, false));
+//                obsPI.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), false, true));
+           //     getListPI();
+                correctSign();
+                return;
+            }
+            pMapIntervals.add(new PInterval(0, 0, 0));
+            int i = pMapIntervals.size()-1;
+            obsPI.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, true));
+            correctSign();
+        }
+
+        // Проходит по List и корректирует знак < и <= где нужно
+        private void correctSign() {
+            if (obsPI.size() == 1) { // Первый и единственный "≤ X ≤"
+                obsPI.get(0).setLabSign(true);
+            } else {
+                for (int i = 0; i < obsPI.size()-1; i++) {  // Середина списка
+                    obsPI.get(i).setLabSign(false); //"≤ X <"
+                }
+                if (obsPI.size() >0) { // Последний
+                    obsPI.get(obsPI.size()-1).setLabSign(true); // "≤ X ≤"
+                }
+            }
+        }
+
         // Формирует список интервалов по началу, концу и кол-ву шагов и добавляет в данный PMapItem
         public void fastIntervalFill(Double from, Double to, int count) {
             Double step, val;
@@ -224,13 +255,14 @@ public class Priznaki extends KSQL {
             if (pMapIntervals.size() >= 2) {  // Элементов в массиве должно быть >=2, чтобы описать концы интервала
                 // В первом интервале 2 поля для ввода, в остальных - по 1, а в последнем - <=
                 pr.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), true, false));
-                for (int i = 2; i < pMapIntervals.size()-1; i++) {
+                for (int i = 2; i < pMapIntervals.size(); i++) {
                     pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, false));
                 }
-                int i = pMapIntervals.size()-1;
-                pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, true));
+ //               int i = pMapIntervals.size()-1;
+ //               pr.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, true));
             }
             obsPI = FXCollections.observableArrayList(pr);
+            correctSign();
             return obsPI;
         }
 
@@ -324,10 +356,22 @@ public class Priznaki extends KSQL {
             return Integer.valueOf(iBallVal.getText());
         }
 
-        public void setLabMin(String str) {
+        // Переносим конец интервала из предыдущего интервала в этот
+        public void setLabMin(String str) {  // Ставим str в нужный Label
             Label lll;
             lll = (Label) this.getChildren().get(1);
             lll.setText(str);
+        }
+
+        // Ставим нужный знак false < или true <= данному интервалу
+        public void setLabSign(boolean sign) {
+            Label lll;
+            lll = (Label) this.getChildren().get(2);
+            if (sign) {
+                lll.setText("≤ X ≤");
+            } else {
+                lll.setText("≤ X <");
+            }
         }
 
         public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst, boolean isLast) {
@@ -368,6 +412,8 @@ public class Priznaki extends KSQL {
 
             iInputVal.setPrefWidth(50);
             iInputVal.setAlignment(Pos.CENTER_RIGHT);
+            iInputVal.focusedProperty().addListener((obs, oldVal, newVal) ->
+                    System.out.println(newVal));
             this.getChildren().add(iInputVal);
 
             ll = new Label(" балл:");
@@ -423,6 +469,8 @@ public class Priznaki extends KSQL {
                         if (i < obsPI.size()) {  // У последнего не нужно
                             obsPI.get(i).setLabMin(d.toString());
                         }
+                        //obsPI.get(obsPI.size()-1).setLabSign();
+                        pMapTmp.correctSign();
                     }
                 });
                 this.getChildren().add(IV);
@@ -629,7 +677,7 @@ public class Priznaki extends KSQL {
                 this.getChildren().add(iInputVal);
 
                 ll = new Label("≤ "+String.valueOf(priznakiMap.get(id).maxVal()));
-                ll.setPrefWidth(50);
+                ll.setPrefWidth(70);
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(ll);
 

@@ -162,7 +162,7 @@ public class Controller {
         priznaki.createFromSQL("");
         lvEQ = new ListView();
         lvEQ.setItems(priznaki.getListEQ());  // Список признаков для calc_eq
-        lvEQ.setPrefWidth(450);
+        lvEQ.setPrefWidth(490);
         lvEQ.setPrefHeight(600);
         iTblPane.getChildren().add(0, lvEQ);
         iTblPane.setPrefHeight(600);
@@ -315,6 +315,7 @@ public class Controller {
         iCalcQEPane.setVisible(true);
         iListArCalcPane.setVisible(true);
         iUsersPane.setVisible(true);
+        iCalcQEArcPane.setVisible(true);
 
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
@@ -371,6 +372,12 @@ public class Controller {
         tableCalcs = calcArc.getCalcsFromSQL("");
         iArcViewPane.setVisible(false);
     }
+
+    // Признаки - добавление нового интервала
+    public void iBtIntervalAddAction(ActionEvent actionEvent) {
+        priznaki.getPMapTmp().addInterval();
+    }
+
 
     // Сохранение нового признака или после редактирования
     public void iBtnPrNewSaveAction(ActionEvent actionEvent) {
