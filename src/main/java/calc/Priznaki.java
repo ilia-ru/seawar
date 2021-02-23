@@ -205,18 +205,14 @@ public class Priznaki extends KSQL {
 
         // Добавление интервала pMapTmp
         public void addInterval() {
-            if (pMapIntervals.size() == 0) {
-                pMapIntervals.add(new PInterval(0, 0, 0));
-                pMapIntervals.add(new PInterval(1, 0, 0));
-                obsPI.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), true, false));
-//                obsPI.add(new PIntervalPR(pMapIntervals.get(0), pMapIntervals.get(1), false, true));
-           //     getListPI();
-                correctSign();
-                return;
+            PInterval p1, p2;
+            if (obsPI.size() == 0) {
+                p1 = new PInterval(0, 0, 0);
+            } else {
+                p1 = new PInterval(0, obsPI.get(obsPI.size() - 1).getInputVal(), 0);
             }
-            pMapIntervals.add(new PInterval(0, 0, 0));
-            int i = pMapIntervals.size()-1;
-            obsPI.add(new PIntervalPR(pMapIntervals.get(i - 1), pMapIntervals.get(i), false, true));
+            p2 = new PInterval(1, 0, 0);
+            obsPI.add(new PIntervalPR(p1, p2, false, true));
             correctSign();
         }
 
@@ -374,7 +370,18 @@ public class Priznaki extends KSQL {
             }
         }
 
+        class MyTextField extends TextField { //
+            PIntervalPR container;  // Ссылка на HBox. Чтобы знать в какой строке списка поле
+
+            public MyTextField(String text, PIntervalPR container) {
+                super(text);
+                this.container = container;
+            }
+            public PIntervalPR getContainer() { return container; }
+        }
+
         public PIntervalPR(PInterval pi, PInterval pi2, boolean isFirst, boolean isLast) {
+
             Label ll = new Label(String.valueOf(pi2.getId()));
             ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
@@ -423,12 +430,18 @@ public class Priznaki extends KSQL {
             ll.setAlignment(Pos.CENTER_RIGHT);
             this.getChildren().add(ll);
 
-            // Второе поле ввода
-            iInputVal = new TextField(String.valueOf(pi2.getVal()));
+        // Второе поле ввода
+            iInputVal = new MyTextField(String.valueOf(pi2.getVal()), this);
             iInputVal.setPrefWidth(60);
             iInputVal.setAlignment(Pos.CENTER_RIGHT);
-            iInputVal.focusedProperty().addListener((obs, oldVal, newVal) ->
-                    System.out.println(newVal));
+            iInputVal.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) { // Потеря фокуса
+                    int i = obsPI.indexOf(this);
+                    if (i < obsPI.size()-1) {
+                        obsPI.get(i+1).setLabMin(obsPI.get(i).getInputVal().toString());
+                    }
+                }
+            });
             // Форматтер для iInputVal
             UnaryOperator<TextFormatter.Change> iInputValfilter2 = change -> {
                 String text = change.getText();
@@ -507,89 +520,6 @@ public class Priznaki extends KSQL {
                 });
                 this.getChildren().add(IV);
             }
-
-            this.setSpacing(5);
-            this.setAlignment(Pos.CENTER_LEFT);
-//            this.setPadding(new Insets(0, 5, 0, 0));
-        }
-
-        public PIntervalPR(PInterval pi, boolean isFirst) {
-            Label ll = new Label(String.valueOf(pi.getId()));
-            ll.setPrefWidth(25);
-            ll.setAlignment(Pos.CENTER_RIGHT);
-            this.getChildren().add(ll);
-
-            if (isFirst) {  // Первый интервал
-                iInputVal = new TextField(String.valueOf(pi.getVal()));
-// Форматтер для ввода только чисел в TextField iInputVal
-                UnaryOperator<TextFormatter.Change> iInputValfilter = change -> {
-                    String text = change.getText();
-                    if (text.compareTo(",") == 0) {
-                        text = ".";
-                        change.setText(".");
-                    }
-                    if (text.matches("[0-9.-]*")) {
-                        if ((text.compareTo(".") == 0) && iInputVal.getText().contains(".")) {
-                            return null;
-                        }  // вторую точку вводят
-                        return change;
-                    }
-                    return null;
-                };
-                TextFormatter<String> iInputValFormatter = new TextFormatter<>(iInputValfilter);
-                iInputVal.setTextFormatter(iInputValFormatter);
-
-                iInputVal.setPrefWidth(50);
-                iInputVal.setAlignment(Pos.CENTER_RIGHT);
-                this.getChildren().add(iInputVal);
-            } else { // Остальные интервалы  - не даем вводить
-                ll = new Label(String.valueOf(pi.getVal()));
-                ll.setPrefWidth(50);
-                ll.setAlignment(Pos.CENTER_RIGHT);
-                this.getChildren().add(ll);
-            }
-
-            ll = new Label("≤ X <");
-            ll.setPrefWidth(25);
-            ll.setAlignment(Pos.CENTER_RIGHT);
-            this.getChildren().add(ll);
-
-            iBallVal = new TextField(String.valueOf(pi.getBall()));
-// Форматтер для ввода только чисел в TextField iBallVal
-            UnaryOperator<TextFormatter.Change> iBallValFilter = change -> {
-                String text = change.getText();
-                if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
-                if (text.matches("[0-9.-]*")) {
-                    if ((text.compareTo(".") == 0) && iBallVal.getText().contains(".")) { return null; }  // вторую точку вводят
-                    return change;
-                }
-                return null;
-            };
-            TextFormatter<String> iBallValFormatter = new TextFormatter<>(iBallValFilter);
-            iBallVal.setTextFormatter(iBallValFormatter);
-
-            iBallVal.setPrefWidth(50);
-            iBallVal.setAlignment(Pos.CENTER_RIGHT);
-            this.getChildren().add(iBallVal);
-
-            this.IV = new ImageView(EQ_IMG_DELETE);
-            this.IV.setFitWidth(20);
-            this.IV.setFitHeight(20);
-            IV.setOnMouseClicked(event -> {  // Удаление интервала
-                System.out.println("delete " + pi.getId());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                        "\"Интервал\" будет удален без возможности восстановления");
-                alert.setTitle("Удаление данных");
-                alert.setHeaderText("Подтвердите удаление интервала");
-                alert.getButtonTypes().clear();
-                alert.getButtonTypes().addAll(new ButtonType("Удалить", ButtonBar.ButtonData.OK_DONE),
-                        new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE));
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && (result.get().getButtonData().name() == "OK_DONE")) {
-                    System.out.println("delete 2 " + pi.getId());
-                }
-            });
-            this.getChildren().add(IV);
 
             this.setSpacing(5);
             this.setAlignment(Pos.CENTER_LEFT);

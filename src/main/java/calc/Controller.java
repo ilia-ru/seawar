@@ -199,7 +199,6 @@ public class Controller {
         lvPR = new ListView();
         lvPR.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
         lvPR.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
-            System.out.println("lll" + obj + " " + oldValue + " " + newValue);
             if (newValue != null) { //
                 clearPrEditPane();
                 iPrEditCaption.setText("Редактирование признака");
@@ -386,7 +385,7 @@ public class Controller {
             alert.setTitle("Внимание");
             alert.setHeaderText("Введите название признака");
             alert.show();
-        } else if (priznaki.getPMapTmp().getPMapIntervals().size() < 2) { // Интервалы не введены
+        } else if (lvPI.getItems().size() < 2) { // Интервалы не введены
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Интервалы признака не введены, или вввдены неверно");
             alert.setTitle("Внимание");
             alert.setHeaderText("Введите интервалы");
@@ -399,10 +398,8 @@ public class Controller {
             // Если == NOT_IN_PMAP - значит добавление т.к. нету ID. Если есть ID - то правка
             if (priznaki.getPMapTmp().getTmpId() == NOT_IN_PMAP) {  // Добавляем
                 // Сохраняем в мапу и БД
-                System.out.println("add");
                 priznaki.addPriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
             } else {  // Изменяем
-                System.out.println("edit");
                 priznaki.changePriznak(priznaki.getPMapTmp(), opr);  // Пишем в мапу и БД
             }
             lvPR.setItems(priznaki.getListPR());  // Обновляем список признаков на экране
