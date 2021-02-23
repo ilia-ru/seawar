@@ -1,23 +1,22 @@
-package calc;
-
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
-public class Main extends Application {
-
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
-        primaryStage.show();
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-}
+                                  <HBox fx:id="iPrIntervalsList" alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" maxHeight="1.7976931348623157E308" prefWidth="490.0" spacing="10.0" />
+                                      <VBox fx:id="iPrCreateEditLogicalPane">
+                                          <VBox visible="false">
+                                              <Label alignment="CENTER" prefHeight="17.0" prefWidth="490.0" styleClass="H2" text="Введите значения" />
+                                              <HBox spacing="5.0">
+                                                  <Label text="Для значения 'Да'" />
+                                                  <TextField fx:id="iPrLogicalYes" />
+                                                  <Label text="баллов" />
+                                          <padding>
+                                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          </padding>
+                                              </HBox>
+                                              <HBox spacing="5.0">
+                                                  <Label text="Для значения 'Нет'" />
+                                                  <TextField fx:id="iPrLogicalNo" />
+                                                  <Label text="баллов" />
+                                          <padding>
+                                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          </padding>
+                                              </HBox>
+                                          </VBox>
+                                      </VBox>

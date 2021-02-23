@@ -145,7 +145,7 @@
                   </HBox>
             </children>
          </VBox>
-          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
+          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
               <children>
                   <HBox prefHeight="17.0" prefWidth="1000.0">
                       <children>
@@ -179,8 +179,24 @@
                                           <Label text="Название признака" />
                                     <TextField fx:id="iPrPriznakName" prefHeight="25.0" prefWidth="325.0" />
                                       </children>
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
                                   </HBox>
-                                  <VBox alignment="CENTER_LEFT" prefHeight="49.0" prefWidth="399.0" spacing="10.0" style="-fx-background-color: #bbbbbb;">
+                                  <HBox alignment="CENTER" minHeight="30.0" prefHeight="31.0" prefWidth="490.0" spacing="10.0">
+                                      <Label prefHeight="17.0" styleClass="H3" text="Тип признака: " />
+                                      <RadioButton fx:id="iPrTypeDecimal" mnemonicParsing="false" text="Числовой" toggleGroup="$radioPrType">
+                                      <toggleGroup>
+                                          <ToggleGroup fx:id="radioPrType" />
+                                      </toggleGroup></RadioButton>
+                                      <RadioButton fx:id="iPrTypeLogical" mnemonicParsing="false" text="Логический" toggleGroup="$radioPrType" />
+                                 <padding>
+                                    <Insets top="5.0" />
+                                 </padding>
+                                  </HBox>
+
+                                      <VBox fx:id="iPrCreateEditDecimalPane">
+                                  <VBox fx:id="iPrFastCreatePane" alignment="CENTER_LEFT" prefHeight="49.0" prefWidth="399.0" spacing="10.0" style="-fx-background-color: #bbbbbb;">
                                       <children>
                                     <HBox prefHeight="100.0" prefWidth="200.0">
                                        <children>
@@ -214,7 +230,9 @@
                                     <Insets top="5.0" />
                                  </VBox.margin>
                                   </HBox>
-                                  <HBox fx:id="iPrIntervalsList" alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" maxHeight="1.7976931348623157E308" prefWidth="490.0" spacing="10.0" />
+                                          <HBox fx:id="iPrIntervalsList" alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" maxHeight="1.7976931348623157E308" prefWidth="490.0" spacing="10.0" />
+                                      </VBox>
+
                                   <HBox alignment="CENTER" layoutX="10.0" layoutY="157.0" prefHeight="49.0" prefWidth="399.0" spacing="120.0">
                                       <children>
                                           <Button fx:id="iBtnPrNewSave" mnemonicParsing="false" onAction="#iBtnPrNewSaveAction" text="Сохранить признак" />

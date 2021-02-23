@@ -72,6 +72,13 @@ public class Controller {
     public DatePicker iArcDateFrom;
     public DatePicker iArcDateTo;
     public VBox iArcViewPane;
+    public RadioButton iPrTypeDecimal;
+    public RadioButton iPrTypeLogical;
+    public ToggleGroup radioPrType;
+    public VBox iPrFastCreatePane;
+    public Button iBtIntervalAdd;
+//    public VBox iPrCreateEditDecimalPane;
+//    public VBox iPrCreateEditLogicalPane;
 
     ListView lvEQ;      // Для EQ
     ListView lvPR;      // Для PR
@@ -197,7 +204,7 @@ public class Controller {
         });
 
         lvPR = new ListView();
-        lvPR.setItems(priznaki.getListPR());  // Список признаков для редактирвоания признаков
+        lvPR.setItems(priznaki.getListPR());  // Список признаков для редактирования признаков
         lvPR.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
             if (newValue != null) { //
                 clearPrEditPane();
@@ -209,6 +216,16 @@ public class Controller {
                 lvPI.setItems(pm.getListPI());
                 iPrIntervalsList.getChildren().clear();
                 iPrIntervalsList.getChildren().add(0, lvPI);
+                // Тип признака 1 - числовой, 2 - логический
+                if (pm.getType() == 1) {  // Radio
+                    iPrTypeDecimal.setSelected(true);
+                } else {
+                    iPrTypeLogical.setSelected(true);
+                }
+                // Тип признака менять не даем
+                iPrTypeLogical.setDisable(true);
+                iPrTypeDecimal.setDisable(true);
+
                 iPrCreateEditPane.setVisible(true);
             }
         });
@@ -310,6 +327,29 @@ public class Controller {
             window.show();
         });
 
+        // Тип признака - показ панели ввода признака- логический
+        iPrTypeLogical.selectedProperty().addListener((obj, oldValue, newValue) -> {
+            if (newValue != null) { //
+                iPrFastFrom.setDisable(true);
+                iPrFastTo.setDisable(true);
+                iPrFastCount.setDisable(true);
+                iBtIntervalAdd.setDisable(true);
+                priznaki.getPMapTmp().setType(2);  // Логический
+            }
+        });
+
+        // Тип признака - показ панели ввода признака- числовой
+        iPrTypeDecimal.selectedProperty().addListener((obj, oldValue, newValue) -> {
+            if (newValue != null) { //
+                //iPrFastCreatePane.setDisable(false);
+                iPrFastFrom.setDisable(false);
+                iPrFastTo.setDisable(false);
+                iPrFastCount.setDisable(false);
+                iBtIntervalAdd.setDisable(false);
+                priznaki.getPMapTmp().setType(1);  // Decimal
+           }
+        });
+
         iPriznakiPane.setVisible(true);
         iCalcQEPane.setVisible(true);
         iListArCalcPane.setVisible(true);
@@ -323,31 +363,42 @@ public class Controller {
 
     }
 
+
+
     // Быстрое создание интервалов
     public void iBtFastCreatePriznakAction(ActionEvent actionEvent) {
-        if (iPrFastFrom.getText().compareTo("") == 0) { iPrFastFrom.setText("0"); }
-        if (iPrFastTo.getText().compareTo("") == 0) { iPrFastTo.setText("0"); }
-        if (iPrFastCount.getText().compareTo("") == 0) { iPrFastCount.setText("10"); }
+            if (iPrFastFrom.getText().compareTo("") == 0) {
+                iPrFastFrom.setText("0");
+            }
+            if (iPrFastTo.getText().compareTo("") == 0) {
+                iPrFastTo.setText("0");
+            }
+            if (iPrFastCount.getText().compareTo("") == 0) {
+                iPrFastCount.setText("0");
+            }
 
-        if (iPrFastFrom.getText().compareTo("") == 0 || iPrFastTo.getText().compareTo("") == 0 ||
-                iPrFastCount.getText().compareTo("") == 0 ||
-                Double.valueOf(iPrFastFrom.getText()) >= Double.valueOf(iPrFastTo.getText()) ||
-                Integer.valueOf(iPrFastCount.getText()) <=0) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Условия на данные: \n1. Введите \"Min\", \"Max\" и \"Кол-во\"\n"+
-                    "2. Должно быть: Min < Max, Кол-во > 0\n"+
-                    "Введите корректные данные");
-            alert.setTitle("Внимание");
-            alert.setHeaderText("Некорректно введены данные");
-            alert.show();
-        } else {
-            Priznaki.PMapItem pm = priznaki.getPMapTmp();
-            pm.fastIntervalFill(Double.valueOf(iPrFastFrom.getText()),
-                    Double.valueOf(iPrFastTo.getText()), Integer.valueOf(iPrFastCount.getText()));
-            //    lvPI = new ListView();
-            lvPI.setItems(pm.getListPI());  // Список
-            iPrIntervalsList.getChildren().clear();
-            iPrIntervalsList.getChildren().add(0, lvPI);
+        if (iPrTypeDecimal.isSelected()) {
+            if (iPrFastFrom.getText().compareTo("") == 0 || iPrFastTo.getText().compareTo("") == 0 ||
+                    iPrFastCount.getText().compareTo("") == 0 ||
+                    Double.valueOf(iPrFastFrom.getText()) >= Double.valueOf(iPrFastTo.getText()) ||
+                    Integer.valueOf(iPrFastCount.getText()) <= 0) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Условия на данные: \n1. Введите \"Min\", \"Max\" и \"Кол-во\"\n" +
+                        "2. Должно быть: Min < Max, Кол-во > 0\n" +
+                        "Введите корректные данные");
+                alert.setTitle("Внимание");
+                alert.setHeaderText("Некорректно введены данные");
+                alert.show();
+                return;
+            }
         }
+        Priznaki.PMapItem pm = priznaki.getPMapTmp();
+        pm.fastIntervalFill(Double.valueOf(iPrFastFrom.getText()),
+                Double.valueOf(iPrFastTo.getText()), Integer.valueOf(iPrFastCount.getText()));
+        //    lvPI = new ListView();
+        lvPI.setItems(pm.getListPI());  // Список
+        iPrIntervalsList.getChildren().clear();
+        iPrIntervalsList.getChildren().add(0, lvPI);
+
     }
 
     // Создание нового пользователя
@@ -427,12 +478,17 @@ public class Controller {
     }
 
     public void iBtnPRCreatePR(ActionEvent actionEvent) {  // Создаем новый признак
-        Priznaki.PMapItem pm = priznaki.newPMapTmp("");
+        Priznaki.PMapItem pm = priznaki.newPMapTmp("", 1);
         // Чистим поля перед открытием
         clearPrEditPane();
         iPrEditCaption.setText("Создание нового признака");
         iBtnPrNewSave.setText("Сохранить новый признак");
+        iPrTypeDecimal.setSelected(true);
         iPrCreateEditPane.setVisible(true);
+        iPrTypeLogical.setDisable(false);
+        iPrTypeDecimal.setDisable(false);
+        iPrTypeDecimal.setSelected(true);
+        pm.setType(1); // decimal
     }
 
 

@@ -152,9 +152,6 @@ public class KSQL {
                     System.out.println("На сервере не найдена БД (" + e.getSQLState() + ")");
                 }
             }
-//        catch (CommunicationsException e) {
-  //          System.out.println("Нет соединения с сервером БД (" + e.getSQLState() + ")");
-//        }
             catch (SQLException e) {
                 if(e.getSQLState().equals("S1000")) { // БД занята другим приложением
                     System.out.println("БД занята другим приложением ("+e.getMessage()+ ")");

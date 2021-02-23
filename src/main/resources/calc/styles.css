@@ -26,7 +26,13 @@
 .H3 {
     -fx-font-weight: bold;
 }
+
 .combo-box {
+    -fx-font-size: 14;
+    -fx-font-name: Arial;
+}
+
+.radio-button {
     -fx-font-size: 14;
     -fx-font-name: Arial;
 }
