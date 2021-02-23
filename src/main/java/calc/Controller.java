@@ -12,10 +12,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Optional;
 
 import static calc.Main.priznaki;
@@ -73,6 +71,7 @@ public class Controller {
     public TextField iUserEditLastName;
     public DatePicker iArcDateFrom;
     public DatePicker iArcDateTo;
+    public VBox iArcViewPane;
 
     ListView lvEQ;      // Для EQ
     ListView lvPR;      // Для PR
@@ -258,9 +257,10 @@ public class Controller {
                 iArcPowerVal.setText(c.getPOWER_VAL());
                 iArcPowerVal.setStyle(c.getPOWER_VAL_STYLE());
                 iArcBalls.setText(c.getBALLS().toString());
-
+                iArcViewPane.setVisible(true);
             }
         });
+        iArcViewPane.setVisible(false);
         iListArCalcPane.getChildren().add(0,tableCalcs);
 
         // Пользователи
@@ -356,14 +356,21 @@ public class Controller {
 
     }
 
-    // Сохраненные расчеты - включение фильтра
+    // Архив расчетов - включение фильтра
     public void iBtnArcFilterAction(ActionEvent actionEvent) {
-        LocalDate d1 = iArcDateFrom.getValue();
-        LocalDate d2 = iArcDateTo.getValue();
-        System.out.println("filter " + d1 + " " + d2);
-
+        calcArc.setFilterDateFrom(iArcDateFrom.getValue());
+        calcArc.setFilterDateTo(iArcDateTo.getValue());
+        tableCalcs = calcArc.getCalcsFromSQL("");
+        iArcViewPane.setVisible(false);
     }
 
+    // Архив расчетов - Отключение фильтра
+    public void iBtnArcFilterCancelAction(ActionEvent actionEvent) {
+        calcArc.setFilterDateFrom(null);
+        calcArc.setFilterDateTo(null);
+        tableCalcs = calcArc.getCalcsFromSQL("");
+        iArcViewPane.setVisible(false);
+    }
 
     // Сохранение нового признака или после редактирования
     public void iBtnPrNewSaveAction(ActionEvent actionEvent) {

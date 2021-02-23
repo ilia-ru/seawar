@@ -242,9 +242,9 @@
                       <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Архив расчетов" />
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="1000.0" spacing="5.0" visible="true">
-                      <Label text="Выбрать за период c:" />
+                      <Label text="Выбрать за период c (&gt;=):" />
                       <DatePicker fx:id="iArcDateFrom" />
-                      <Label text="по:">
+                      <Label text="по (&lt;=):">
                         <padding>
                            <Insets left="5.0" />
                         </padding></Label>
@@ -252,6 +252,11 @@
                       <Button mnemonicParsing="false" onAction="#iBtnArcFilterAction" text="Показать">
                         <HBox.margin>
                            <Insets left="10.0" />
+                        </HBox.margin>
+                      </Button>
+                      <Button mnemonicParsing="false" onAction="#iBtnArcFilterCancelAction" text="Сбросить фильтр">
+                        <HBox.margin>
+                           <Insets left="5.0" />
                         </HBox.margin></Button>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -268,7 +273,7 @@
                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                               </padding>
                           </VBox>
-                          <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="699.0" style="-fx-border-color: #aaaaaa; -fx-border-width: 2;">
+                          <VBox fx:id="iArcViewPane" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="697.0" prefWidth="699.0" style="-fx-border-color: #aaaaaa; -fx-border-width: 2;">
                               <children>
                                   <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="490.0" spacing="10.0">
                                       <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" styleClass="H3" text="Сохраненный расчет:" textAlignment="CENTER" />

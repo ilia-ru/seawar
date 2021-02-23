@@ -13,6 +13,8 @@ import javafx.scene.layout.HBox;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,12 +25,30 @@ public class CalcArc extends KSQL {
     TableView<CalcRecord> tableArc = null;; // Таблица для показа на экране
     ObservableList<CalcRecord> obsCR;  // СПисок для TableView - список расчетов
     ObservableList<PriznakArc> obsPR;  // СПисок для ListView - список признаков
+    private LocalDate filterDateFrom;  // Фильтр - дата с
+    private LocalDate filterDateTo;    // Фильтр - дата по
 
     public CalcArc() {
         super();
         // Таблица
         this.tableArc = new TableView<CalcRecord>();
         TableViewDecorate(); // оформили внешний вид
+    }
+
+    public LocalDate getFilterDateFrom() {
+        return filterDateFrom;
+    }
+
+    public void setFilterDateFrom(LocalDate filterDateFrom) {
+        this.filterDateFrom = filterDateFrom;
+    }
+
+    public LocalDate getFilterDateTo() {
+        return filterDateTo;
+    }
+
+    public void setFilterDateTo(LocalDate filterDateTo) {
+        this.filterDateTo = filterDateTo;
     }
 
     public TableView<CalcRecord> getTableArc() {
@@ -207,7 +227,21 @@ public class CalcArc extends KSQL {
     }
 
     public TableView getCalcsFromSQL(String where) { // Создает из БД список расчетов
-        ResultSet rs = this.ksqlSELECT("SELECT * FROM PUBLIC.PUBLIC.ARCHIVE ORDER BY DATA,NAME");
+        String q = "SELECT * FROM PUBLIC.PUBLIC.ARCHIVE";
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (!(getFilterDateFrom() == null)) {  // есть От
+            q += " WHERE DATA >='" + getFilterDateFrom().format(dtf) + "'";
+            if (!(getFilterDateTo() == null)) {  // есть До
+                q += " AND DATA<='" + getFilterDateTo().format(dtf) + "'";
+            }
+        } else {  // нет От
+            if (!(getFilterDateTo() == null)) {  // есть До
+                q += " WHERE DATA<='" + getFilterDateTo().format(dtf) + "'";
+            }
+        }
+        q += " ORDER BY DATA,NAME";
+ //       System.out.println(q);
+        ResultSet rs = this.ksqlSELECT(q);
         List<CalcRecord> pr = new ArrayList<>();
         if (rs != null) {
             try {
