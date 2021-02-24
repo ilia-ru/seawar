@@ -20,13 +20,13 @@
       <StackPane fx:id="iStackPane">
          <VBox fx:id="iStudentPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
             <children>
-               <Label alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="17.0" prefWidth="1000.0" styleClass="H2" text="Критерии Стьюдента" textAlignment="CENTER" />
+               <Label alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="17.0" prefWidth="1000.0" styleClass="module-caption" text="Критерии Стьюдента" textAlignment="CENTER" />
             </children>
          </VBox>
          <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
             <children>
                   <HBox prefWidth="1000.0" visible="true">
-                        <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Симуляционный калькулятор" />
+                        <Label alignment="CENTER" prefWidth="1000.0" styleClass="module-caption" text="Симуляционный калькулятор" />
                   </HBox>
                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
                   <children>
@@ -145,11 +145,11 @@
                   </HBox>
             </children>
          </VBox>
-          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox prefHeight="17.0" prefWidth="1000.0">
                       <children>
-                          <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Признаки" />
+                          <Label alignment="CENTER" prefWidth="1000.0" styleClass="module-caption" text="Признаки" />
                       </children>
                   </HBox>
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="682.0" prefWidth="1000.0">
@@ -257,7 +257,7 @@
           <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox prefWidth="1000.0" visible="true">
-                      <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Архив расчетов" />
+                      <Label alignment="CENTER" prefWidth="1000.0" styleClass="module-caption" text="Архив расчетов" />
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefWidth="1000.0" spacing="5.0" visible="true">
                       <Label text="Выбрать за период c (&gt;=):" />
@@ -353,7 +353,7 @@
           <!--  ********* -->
           <VBox fx:id="iUsersPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" visible="false">
               <HBox prefWidth="1000.0" visible="true">
-              <Label alignment="CENTER" prefWidth="1000.0" styleClass="H2" text="Пользователи" />
+              <Label alignment="CENTER" prefWidth="1000.0" styleClass="module-caption" text="Пользователи" />
               </HBox>
               <HBox prefHeight="733.0" prefWidth="1000.0">
                   <VBox>

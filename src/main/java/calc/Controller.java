@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import static calc.Main.priznaki;
 
@@ -165,6 +166,56 @@ public class Controller {
         TopMenu t = new TopMenu();
         iHBoxMenu.getChildren().add(t.getMenu());
 
+        // Форматтеры для панели быстрого ввода
+        // iPrFastFrom
+        UnaryOperator<TextFormatter.Change> iPrFastFromFilter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) {
+                text = ".";
+                change.setText(".");
+            }
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iPrFastFrom.getText().contains(".")) {
+                    return null;
+                }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iPrFastFromFormatter = new TextFormatter<>(iPrFastFromFilter);
+        iPrFastFrom.setTextFormatter(iPrFastFromFormatter);
+        iPrFastFrom.setAlignment(Pos.CENTER_RIGHT);
+        // iPrFastTo
+        UnaryOperator<TextFormatter.Change> iPrFastToFilter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) {
+                text = ".";
+                change.setText(".");
+            }
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iPrFastTo.getText().contains(".")) {
+                    return null;
+                }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iPrFastToFormatter = new TextFormatter<>(iPrFastToFilter);
+        iPrFastTo.setTextFormatter(iPrFastToFormatter);
+        iPrFastTo.setAlignment(Pos.CENTER_RIGHT);
+        // iPrFastCount
+        UnaryOperator<TextFormatter.Change> iPrFastCountFilter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9-]*")) {  // integer
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iPrFastCountFormatter = new TextFormatter<>(iPrFastCountFilter);
+        iPrFastCount.setTextFormatter(iPrFastCountFormatter);
+        iPrFastCount.setAlignment(Pos.CENTER_RIGHT);
+
         priznaki = new Priznaki();
         priznaki.createFromSQL("");
         lvEQ = new ListView();
@@ -175,7 +226,8 @@ public class Controller {
         iTblPane.setPrefHeight(600);
 
         iImgAlgoritm.setOnMouseClicked(event -> {  // Разворачиваем в отдельное окно
-            //         System.out.println("цштв");
+            if (iImgAlgoritm.getImage() == null) { return; }  // Нет картинки, не нужно окно
+
             Stage window = new Stage();
             window.setTitle("Алгоритм принятия решений");
             VBox pane = new VBox();

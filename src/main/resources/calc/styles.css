@@ -23,6 +23,12 @@
     -fx-font-weight: bold;
 }
 
+.module-caption {
+    -fx-font-weight: bold;
+    -fx-background-color: #999999;
+    -fx-text-fill: white;
+}
+
 .H3 {
     -fx-font-weight: bold;
 }

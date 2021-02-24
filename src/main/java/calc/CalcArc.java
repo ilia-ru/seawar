@@ -262,7 +262,7 @@ public class CalcArc extends KSQL {
     }
 
     public ObservableList<PriznakArc> getPRFromSQL(Long arcId) { // Создает из БД список расчетов
-        String q = "SELECT * FROM PUBLIC.PUBLIC.ARCHIVE_PR WHERE ARC_ID=" + arcId + " ORDER BY NAME";
+        String q = "SELECT * FROM PUBLIC.PUBLIC.ARCHIVE_PR WHERE ARC_ID=" + arcId; // + " ORDER BY NAME";
         ResultSet rs = this.ksqlSELECT(q);
   //      System.out.println(q);
         List<PriznakArc> pr = new ArrayList<>();

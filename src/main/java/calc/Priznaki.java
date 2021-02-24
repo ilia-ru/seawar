@@ -668,11 +668,11 @@ public class Priznaki extends KSQL {
                 ll = new Label(id.toString());
                 ll.setPrefWidth(25);
                 ll.setAlignment(Pos.CENTER_RIGHT);
-                this.getChildren().add(ll);
+           //     this.getChildren().add(ll);
 
             ll = new Label(priznakiMap.getName(id));
-            ll.setPrefWidth(150);
-            ll.setMaxWidth(150);
+            ll.setPrefWidth(155);
+            ll.setMaxWidth(155);
             ll.setAlignment(Pos.CENTER_LEFT);
             this.getChildren().add(ll);
 
@@ -686,7 +686,7 @@ public class Priznaki extends KSQL {
                     ll.setPrefWidth(50);
                 } else {
                     ll = new Label("");
-                    ll.setPrefWidth(30);
+                    ll.setPrefWidth(45);
                 }
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(ll);
@@ -706,7 +706,7 @@ public class Priznaki extends KSQL {
                 TextFormatter<String> iInputValFormatter = new TextFormatter<>(iInputValfilter);
                 iInputVal.setTextFormatter(iInputValFormatter);
 
-                iInputVal.setPrefWidth(50);
+                iInputVal.setPrefWidth(70);
                 iInputVal.setAlignment(Pos.CENTER_RIGHT);
                 iInputVal.textProperty().addListener(  // расчет баллов
                         (observable, oldValue, newValue) -> {
@@ -780,7 +780,7 @@ public class Priznaki extends KSQL {
                     ll.setPrefWidth(70);
                 } else {
                     ll = new Label("");
-                    ll.setPrefWidth(60);
+                    ll.setPrefWidth(65);
                 }
                 ll.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(ll);
@@ -788,6 +788,7 @@ public class Priznaki extends KSQL {
 
                 iBalls = new Label("");
                 iBalls.setPrefWidth(50);
+                iBalls.setAlignment(Pos.CENTER_RIGHT);
                 this.getChildren().add(iBalls);
 
                 this.IV = new ImageView();
@@ -826,14 +827,18 @@ public class Priznaki extends KSQL {
         public PriznakPR(Long pid) {
             this.pid = pid;
             Label ll = new Label(pid.toString());
-            ll.setPrefWidth(25);
+            ll.setPrefWidth(0);
+            ll.setMaxWidth(0);
+            ll.setMinWidth(0);
+//            ll.setPrefWidth(25);
             ll.setAlignment(Pos.CENTER_RIGHT);
+            ll.setVisible(false);
             this.getChildren().add(ll);
 
           //  this.name = name;
             ll = new Label(priznakiMap.getName(pid));
-            ll.setPrefWidth(350);
-            ll.setMaxWidth(350);
+            ll.setPrefWidth(375);
+            ll.setMaxWidth(375);
             ll.setAlignment(Pos.CENTER_LEFT);
             this.getChildren().add(ll);
 
@@ -952,7 +957,6 @@ public class Priznaki extends KSQL {
                     " POWER_VAL_STYLE, BALLS, ALG) VALUES('" + name + "', '" +
                     design + "', '" + power + "', '" + power_val + "', '" + power_val_style + "', " +
                     balls  + ", " + alg + ");";
-        System.out.println(q);
         Long newId = this.ksqlINSERT(q);  // Кладем расчет в БД
         if (newId >= 0) { // Пишем в БД признаки
             // Значения берем из list, который был на экране
@@ -960,7 +964,6 @@ public class Priznaki extends KSQL {
                 if (priznakiMap.get(p.getEQid()).getDataValid() == DATA_OK) { // Только по валидным признакам
                     q = "INSERT INTO PUBLIC.PUBLIC.ARCHIVE_PR (ARC_ID, NAME, VAL) VALUES(" +
                             newId + ", '" + priznakiMap.get(p.getEQid()).getName() + "'," + p.iInputVal.getText() + ");";
-                    System.out.println(q);
                     this.ksqlINSERT(q);  // Кладем признаки в БД
                 }
             }
