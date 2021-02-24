@@ -23,7 +23,18 @@
     -fx-font-weight: bold;
 }
 
+.hi-user-pane .label {
+    -fx-font-weight: 400;
+    -fx-text-fill: black;
+}
+
 .module-caption {
+    -fx-font-weight: bold;
+    -fx-background-color: #999999;
+    -fx-text-fill: white;
+}
+
+.module-caption .label {
     -fx-font-weight: bold;
     -fx-background-color: #999999;
     -fx-text-fill: white;

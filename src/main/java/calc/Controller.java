@@ -26,10 +26,11 @@ public class Controller {
     public Button iBtnHide;
     public VBox iVBCalcSave;
     public TextField iCalcNameToSave;
-    public BorderPane iAscPane;
     public MenuBar iMainMenu;
     //    public TableView iTblPrizn;
     public HBox iTblPane;
+    public BorderPane iAuthorPane;
+    public Pane iFonPane;
     public Pane iListPane;
     public HBox iHBoxMenu;
     public HBox iListArCalcPane;
@@ -68,6 +69,7 @@ public class Controller {
     public HBox iUsersTable;
     public Label iUserEditId;
     public Label iUserEditCaption;
+    public Label iMsgNoUserFound;
     public TextField iUserEditName;
     public TextField iUserEditLastName;
     public DatePicker iArcDateFrom;
@@ -78,6 +80,11 @@ public class Controller {
     public ToggleGroup radioPrType;
     public VBox iPrFastCreatePane;
     public Button iBtIntervalAdd;
+    public TextField iLogin;
+    public PasswordField iPassword;
+    public HBox iHiUserPane;
+    public Label iModuleCaption;
+
 //    public VBox iPrCreateEditDecimalPane;
 //    public VBox iPrCreateEditLogicalPane;
 
@@ -88,7 +95,8 @@ public class Controller {
     TableView tableCalcs; // Список сохраненных расчетов
     CalcArc calcArc;
     TableView tableUsers; // Список пользователей
-    Users user;           //
+    Users users;          // Список пользователей. Там-же и текущий автооризованный, если есть
+    int moduleAccessMode; // У каждого модуля свой режим. 0 - общий доступ, 1 - только админ.
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
@@ -100,8 +108,15 @@ public class Controller {
 
             Label ll = new Label("Симуляционный калькулятор");
             ll.setOnMouseClicked(event -> {
-//                System.out.println("Симуляционный калькулятор " + event);
-                //iCalcQEPane.setVisible(false);
+                moduleAccessMode = 0; // Общий модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    return;
+                }
+                iModuleCaption.setText("Симуляционный калькулятор");
                 iCalcQEPane.toFront();
             });
             Menu mi = new Menu("", ll);
@@ -123,9 +138,17 @@ public class Controller {
 
             ll = new Label("Архив");
             ll.setOnMouseClicked(event -> {
+//                iListArCalcPane.setVisible(true);
+                moduleAccessMode = 1; // Закрытый модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    return;
+                }
+                iModuleCaption.setText("Архив");
                 tableCalcs = calcArc.getCalcsFromSQL("");
-//                tableCalcs.refresh();
-                iListArCalcPane.setVisible(true);
                 iCalcQEArcPane.toFront();
                 tableCalcs.requestFocus();
             });
@@ -135,6 +158,15 @@ public class Controller {
             ll = new Label("Признаки");
             ll.setOnMouseClicked(event -> {
                 //               System.out.println("Признаки " + event);
+                moduleAccessMode = 1; // Закрытый модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    return;
+                }
+                iModuleCaption.setText("Признаки");
                 iPriznakiPane.toFront();
             });
             mi = new Menu("", ll);
@@ -142,7 +174,15 @@ public class Controller {
 
             ll = new Label("Критерии Стьюдента");
             ll.setOnMouseClicked(event -> {
-                System.out.println("Критерии Стьюдента " + event);
+                moduleAccessMode = 1; // Закрытый модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    return;
+                }
+                iModuleCaption.setText("Критерии Стьюдента");
                 iStudentPane.toFront();
 
             });
@@ -151,8 +191,18 @@ public class Controller {
 
             ll = new Label("Пользователи");
             ll.setOnMouseClicked(event -> {
+                moduleAccessMode = 1; // Закрытый модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    return;
+                }
+                iModuleCaption.setText("Пользователи");
                 iUsersPane.toFront();
             });
+            iModuleCaption.setText("Пользователи");
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
         }
@@ -166,6 +216,20 @@ public class Controller {
         TopMenu t = new TopMenu();
         iHBoxMenu.getChildren().add(t.getMenu());
 
+        // При выходе пользователя, переводим на открытый раздел
+        iHiUserPane.visibleProperty().addListener((obj, oldValue, newValue) -> {
+            if (newValue != null && !newValue) {
+                iModuleCaption.setText("Симуляционный калькулятор");
+                iCalcQEPane.toFront();  // Первое окно - симуляц кальк
+            }
+        });
+
+        //  Убираем красную надпись в авторизации
+        iAuthorPane.visibleProperty().addListener((obj, oldValue, newValue) -> {
+            if (newValue != null && newValue) {
+                iMsgNoUserFound.setVisible(false);
+            }
+        });
         // Форматтеры для панели быстрого ввода
         // iPrFastFrom
         UnaryOperator<TextFormatter.Change> iPrFastFromFilter = change -> {
@@ -334,9 +398,9 @@ public class Controller {
         // Пользователи
         TableView tableUsers; // Список пользователей
 
-        user = new Users();
+        users = new Users();
         //       CalcArc.getTableArc().setItems();  // Список расчетов
-        tableUsers = user.getUsersFromSQL("");
+        tableUsers = users.getUsersFromSQL("");
         tableUsers.setEditable(true);
 //        tableUsers.setPrefWidth(285);
 //        tableUsers.setMaxWidth(285);
@@ -408,6 +472,7 @@ public class Controller {
         iUsersPane.setVisible(true);
         iCalcQEArcPane.setVisible(true);
 
+        iModuleCaption.setText("Симуляционный калькулятор");
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
 //        iListArCalcPane.setVisible(true);
@@ -543,16 +608,23 @@ public class Controller {
         pm.setType(1); // decimal
     }
 
-
-    public void iBtLoginLogin(ActionEvent actionEvent) {  // Авторизация - входим
-        System.out.println("Login - ok");
-        iAscPane.setVisible(false);
-        //iCVintra.
+    // Авторизация - входим
+    public void iBtLoginLogin(ActionEvent actionEvent) {
+        //System.out.println("Login - ok");
+        if (users.auth(iLogin.getText(), iPassword.getText())) {
+            iFonPane.setVisible(false);  // Авторизовались
+            iAuthorPane.setVisible(false);
+            iMsgNoUserFound.setVisible(false);
+            iHiUserPane.setVisible(true);
+            users.getCurrentUser().getHiUserPane(iHiUserPane);
+        } else {
+            iMsgNoUserFound.setVisible(true);
+        }
     }
 
     public void iBtLoginCancel(ActionEvent actionEvent) {  // Авторизация - Отказ
-        System.out.println("Login - Cancel");
-        //iCVintra.
+        iFonPane.setVisible(false);
+        iAuthorPane.setVisible(false);
     }
 
     // Расчет Симуляц. калькулятора

@@ -19,20 +19,46 @@ import java.util.Optional;
 
 public class Users extends KSQL {
 
+    final int USERS_ACCESS_ADMIN = 1;   // Код статуса админа
+    final int USERS_ACCESS_COMMON = 0;  //  Код статуса бесправного пользователя
+
     TableView<User> tableUsers = null;; // Таблица для показа на экране
     ObservableList<User> obsUSR;  // СПисок для TableView - список расчетов
+    private User currentUser; // Текущий пользователь
 
     public Users() {
         super();
         // Таблица
         this.tableUsers = new TableView<User>();
         TableViewDecorate(); // оформили внешний вид
+        currentUser = new User();
     }
 
-    public TableView<User> getTableArc() {
+    // Возвращает текущего пользователя
+    public User getCurrentUser() {
+        return this.currentUser;
+    }
+
+    // Очищает данные текущего пользователя
+    public void clearCurrentUser() {
+        this.currentUser = new User();
+    }
+
+
+    // Авторизация
+    public boolean auth(String login, String password) {
+        for (User u: obsUSR) {  // Ищем такого в списке
+            if ((u.getLogin().compareTo(login) == 0) && (u.getPassword().compareTo(password) == 0)) {
+                this.currentUser = u;
+                return true;  // Авторизация успешно
+            }
+        }
+        return false;  // враг - прогоняем
+    }
+
+    public TableView<User> getTableUsers() {
         return tableUsers;
     }
-
 
     public class User extends HBox {  // Одна строка - один user
         private Long pid;
@@ -40,9 +66,20 @@ public class Users extends KSQL {
         private String lastName;
         private String login;
         private String password;
-        private String access;
+        private String accessString;  // Это для дальнейшего развития. Пока int
+        private int access;
         private ImageView IV; // Кнопка "Удалить"
         private HBox actionHb;
+
+        public User() {  // Пустой пользователь. Еще никто не авторизовался
+            this.pid = -1l;
+            this.access = USERS_ACCESS_COMMON;  // До авторизации эмулируем user - без прав
+            this.actionHb = new HBox();  // Панель кнопок
+            this.IV = new ImageView(new Image("del.png"));
+            this.IV.setFitWidth(15);
+            this.IV.setFitHeight(15);
+            this.actionHb.getChildren().add(IV);
+        }
 
         public User(Long pid, String name, String lastName, String login, String password, String access) {
             this.pid = pid;
@@ -50,12 +87,58 @@ public class Users extends KSQL {
             this.lastName = lastName;
             this.login = login;
             this.password = password;
-            this.access = access;
+            if (access.compareTo("1") == 0) {
+                this.access = USERS_ACCESS_ADMIN;  // Админ
+            } else {
+                this.access = USERS_ACCESS_COMMON;  // user
+            }
             this.actionHb = new HBox();  // Панель кнопок
             this.IV = new ImageView(new Image("del.png"));
             this.IV.setFitWidth(15);
             this.IV.setFitHeight(15);
             this.actionHb.getChildren().add(IV);
+        }
+
+        // Заполняем панель для показа в строке названия модуля - с кнопкой выхода
+        public void getHiUserPane(HBox hb) {
+            Label ll = new Label("Здравствуйте,");
+            ll.getStyleClass().clear();
+            ll.getStyleClass().add("hi-user-pane");
+            hb.getChildren().add(ll);
+
+            if (getLastName().compareTo("") <= 0) {
+                ll = new Label(getName());
+            } else {
+                ll = new Label(getName() + " " + getLastName());
+            }
+            ll.getStyleClass().clear();
+            ll.getStyleClass().add("hi-user-pane");
+            hb.getChildren().add(ll);
+
+            ImageView i = new ImageView(new Image("exit.png"));
+            i.setFitWidth(30);
+            i.setFitHeight(30);
+            i.setOnMouseClicked((new EventHandler<MouseEvent>() { // Выход
+                public void handle(MouseEvent event) {  //
+                    if (event.getButton().name().equals("PRIMARY"))  // по левой кнопке мыши
+                    {
+                        System.out.println("exit");
+                        hb.getChildren().clear();
+                        hb.setVisible(false);
+                        clearCurrentUser();
+                    }
+                }
+            }));
+
+            hb.getChildren().add(i);
+        }
+
+        // Спрашиваем, можно ли зайти в раздел текущему пользователю
+        public boolean canComeIn(int moduleAccessMode) {
+            if (this.getAccess() >= moduleAccessMode) {  // Авторизован и прав хватает
+                return true;
+            }
+            return false;
         }
 
         public Long getPid() {
@@ -88,10 +171,10 @@ public class Users extends KSQL {
         public void setPassword(String password) {
             this.password = password;
        }
-        public String getAccess() {
+        public int getAccess() {
             return access;
         }
-        public void setAccess(String access) {
+        public void setAccess(int access) {
             this.access = access;
         }
         public HBox getActionHb() {
