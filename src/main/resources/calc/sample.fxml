@@ -18,11 +18,11 @@
          </VBox.margin>
       </HBox>
           <HBox alignment="CENTER_LEFT" prefWidth="1000.0" styleClass="module-caption" visible="true">
-              <Label fx:id="iModuleCaption"  alignment="CENTER_LEFT" prefWidth="700.0" prefHeight="30.0" minHeight="30.0" text="1111">
+              <Label fx:id="iModuleCaption" alignment="CENTER_LEFT" minHeight="30.0" prefHeight="30.0" prefWidth="700.0" text="1111">
                   <padding>
                       <Insets left="5.0" />
                   </padding></Label>
-              <HBox fx:id="iHiUserPane" alignment="CENTER_RIGHT" prefWidth="300.0" spacing="5.0" >
+              <HBox fx:id="iHiUserPane" alignment="CENTER_RIGHT" prefWidth="300.0" spacing="5.0">
                   <padding>
                       <Insets right="5.0" />
                   </padding>
@@ -153,7 +153,7 @@
                   </HBox>
             </children>
          </VBox>
-          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
+          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
               <children>
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="682.0" prefWidth="1000.0">
                       <children>
@@ -257,7 +257,7 @@
 
 
           <!--  ********* -->
-          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
+          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
               <children>
                   <HBox alignment="CENTER_LEFT" prefWidth="1000.0" spacing="5.0" visible="true">
                       <Label text="Выбрать за период c (&gt;=):" />
@@ -351,38 +351,47 @@
               </children>
           </VBox>
           <!--  ********* -->
-          <VBox fx:id="iUsersPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" visible="false">
+          <VBox fx:id="iUsersPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;">
               <HBox prefHeight="733.0" prefWidth="1000.0">
                   <VBox>
                       <HBox fx:id="iUsersTable" minWidth="300" prefHeight="714.0" prefWidth="419.0">
-                      </HBox>
+                        <VBox.margin>
+                           <Insets left="5.0" />
+                        </VBox.margin></HBox>
                       <HBox alignment="CENTER" minWidth="300">
-                          <Button fx:id="iBtUserNew" mnemonicParsing="false" onAction="#iBtUserNewAction" prefHeight="25.0" prefWidth="194.0" text="Добавить пользователя" />
+                          <Button fx:id="iBtUserNew" mnemonicParsing="false" onAction="#iBtUserNewAction" prefHeight="25.0" prefWidth="194.0" text="Добавить пользователя">
+                           <HBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </HBox.margin></Button>
                       </HBox>
                   </VBox>
-                  <VBox fx:id="iUsersEditPane" prefHeight="714.0" prefWidth="575.0">
-                      <HBox>
+                  <VBox fx:id="iUsersEditPane" prefHeight="714.0" prefWidth="575.0" spacing="5.0">
+                      <HBox alignment="CENTER">
                           <Label fx:id="iUserEditCaption" styleClass="H1" text="Редактирование данных пользователя" />
                         <VBox.margin>
                            <Insets top="15.0" />
                         </VBox.margin>
                       </HBox>
                       <HBox spacing="5.0">
-                          <Label text="ID" />
-                          <Label fx:id="iUserEditId" text="" />
-                      </HBox>
-                      <HBox spacing="5.0">
-                          <Label text="Имя" />
+                          <Label prefHeight="17.0" prefWidth="80.0" text="Имя" />
                           <TextField fx:id="iUserEditName" />
                       </HBox>
                       <HBox spacing="5.0">
-                          <Label text="Фамилия" />
+                          <Label prefHeight="17.0" prefWidth="80.0" text="Фамилия" />
                           <TextField fx:id="iUserEditLastName" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="80.0" text="Логин" />
+                          <TextField fx:id="iUserEditLogin" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="80.0" text="Пароль" />
+                          <TextField fx:id="iUserEditPassword" />
                       </HBox>
                       <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="80.0">
                           <children>
-                              <Button fx:id="iBtUserSave" mnemonicParsing="false" onAction="#iBtLoginLogin" prefHeight="25.0" prefWidth="131.0" text="Сохранить" />
-                              <Button fx:id="iBtUserSaveCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtLoginCancel" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
+                              <Button fx:id="iBtUserSave" mnemonicParsing="false" onAction="#iBtUserSaveAction" prefHeight="25.0" prefWidth="131.0" text="Сохранить" />
+                              <Button fx:id="iBtUserSaveCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtUserSaveCancelAction" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
                           </children>
                           <padding>
                               <Insets left="5.0" top="5.0" />
@@ -432,7 +441,7 @@
                         <HBox.margin>
                            <Insets left="20.0" />
                         </HBox.margin></Label>
-                     <PasswordField fx:id="iPassword" prefWidth="200.0" text="111"/>
+                     <PasswordField fx:id="iPassword" prefWidth="200.0" text="111" />
                      </children>
                      <padding>
                          <Insets left="5.0" top="5.0" />

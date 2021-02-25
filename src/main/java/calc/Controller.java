@@ -72,6 +72,8 @@ public class Controller {
     public Label iMsgNoUserFound;
     public TextField iUserEditName;
     public TextField iUserEditLastName;
+    public TextField iUserEditLogin;
+    public TextField iUserEditPassword;
     public DatePicker iArcDateFrom;
     public DatePicker iArcDateTo;
     public VBox iArcViewPane;
@@ -84,6 +86,8 @@ public class Controller {
     public PasswordField iPassword;
     public HBox iHiUserPane;
     public Label iModuleCaption;
+    public VBox iUsersEditPane;
+
 
 //    public VBox iPrCreateEditDecimalPane;
 //    public VBox iPrCreateEditLogicalPane;
@@ -167,6 +171,8 @@ public class Controller {
                     return;
                 }
                 iModuleCaption.setText("Признаки");
+                lvPR.getFocusModel().focusNext();
+                lvPR.getFocusModel().focusPrevious();
                 iPriznakiPane.toFront();
             });
             mi = new Menu("", ll);
@@ -200,9 +206,21 @@ public class Controller {
                     return;
                 }
                 iModuleCaption.setText("Пользователи");
+                tableUsers.requestFocus();
+//                tableUsers.getFocusModel().focus(tableUsers.getFocusModel().getFocusedIndex());
+
+                Users.User u = (Users.User) tableUsers.getFocusModel().focusedItemProperty().get(); // Первый в списке
+                if (u != null) {
+                    users.setTmpUser(u);
+                    iUserEditName.setText(users.getTmpUser().getName());
+                    iUserEditLastName.setText(users.getTmpUser().getLastName());
+                    iUserEditLogin.setText(users.getTmpUser().getLogin());
+                    iUserEditPassword.setText(users.getTmpUser().getPassword());
+                    iUserEditCaption.setText("Редактирование данных пользователя");
+                    iUsersEditPane.setVisible(true);
+                }
                 iUsersPane.toFront();
             });
-            iModuleCaption.setText("Пользователи");
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
         }
@@ -396,8 +414,6 @@ public class Controller {
         iListArCalcPane.getChildren().add(0,tableCalcs);
 
         // Пользователи
-        TableView tableUsers; // Список пользователей
-
         users = new Users();
         //       CalcArc.getTableArc().setItems();  // Список расчетов
         tableUsers = users.getUsersFromSQL("");
@@ -405,16 +421,22 @@ public class Controller {
 //        tableUsers.setPrefWidth(285);
 //        tableUsers.setMaxWidth(285);
         tableUsers.setPrefHeight(1000);
+        // По смене фокуса заполняем правое окно
         tableUsers.getFocusModel().focusedItemProperty().addListener((obj, oldValue, newValue) -> {
-            //           System.out.println("lll" + obj + " " + oldValue + " " + newValue);
-            if (newValue != null) { // Пока фокус не ушел
-                Users.User c = (Users.User) newValue;
-                iUserEditId.setText(c.getPid().toString());
-                iUserEditName.setText(c.getName());
-                iUserEditLastName.setText(c.getLastName());
+//                       System.out.println("lll" + obj + " " + oldValue + " " + newValue);
+            if (newValue != null) {
+                users.setTmpUser((Users.User) newValue);
+                iUserEditName.setText(users.getTmpUser().getName());
+                iUserEditLastName.setText(users.getTmpUser().getLastName());
+                iUserEditLogin.setText(users.getTmpUser().getLogin());
+                iUserEditPassword.setText(users.getTmpUser().getPassword());
+                iUserEditCaption.setText("Редактирование данных пользователя");
+                iUsersEditPane.setVisible(true);
             }
         });
         iUsersTable.getChildren().add(0,tableUsers);
+        iUsersEditPane.setVisible(false);
+
 
 // Алгоритм в отдельное окно
         iImgAlgoritmArc.setOnMouseClicked(event -> {  // Разворачиваем в отдельное окно
@@ -466,13 +488,8 @@ public class Controller {
            }
         });
 
-        iPriznakiPane.setVisible(true);
-        iCalcQEPane.setVisible(true);
-        iListArCalcPane.setVisible(true);
-        iUsersPane.setVisible(true);
-        iCalcQEArcPane.setVisible(true);
-
         iModuleCaption.setText("Симуляционный калькулятор");
+
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
 
 //        iListArCalcPane.setVisible(true);
@@ -481,6 +498,17 @@ public class Controller {
     }
 
 
+    // Создание нового пользователя
+    public void iBtUserNewAction(ActionEvent actionEvent) {
+        users.clearCurrentUser();
+        users.clearTmpUser();
+        iUserEditName.setText("");
+        iUserEditLastName.setText("");
+        iUserEditLogin.setText("");
+        iUserEditPassword.setText("");
+        iUserEditCaption.setText("Добавление нового пользователя");
+        iUsersEditPane.setVisible(true);
+    }
 
     // Быстрое создание интервалов
     public void iBtFastCreatePriznakAction(ActionEvent actionEvent) {
@@ -515,12 +543,6 @@ public class Controller {
         lvPI.setItems(pm.getListPI());  // Список
         iPrIntervalsList.getChildren().clear();
         iPrIntervalsList.getChildren().add(0, lvPI);
-
-    }
-
-    // Создание нового пользователя
-    public void iBtUserNewAction(ActionEvent actionEvent) {
-        System.out.println("new user");
 
     }
 
@@ -606,6 +628,21 @@ public class Controller {
         iPrTypeDecimal.setDisable(false);
         iPrTypeDecimal.setSelected(true);
         pm.setType(1); // decimal
+    }
+
+    // Сохраняем изменения после редактирования/добавления пользователя
+    public void iBtUserSaveAction(ActionEvent actionEvent) {
+        users.saveUser(iUserEditName.getText(),
+            iUserEditLastName.getText(),
+            iUserEditLogin.getText(),
+            iUserEditPassword.getText());
+        tableUsers.refresh();
+        iUsersEditPane.setVisible(false);
+    }
+
+    // Отмена редактирования/добавления пользователя
+    public void iBtUserSaveCancelAction(ActionEvent actionEvent) {
+        iUsersEditPane.setVisible(false);
     }
 
     // Авторизация - входим

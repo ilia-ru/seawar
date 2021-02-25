@@ -23,8 +23,9 @@ public class Users extends KSQL {
     final int USERS_ACCESS_COMMON = 0;  //  Код статуса бесправного пользователя
 
     TableView<User> tableUsers = null;; // Таблица для показа на экране
-    ObservableList<User> obsUSR;  // СПисок для TableView - список расчетов
-    private User currentUser; // Текущий пользователь
+    ObservableList<User> obsUSR;// СПисок для TableView - список расчетов
+    private User currentUser;   // Текущий пользователь
+    private User tmpUser;       // Временный пользователь
 
     public Users() {
         super();
@@ -34,16 +35,36 @@ public class Users extends KSQL {
         currentUser = new User();
     }
 
+    // Возвращает временного пользователя
+    public User getTmpUser() {
+        return this.tmpUser;
+    }
+
+    // Сохраняем данные в временного пользователя
+    public void setTmpUser(User user) {
+        this.tmpUser = user;
+    }
+
+    // Очищает данные временного пользователя
+    public void clearTmpUser() {
+        this.tmpUser = new User();
+    }
+
+
     // Возвращает текущего пользователя
     public User getCurrentUser() {
         return this.currentUser;
+    }
+
+    // Сохраняем данные в текущего пользователя
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
     }
 
     // Очищает данные текущего пользователя
     public void clearCurrentUser() {
         this.currentUser = new User();
     }
-
 
     // Авторизация
     public boolean auth(String login, String password) {
@@ -73,7 +94,7 @@ public class Users extends KSQL {
 
         public User() {  // Пустой пользователь. Еще никто не авторизовался
             this.pid = -1l;
-            this.access = USERS_ACCESS_COMMON;  // До авторизации эмулируем user - без прав
+            this.access = USERS_ACCESS_COMMON;  // До авторизации эмулируем user без прав
             this.actionHb = new HBox();  // Панель кнопок
             this.IV = new ImageView(new Image("del.png"));
             this.IV.setFitWidth(15);
@@ -122,7 +143,6 @@ public class Users extends KSQL {
                 public void handle(MouseEvent event) {  //
                     if (event.getButton().name().equals("PRIMARY"))  // по левой кнопке мыши
                     {
-                        System.out.println("exit");
                         hb.getChildren().clear();
                         hb.setVisible(false);
                         clearCurrentUser();
@@ -185,48 +205,79 @@ public class Users extends KSQL {
         }
     }
 
+    // Сохраняем добавленного или изменненого пользователя
+    public void saveUser(String name, String lastName, String login, String password) {
+        if (getTmpUser().getPid() >= 0) { // Измененный
+            getTmpUser().setName(name);
+            getTmpUser().setLastName(lastName);
+            getTmpUser().setLogin(login);
+            getTmpUser().setPassword(password);
+            String q = "UPDATE PUBLIC.PUBLIC.USERS SET NAME='" + name + "'" +
+                    ", LASTNAME='" + lastName + "'"+
+                    ", LOGIN='" + login + "'"+
+                    ", PASSWORD='" + password + "' WHERE ID=" + getTmpUser().getPid() + ";";
+           // System.out.println(q);
+            this.ksqlUPDATE(q);  // Изменяем признак в БД
+        } else {  // Добавленный
+            // ACCESS = "1" всем, т.к. в списке только админы
+            String q = "INSERT INTO PUBLIC.PUBLIC.USERS (NAME, LASTNAME, LOGIN, PASSWORD, ACCESS) VALUES('" + name + "', '" +
+                    lastName + "', '" + login + "', '" + password + "', '1');";
+            System.out.println(q);
+            long id = this.ksqlINSERT(q);  // Кладем в БД
+            obsUSR.add(new User(id, name, lastName, login, password, "1"));
+        }
+    }
+
     // Формирует внешний вид таблицы - список users
     public void TableViewDecorate() {
 
-        TableColumn<User, Long> idCol //
+/*        TableColumn<User, Long> idCol //
                 = new TableColumn<>("id");
         idCol.setCellValueFactory(new PropertyValueFactory<>("pid"));
-
+*/
         TableColumn<User, String> nameCol //
                 = new TableColumn<>("Имя");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-//        nameCol.setPrefWidth(150);
+        nameCol.setPrefWidth(100);
 
         TableColumn<User, String> lastNameCol //
                 = new TableColumn<>("Фамилия");
         lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-//        nameCol.setPrefWidth(150);
+        lastNameCol.setPrefWidth(160);
 
         TableColumn<User, String> loginCol //
                 = new TableColumn<>("Логин");
         loginCol.setCellValueFactory(new PropertyValueFactory<>("login"));
-//        nameCol.setPrefWidth(150);
+        loginCol.setPrefWidth(65);
 
         TableColumn<User, String> passwordCol //
                 = new TableColumn<>("Пароль");
         passwordCol.setCellValueFactory(new PropertyValueFactory<>("password"));
-//        nameCol.setPrefWidth(150);
+        passwordCol.setPrefWidth(65);
 
-        TableColumn<User, String> accessdCol //
+/*        TableColumn<User, String> accessdCol //
                 = new TableColumn<>("Доступ");
         accessdCol.setCellValueFactory(new PropertyValueFactory<>("access"));
 //        nameCol.setPrefWidth(150);
-
+*/
         TableColumn actionCol = //
                 new TableColumn<>("");
         actionCol.setCellValueFactory(new PropertyValueFactory<>("actionHb"));
         actionCol.setMaxWidth(20);
 
-        this.tableUsers.getColumns().addAll(idCol, nameCol, lastNameCol, loginCol, passwordCol, accessdCol, actionCol);
-        this.tableUsers.setOnMouseClicked((new EventHandler<MouseEvent>() { // Удаление расчета
+//        this.tableUsers.getColumns().addAll(idCol, nameCol, lastNameCol, loginCol, passwordCol, accessdCol, actionCol);
+        this.tableUsers.getColumns().addAll(nameCol, lastNameCol, loginCol, passwordCol, actionCol);
+        this.tableUsers.setOnMouseClicked((new EventHandler<MouseEvent>() { // Удаление пользователя
             public void handle(MouseEvent event) {  //
                 if (event.getButton().name().equals("PRIMARY"))  // по левой кнопке мыши
                 {
+                    if (obsUSR.size() <=1 ) {  // Последнего не удаляем. Иначе как авторизоваться потом
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Нелья удалять последнего пользователя. После этого невозможно будет авторизоваться. Сначала создайте другого пользователя.");
+                        alert.setTitle("Внимание");
+                        alert.setHeaderText("Нелья удалять последнего пользователя");
+                        alert.show();
+                        return;
+                    }
                     // Убедимся, что клик по кнопке
                     if (event.getTarget().getClass().getName().indexOf("ImageView") >= 0) {
 //                        Student.MyImageView i = (Student.MyImageView) event.getTarget();
@@ -243,8 +294,8 @@ public class Users extends KSQL {
                             // Удаляем признаки этого расчета
                             String q = "DELETE FROM PUBLIC.PUBLIC.USERS WHERE ID=" + tableUsers.getFocusModel().getFocusedItem().getPid() + ";";
                             System.out.println(q);
-//                            ksqlDELETE(q);
-//                            obsUSR.remove(tableUsers.getFocusModel().getFocusedItem());
+                            ksqlDELETE(q);
+                            obsUSR.remove(tableUsers.getFocusModel().getFocusedItem());
                         }
                     }
                 }
