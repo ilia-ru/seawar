@@ -403,6 +403,54 @@
                   </VBox>
               </HBox>
           </VBox>
+
+          <!--  ********* CVintra -->
+          <VBox fx:id="iCVintraPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;">
+              <HBox prefHeight="733.0" prefWidth="1000.0">
+                  <VBox prefHeight="714.0" prefWidth="575.0" spacing="5.0">
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="80.0" text="Cmax" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
+                          <TextField fx:id="iNumOfSubject" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Low bound" />
+                          <TextField fx:id="iLowBound" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Upper bound" />
+                          <TextField fx:id="iUpperBound" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Point estimate" />
+                          <TextField fx:id="iPointEst" alignment="CENTER_RIGHT" editable="false" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Confidence interval" />
+                          <TextField fx:id="iConfInterval" alignment="CENTER_RIGHT" editable="false" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
+                          <TextField fx:id="iMSE" alignment="CENTER_RIGHT" editable="false" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="t (sudent)" />
+                          <TextField fx:id="iCVStudent" alignment="CENTER_RIGHT" editable="false" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="CVintra" />
+                          <TextField fx:id="iCVintra" alignment="CENTER_RIGHT" editable="false" />
+                      </HBox>
+                     <padding>
+                          <Insets left="10.0" />
+                      </padding>
+                  </VBox>
+              </HBox>
+          </VBox>
+
+
       </StackPane>
       </children>
    </VBox>
@@ -426,7 +474,7 @@
                         <HBox.margin>
                            <Insets left="20.0" />
                         </HBox.margin></Label>
-                         <TextField fx:id="iLogin" prefHeight="25.0" prefWidth="200.0" text="dim">
+                         <TextField fx:id="iLogin" prefHeight="25.0" prefWidth="200.0">
                         <HBox.margin>
                            <Insets left="7.0" />
                         </HBox.margin></TextField>
@@ -441,7 +489,7 @@
                         <HBox.margin>
                            <Insets left="20.0" />
                         </HBox.margin></Label>
-                     <PasswordField fx:id="iPassword" prefWidth="200.0" text="111" />
+                     <PasswordField fx:id="iPassword" prefWidth="200.0" />
                      </children>
                      <padding>
                          <Insets left="5.0" top="5.0" />

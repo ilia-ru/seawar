@@ -87,6 +87,15 @@ public class Controller {
     public HBox iHiUserPane;
     public Label iModuleCaption;
     public VBox iUsersEditPane;
+    public VBox iCVintraPane;
+    public TextField iNumOfSubject;
+    public TextField iLowBound;
+    public TextField iUpperBound;
+    public TextField iPointEst;
+    public TextField iConfInterval;
+    public TextField iMSE;
+    public TextField iCVStudent;
+    public TextField iCVintra;
 
 
 //    public VBox iPrCreateEditDecimalPane;
@@ -101,6 +110,7 @@ public class Controller {
     TableView tableUsers; // Список пользователей
     Users users;          // Список пользователей. Там-же и текущий автооризованный, если есть
     int moduleAccessMode; // У каждого модуля свой режим. 0 - общий доступ, 1 - только админ.
+    Student student;      // Student
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
@@ -129,6 +139,16 @@ public class Controller {
             ll = new Label("CVintra");
             ll.setOnMouseClicked(event -> {
                 System.out.println("CVintra " + event);
+                moduleAccessMode = 0; // Общий модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    return;
+                }
+                iModuleCaption.setText("CVintra");
+                iCVintraPane.toFront();
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
@@ -230,9 +250,122 @@ public class Controller {
         }
     }
 
+    // Производим расчет по всем вводимым полям
+    private void CVintraCalc() {
+        // Number of subjects
+        int numOfSubject;
+        if (iNumOfSubject.getText().compareTo("") == 0) {
+            numOfSubject = 0;
+        } else {
+            numOfSubject = Integer.parseInt(iNumOfSubject.getText());
+        }
+
+        Double lowBound;
+        if (iLowBound.getText().compareTo("") == 0) {
+            lowBound = 0.0;
+        } else {
+            lowBound = Double.valueOf(iLowBound.getText());
+        }
+
+        Double upperBound;
+        if (iUpperBound.getText().compareTo("") == 0) {
+            upperBound = 0.0;
+        } else {
+            upperBound = Double.valueOf(iUpperBound.getText());
+        }
+
+        // PointEst
+        Double pointEst = Math.sqrt(lowBound * upperBound);
+        iPointEst.setText(pointEst.toString());
+
+        // iConfInterval
+        Double confInterval = Math.log1p(pointEst-1) - Math.log1p(lowBound-1);
+        iConfInterval.setText(confInterval.toString());
+
+        // Student
+        Double stdn = student.getVal(numOfSubject - 2);
+        if (stdn == null) {
+            iCVStudent.setText("N/A");
+        } else {  // ведено валидное значение
+            iCVStudent.setText(stdn.toString());
+        }
+
+        // iMSE
+// 2*(Conf/((КОРЕНЬ(1/(num/2)+1/(num/2)))*stu)*(Conf/((КОРЕНЬ(1/(num/2)+1/(num/2)))*stu)))
+        Double MSE;
+        if (stdn != null) {
+            MSE = 2 * (confInterval / ((Math.sqrt(1.0 / (numOfSubject / 2.0) + 1.0 / (numOfSubject / 2.0))) * stdn) *
+                    (confInterval / ((Math.sqrt(1.0 / (numOfSubject / 2.0) + 1.0 / (numOfSubject / 2.0))) * stdn)));
+            iMSE.setText(MSE.toString());
+        } else {
+            iMSE.setText("Ошибка");
+            MSE = null;
+        }
+
+        // CVintra
+// =100*КОРЕНЬ(EXP(C8)-1)
+        if (stdn == null || MSE == null) {
+            iCVintra.setText("Ошибка");
+        } else {
+            double CVintra = 100 * Math.sqrt(Math.exp(MSE) - 1);
+            iCVintra.setText(Double.toString(CVintra));
+        }
+    }
+
     public void initialize() {
         TopMenu t = new TopMenu();
         iHBoxMenu.getChildren().add(t.getMenu());
+
+        student = new Student();
+
+        // Калькулятор CVintra
+        UnaryOperator<TextFormatter.Change> iNumOfSubjectFilter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iNumOfSubjectlFormatter = new TextFormatter<>(iNumOfSubjectFilter);
+        iNumOfSubject.setTextFormatter(iNumOfSubjectlFormatter);
+        iNumOfSubject.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalc(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iLowBoundFilter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iLowBound.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iLowBoundFormatter = new TextFormatter<>(iLowBoundFilter);
+        iNumOfSubject.setTextFormatter(iLowBoundFormatter);
+        iLowBound.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalc(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iUpperBoundFilter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iUpperBound.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iUpperBoundFormatter = new TextFormatter<>(iUpperBoundFilter);
+        iNumOfSubject.setTextFormatter(iUpperBoundFormatter);
+        iUpperBound.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalc(); // Считаем все
+                });
+
 
         // При выходе пользователя, переводим на открытый раздел
         iHiUserPane.visibleProperty().addListener((obj, oldValue, newValue) -> {
@@ -831,66 +964,4 @@ public class Controller {
 
         }
     }
-
-        public void iBtnAction(ActionEvent actionEvent) {
-        System.out.println("aaaaaaaa");
-
-        //String aaa = new String();
-        //aaa.matches();
-
-        Connection conn = null;
-        try {
-            conn = DriverManager
-                    .getConnection("jdbc:hsqldb:file:/d:\\_work\\ilia\\_java\\calc_eq\\src\\main\\db\\cached;ifexists=true",
-                            "user", "111");
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-
-        PreparedStatement selectStatement = null;
-        try {
-            selectStatement = conn.prepareStatement("select * from \"PUBLIC\".\"USERS\"");
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        ResultSet rs = null;
-        try {
-            rs = selectStatement.executeQuery();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-
-        //       List<User> users = new ArrayList<>();
-
-/*            while (true) {
-                try {
-                    if (!rs.next()) break;
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                } // will traverse through all rows
-*/
-        try {
-//            rs.next();
-            rs.next();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        Integer id = null;
-        String name = null;
-        try {
-            id = rs.getInt("id");
-            name = rs.getString("name");
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-//                String lastName = rs.getString("last_name");
-
-        //              User user = new User(id, firstName, lastName);
-        //            users.add(user);
-        System.out.println("Кнопка " + id + " " + name);
-
-    }
-
-
-
 }

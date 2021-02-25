@@ -271,16 +271,15 @@ public class Users extends KSQL {
             public void handle(MouseEvent event) {  //
                 if (event.getButton().name().equals("PRIMARY"))  // по левой кнопке мыши
                 {
-                    if (obsUSR.size() <=1 ) {  // Последнего не удаляем. Иначе как авторизоваться потом
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Нелья удалять последнего пользователя. После этого невозможно будет авторизоваться. Сначала создайте другого пользователя.");
-                        alert.setTitle("Внимание");
-                        alert.setHeaderText("Нелья удалять последнего пользователя");
-                        alert.show();
-                        return;
-                    }
                     // Убедимся, что клик по кнопке
                     if (event.getTarget().getClass().getName().indexOf("ImageView") >= 0) {
-//                        Student.MyImageView i = (Student.MyImageView) event.getTarget();
+                        if (obsUSR.size() <=1 ) {  // Последнего не удаляем. Иначе как авторизоваться потом
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Нелья удалять последнего пользователя. После этого невозможно будет авторизоваться. Сначала создайте другого пользователя.");
+                            alert.setTitle("Внимание");
+                            alert.setHeaderText("Нелья удалять последнего пользователя");
+                            alert.show();
+                            return;
+                        }
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                                 "Информация о пользователе будет удалена из базы данных " +
                                         "БЕЗ ВОЗМОЖНОСТИ ВОССТАНОВЛЕНИЯ");
