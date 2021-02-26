@@ -32,15 +32,28 @@
               </HBox>
           </HBox>
       <StackPane fx:id="iStackPane">
-         <VBox fx:id="iStudentPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+         <VBox fx:id="iStudentPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
                <children>
+                  <HBox>
                   <TableView fx:id="iStudentTable" editable="true" maxWidth="200.0" prefHeight="729.0" prefWidth="200.0">
                     <columns>
                       <TableColumn prefWidth="75.0" text="C1" />
                       <TableColumn prefWidth="75.0" text="C2" />
                     </columns>
                   </TableView>
-               </children></VBox>
+                      <VBox maxHeight="-Infinity" prefHeight="61.0" prefWidth="512.0" spacing="5.0" style="-fx-border-color: #999999;">
+                      <Label text="Чтобы изменить значения, сделайте двойной клик в нужной строке." />
+                      <Label text="Чтобы сохранить после изменения, нажмите 'Enter'." />
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </HBox.margin>
+                        <padding>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                      </VBox>
+                  </HBox>
+               </children>
+         </VBox>
          <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
             <children>
                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
@@ -417,12 +430,12 @@
                   <VBox prefHeight="733.0" prefWidth="500.0" spacing="5.0">
                       <HBox alignment="CENTER" spacing="5.0" styleClass="H2">
                           <Label alignment="CENTER" prefHeight="17.0" prefWidth="80.0" text="Cmax" textAlignment="CENTER">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin></Label>
-                        <VBox.margin>
-                           <Insets top="10.0" />
-                        </VBox.margin>
+                              <HBox.margin>
+                                  <Insets />
+                              </HBox.margin></Label>
+                          <VBox.margin>
+                              <Insets top="10.0" />
+                          </VBox.margin>
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
@@ -438,80 +451,177 @@
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Point estimate" />
-                          <TextField fx:id="iPointEst" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iPointEst" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Confidence interval" />
-                          <TextField fx:id="iConfInterval" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iConfInterval" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
-                          <TextField fx:id="iMSE" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iMSE" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="t (student)" />
-                          <TextField fx:id="iCVStudent" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iCVStudent" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="CVintra" />
-                          <TextField fx:id="iCVintra" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res2" />
+                          <TextField fx:id="iCVintra" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res2" />
                       </HBox>
                       <HBox alignment="CENTER" spacing="5.0">
                           <Button fx:id="iBtCVintraCalc1" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtCVintraCalc1Action" prefHeight="25.0" prefWidth="131.0" text="Рассчитать" />
                       </HBox>
-                     <padding>
+                      <padding>
                           <Insets left="10.0" />
                       </padding>
-                     <HBox.margin>
-                        <Insets left="60.0" />
-                     </HBox.margin>
+                      <HBox.margin>
+                          <Insets left="60.0" />
+                      </HBox.margin>
                   </VBox>
                   <VBox prefHeight="733.0" prefWidth="500.0" spacing="5.0">
                       <HBox alignment="CENTER" spacing="5.0" styleClass="H2">
                           <Label alignment="CENTER" prefHeight="17.0" prefWidth="80.0" text="AUC" textAlignment="CENTER">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin></Label>
-                        <VBox.margin>
-                           <Insets top="10.0" />
-                        </VBox.margin>
+                              <HBox.margin>
+                                  <Insets />
+                              </HBox.margin></Label>
+                          <VBox.margin>
+                              <Insets top="10.0" />
+                          </VBox.margin>
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
-                          <TextField fx:id="iNumOfSubject2" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iNumOfSubject2" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Low bound" />
-                          <TextField fx:id="iLowBound2" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iLowBound2" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Upper bound" />
-                          <TextField fx:id="iUpperBound2" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iUpperBound2" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Point estimate" />
-                          <TextField fx:id="iPointEst2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iPointEst2" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Confidence interval" />
-                          <TextField fx:id="iConfInterval2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iConfInterval2" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
-                          <TextField fx:id="iMSE2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iMSE2" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="t (student)" />
-                          <TextField fx:id="iCVStudent2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                          <TextField fx:id="iCVStudent2" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res1" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="CVintra" />
-                          <TextField fx:id="iCVintra2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res2" />
+                          <TextField fx:id="iCVintra2" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res2" />
                       </HBox>
-                     <padding>
+                      <padding>
                           <Insets left="10.0" />
                       </padding>
                   </VBox>
+              </HBox>
+          </VBox>
+
+          <!--  ********* Расчет доверительных интервалов -->
+          <VBox fx:id="iDoverPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" visible="false">
+              <HBox prefHeight="733.0" prefWidth="1000.0">
+                  <VBox prefHeight="733.0" prefWidth="500.0" spacing="5.0">
+                      <HBox alignment="CENTER" spacing="5.0" styleClass="H2">
+                          <Label alignment="CENTER" prefHeight="17.0" prefWidth="80.0" text="Cmax" textAlignment="CENTER">
+                              <HBox.margin>
+                                  <Insets />
+                              </HBox.margin></Label>
+                          <VBox.margin>
+                              <Insets top="10.0" />
+                          </VBox.margin>
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
+                          <TextField fx:id="iNumOfSubjectD1" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Gmean ratio (PE)" />
+                          <TextField fx:id="iGmeanD1" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
+                          <TextField fx:id="iMSED1" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="t (student)" />
+                          <TextField fx:id="iStudentD1" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Low bound" />
+                          <TextField fx:id="iLowBoundD1" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res2" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Upper bound" />
+                          <TextField fx:id="iUpperBoundD1" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res2" />
+                      </HBox>
+                      <HBox alignment="CENTER" spacing="5.0">
+                          <!--<Button fx:id="iBtCVintraCalc1" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtCVintraCalc1Action" prefHeight="25.0" prefWidth="131.0" text="Рассчитать" />
+                          -->
+                      </HBox>
+                      <padding>
+                          <Insets left="10.0" />
+                      </padding>
+                      <HBox.margin>
+                          <Insets left="60.0" />
+                      </HBox.margin>
+                  </VBox>
+                  <VBox prefHeight="733.0" prefWidth="500.0" spacing="5.0">
+                      <HBox alignment="CENTER" spacing="5.0" styleClass="H2">
+                          <Label alignment="CENTER" prefHeight="17.0" prefWidth="80.0" text="AUC" textAlignment="CENTER">
+                              <HBox.margin>
+                                  <Insets />
+                              </HBox.margin></Label>
+                          <VBox.margin>
+                              <Insets top="10.0" />
+                          </VBox.margin>
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
+                          <TextField fx:id="iNumOfSubjectD2" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Gmean ratio (PE)" />
+                          <TextField fx:id="iGmeanD2" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
+                          <TextField fx:id="iMSED2" alignment="CENTER_RIGHT" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="t (student)" />
+                          <TextField fx:id="iStudentD2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res1" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Low bound" />
+                          <TextField fx:id="iLowBoundD2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res2" />
+                      </HBox>
+                      <HBox spacing="5.0">
+                          <Label prefHeight="17.0" prefWidth="125.0" text="Upper bound" />
+                          <TextField fx:id="iUpperBoundD2" alignment="CENTER_RIGHT" editable="false" styleClass="calc-res2" />
+                      </HBox>
+                      <HBox alignment="CENTER" spacing="5.0">
+                          <!--<Button fx:id="iBtCVintraCalc1" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtCVintraCalc1Action" prefHeight="25.0" prefWidth="131.0" text="Рассчитать" />
+                          -->
+                      </HBox>
+                      <padding>
+                          <Insets left="10.0" />
+                      </padding>
+                      <HBox.margin>
+                          <Insets left="60.0" />
+                      </HBox.margin>
+                  </VBox>
+
               </HBox>
           </VBox>
 

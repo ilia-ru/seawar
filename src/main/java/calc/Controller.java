@@ -87,6 +87,8 @@ public class Controller {
     public Label iModuleCaption;
     public VBox iUsersEditPane;
     public VBox iCVintraPane;
+    public TableView iStudentTable;
+
     public TextField iNumOfSubject;
     public TextField iLowBound;
     public TextField iUpperBound;
@@ -95,7 +97,6 @@ public class Controller {
     public TextField iMSE;
     public TextField iCVStudent;
     public TextField iCVintra;
-    public TableView iStudentTable;
 
     public TextField iNumOfSubject2;
     public TextField iLowBound2;
@@ -105,7 +106,21 @@ public class Controller {
     public TextField iMSE2;
     public TextField iCVStudent2;
     public TextField iCVintra2;
-    public TableView iStudentTable2;
+
+    public VBox iDoverPane;
+    public TextField iNumOfSubjectD1;
+    public TextField iGmeanD1;
+    public TextField iMSED1;
+    public TextField iStudentD1;
+    public TextField iLowBoundD1;
+    public TextField iUpperBoundD1;
+
+    public TextField iNumOfSubjectD2;
+    public TextField iGmeanD2;
+    public TextField iMSED2;
+    public TextField iStudentD2;
+    public TextField iLowBoundD2;
+    public TextField iUpperBoundD2;
 
 
 //    public VBox iPrCreateEditDecimalPane;
@@ -151,7 +166,6 @@ public class Controller {
 
             ll = new Label("CVintra");
             ll.setOnMouseClicked(event -> {
-                System.out.println("CVintra " + event);
                 moduleAccessMode = 0; // Общий модуль
                 if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
                     iFonPane.toFront(); // Авторизуемся
@@ -170,7 +184,18 @@ public class Controller {
 
             ll = new Label("Расчет доверительных интервалов");
             ll.setOnMouseClicked(event -> {
-                System.out.println("Расчет доверительных интервалов " + event);
+                moduleAccessMode = 0; // Общий модуль
+                if (!users.getCurrentUser().canComeIn(moduleAccessMode)) {  // Хватает прав на раздел?
+                    iFonPane.toFront(); // Авторизуемся
+                    iFonPane.setVisible(true);
+                    iAuthorPane.toFront();
+                    iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
+                    return;
+                }
+                iModuleCaption.setText("Расчет доверительных интервалов");
+                iDoverPane.setVisible(true);
+                iDoverPane.toFront();
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
@@ -273,9 +298,8 @@ public class Controller {
         }
     }
 
-    // Производим расчет по всем вводимым полям
+    // CVintra -  расчет
     private void CVintraCalc1() {
-        // Number of subjects
         int numOfSubject;
         if (iNumOfSubject.getText().compareTo("") == 0) {
             numOfSubject = 0;
@@ -310,7 +334,7 @@ public class Controller {
         if (stdn == null) {
             iCVStudent.setText("N/A");
         } else {  // ведено валидное значение
-            iCVStudent.setText(String.format("%.3f", stdn));
+            iCVStudent.setText(String.format("%.4f", stdn));
         }
 
         // iMSE
@@ -340,9 +364,18 @@ public class Controller {
         CVintraCalc1();
     };
 
-    // Производим расчет по всем вводимым полям
+    // CVintra -  расчет 2
     private void CVintraCalc2() {
-        // Number of subjects
+        if (iNumOfSubject2.getText().compareTo("") <= 0 ||
+                iLowBound2.getText().compareTo("") <= 0 ||
+                iUpperBound2.getText().compareTo("") <= 0) {  // Не введены данные
+            iPointEst2.setText("");
+            iConfInterval2.setText("");
+            iCVStudent2.setText("");
+            iMSE2.setText("");
+            iCVintra2.setText("");
+            return;
+        }
         int numOfSubject;
         if (iNumOfSubject2.getText().compareTo("") == 0) {
             numOfSubject = 0;
@@ -377,7 +410,7 @@ public class Controller {
         if (stdn == null) {
             iCVStudent2.setText("N/A");
         } else {  // ведено валидное значение
-            iCVStudent2.setText(String.format("%.3f", stdn));
+            iCVStudent2.setText(String.format("%.4f", stdn));
         }
 
         // iMSE
@@ -407,6 +440,96 @@ public class Controller {
 //        CVintraCalc2();
     };
 
+    // Расчет доверительных интервалов - 1
+    private void CVintraCalcD1() {
+        // Number of subjects
+        int numOfSubjectD1;
+        if (iNumOfSubjectD1.getText().compareTo("") == 0) {
+            numOfSubjectD1 = 0;
+        } else {
+            numOfSubjectD1 = Integer.parseInt(iNumOfSubjectD1.getText());
+        }
+
+        Double GmeanD1;
+        if (iGmeanD1.getText().compareTo("") == 0) {
+            GmeanD1 = 0.0;
+        } else {
+            GmeanD1 = Double.valueOf(iGmeanD1.getText());
+        }
+
+        Double MSED1;
+        if (iMSED1.getText().compareTo("") == 0) {
+            MSED1 = 0.0;
+        } else {
+            MSED1 = Double.valueOf(iMSED1.getText());
+        }
+
+        // Student
+        Double stdnD1 = students.getVal(numOfSubjectD1 - 2);
+        if (stdnD1 == null) {
+            iStudentD1.setText("N/A");
+        } else {  // ведено валидное значение
+            iStudentD1.setText(String.format("%.4f", stdnD1));
+        }
+
+        // lowBound
+//EXP(LN(Gmean)-Stud*(КОРЕНЬ(MSE)*КОРЕНЬ(2/Num)))
+        Double lowBoundD1 = Math.exp(Math.log1p(GmeanD1-1) -
+                stdnD1 * Math.sqrt(MSED1) * Math.sqrt(2.0 / numOfSubjectD1));
+        iLowBoundD1.setText(String.format("%.3f", lowBoundD1));
+
+        // lowBound
+//EXP(LN(Gmean)-Stud*(КОРЕНЬ(MSE)*КОРЕНЬ(2/Num)))
+        Double upperBoundD1 = Math.exp(Math.log1p(GmeanD1-1) +
+                stdnD1 * Math.sqrt(MSED1) * Math.sqrt(2.0 / numOfSubjectD1));
+        iUpperBoundD1.setText(String.format("%.3f", upperBoundD1));
+    }
+
+// Расчет доверительных интервалов - 2
+    private void CVintraCalcD2() {
+        // Number of subjects
+        int numOfSubjectD2;
+        if (iNumOfSubjectD2.getText().compareTo("") == 0) {
+            numOfSubjectD2 = 0;
+        } else {
+            numOfSubjectD2 = Integer.parseInt(iNumOfSubjectD2.getText());
+        }
+
+        Double GmeanD2;
+        if (iGmeanD2.getText().compareTo("") == 0) {
+            GmeanD2 = 0.0;
+        } else {
+            GmeanD2 = Double.valueOf(iGmeanD2.getText());
+        }
+
+        Double MSED2;
+        if (iMSED2.getText().compareTo("") == 0) {
+            MSED2 = 0.0;
+        } else {
+            MSED2 = Double.valueOf(iMSED2.getText());
+        }
+
+        // Student
+        Double stdnD2 = students.getVal(numOfSubjectD2 - 2);
+        if (stdnD2 == null) {
+            iStudentD2.setText("N/A");
+        } else {  // ведено валидное значение
+            iStudentD2.setText(String.format("%.4f", stdnD2));
+        }
+
+        // lowBound
+//EXP(LN(Gmean)-Stud*(КОРЕНЬ(MSE)*КОРЕНЬ(2/Num)))
+        Double lowBoundD2 = Math.exp(Math.log1p(GmeanD2-1) -
+                stdnD2 * Math.sqrt(MSED2) * Math.sqrt(2.0 / numOfSubjectD2));
+        iLowBoundD2.setText(String.format("%.3f", lowBoundD2));
+
+        // lowBound
+//EXP(LN(Gmean)-Stud*(КОРЕНЬ(MSE)*КОРЕНЬ(2/Num)))
+        Double upperBoundD2 = Math.exp(Math.log1p(GmeanD2-1) +
+                stdnD2 * Math.sqrt(MSED2) * Math.sqrt(2.0 / numOfSubjectD2));
+        iUpperBoundD2.setText(String.format("%.3f", upperBoundD2));
+
+    }
 
     public void initialize() {
         TopMenu t = new TopMenu();
@@ -426,11 +549,11 @@ public class Controller {
         };
         TextFormatter<String> iNumOfSubjectlFormatter = new TextFormatter<>(iNumOfSubjectFilter);
         iNumOfSubject.setTextFormatter(iNumOfSubjectlFormatter);
-        iNumOfSubject.textProperty().addListener(
+/*        iNumOfSubject.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     CVintraCalc1(); // Считаем все
                 });
-
+*/
         UnaryOperator<TextFormatter.Change> iLowBoundFilter = change -> {
             String text = change.getText();
             if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
@@ -442,11 +565,11 @@ public class Controller {
         };
         TextFormatter<String> iLowBoundFormatter = new TextFormatter<>(iLowBoundFilter);
         iLowBound.setTextFormatter(iLowBoundFormatter);
-        iLowBound.textProperty().addListener(
+/*        iLowBound.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     CVintraCalc1(); // Считаем все
                 });
-
+*/
         UnaryOperator<TextFormatter.Change> iUpperBoundFilter = change -> {
             String text = change.getText();
             if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
@@ -458,11 +581,11 @@ public class Controller {
         };
         TextFormatter<String> iUpperBoundFormatter = new TextFormatter<>(iUpperBoundFilter);
         iUpperBound.setTextFormatter(iUpperBoundFormatter);
-        iUpperBound.textProperty().addListener(
+/*        iUpperBound.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     CVintraCalc1(); // Считаем все
                 });
-
+*/
 //*************
         // Калькулятор CVintra2
         UnaryOperator<TextFormatter.Change> iNumOfSubject2Filter = change -> {
@@ -512,6 +635,101 @@ public class Controller {
                     CVintraCalc2(); // Считаем все
                 });
 
+        // Калькулятор Расчет доверительных интервалов 1
+        UnaryOperator<TextFormatter.Change> iNumOfSubjectD1Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iNumOfSubjectD1Formatter = new TextFormatter<>(iNumOfSubjectD1Filter);
+        iNumOfSubjectD1.setTextFormatter(iNumOfSubjectD1Formatter);
+        iNumOfSubjectD1.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalcD1(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iGmeanD1Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iGmeanD1.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iGmeanD1Formatter = new TextFormatter<>(iGmeanD1Filter);
+        iGmeanD1.setTextFormatter(iGmeanD1Formatter);
+        iGmeanD1.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalcD1(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iMSED1Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iMSED1.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iMSED1Formatter = new TextFormatter<>(iMSED1Filter);
+        iMSED1.setTextFormatter(iMSED1Formatter);
+        iMSED1.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalcD1(); // Считаем все
+                });
+
+        // Калькулятор Расчет доверительных интервалов 2
+        UnaryOperator<TextFormatter.Change> iNumOfSubjectD2Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iNumOfSubjectD2Formatter = new TextFormatter<>(iNumOfSubjectD2Filter);
+        iNumOfSubjectD2.setTextFormatter(iNumOfSubjectD2Formatter);
+        iNumOfSubjectD2.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalcD2(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iGmeanD2Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iGmeanD2.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iGmeanD2Formatter = new TextFormatter<>(iGmeanD2Filter);
+        iGmeanD2.setTextFormatter(iGmeanD2Formatter);
+        iGmeanD2.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalcD2(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iMSED2Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iMSED2.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iMSED2Formatter = new TextFormatter<>(iMSED2Filter);
+        iMSED2.setTextFormatter(iMSED2Formatter);
+        iMSED2.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalcD2(); // Считаем все
+                });
         //*******************
 
         // При выходе пользователя, переводим на открытый раздел
