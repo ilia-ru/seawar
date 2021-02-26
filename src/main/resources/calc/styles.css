@@ -28,6 +28,14 @@
     -fx-text-fill: black;
 }
 
+.calc-res1 {
+    -fx-background-color: #c6efce;
+}
+
+.calc-res2 {
+    -fx-background-color: #00b0f0;
+}
+
 .module-caption {
     -fx-font-weight: bold;
     -fx-background-color: #999999;

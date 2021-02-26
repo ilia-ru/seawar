@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Students extends KSQL {
-    private ArrayList<Student> students;  // Значения
+//    private ArrayList<Student> students;  // Значения
     ObservableList<Students.Student> obsST;// СПисок для TableView
 
     public Students() {
-        students = new ArrayList<Student>();
+       // students = new ArrayList<Student>();
         getFromSQL();
     }
 
@@ -53,7 +53,7 @@ public class Students extends KSQL {
         if (i<1) { i = 1; }
         if (i>100) { i = 100; }
         // id начинаются с 1, а элементы в List с 0. Поэтому -1
-        return students.get(i-1).getValue();
+        return obsST.get(i-1).getValue();
     }
 
     // Формирует внешний вид таблицы

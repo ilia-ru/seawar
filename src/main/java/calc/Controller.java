@@ -97,6 +97,16 @@ public class Controller {
     public TextField iCVintra;
     public TableView iStudentTable;
 
+    public TextField iNumOfSubject2;
+    public TextField iLowBound2;
+    public TextField iUpperBound2;
+    public TextField iPointEst2;
+    public TextField iConfInterval2;
+    public TextField iMSE2;
+    public TextField iCVStudent2;
+    public TextField iCVintra2;
+    public TableView iStudentTable2;
+
 
 //    public VBox iPrCreateEditDecimalPane;
 //    public VBox iPrCreateEditLogicalPane;
@@ -264,7 +274,7 @@ public class Controller {
     }
 
     // Производим расчет по всем вводимым полям
-    private void CVintraCalc() {
+    private void CVintraCalc1() {
         // Number of subjects
         int numOfSubject;
         if (iNumOfSubject.getText().compareTo("") == 0) {
@@ -289,18 +299,18 @@ public class Controller {
 
         // PointEst
         Double pointEst = Math.sqrt(lowBound * upperBound);
-        iPointEst.setText(pointEst.toString());
+        iPointEst.setText(String.format("%.3f", pointEst));
 
         // iConfInterval
         Double confInterval = Math.log1p(pointEst-1) - Math.log1p(lowBound-1);
-        iConfInterval.setText(confInterval.toString());
+        iConfInterval.setText(String.format("%.3f", confInterval));
 
         // Student
         Double stdn = students.getVal(numOfSubject - 2);
         if (stdn == null) {
             iCVStudent.setText("N/A");
         } else {  // ведено валидное значение
-            iCVStudent.setText(stdn.toString());
+            iCVStudent.setText(String.format("%.3f", stdn));
         }
 
         // iMSE
@@ -309,7 +319,7 @@ public class Controller {
         if (stdn != null) {
             MSE = 2 * (confInterval / ((Math.sqrt(1.0 / (numOfSubject / 2.0) + 1.0 / (numOfSubject / 2.0))) * stdn) *
                     (confInterval / ((Math.sqrt(1.0 / (numOfSubject / 2.0) + 1.0 / (numOfSubject / 2.0))) * stdn)));
-            iMSE.setText(MSE.toString());
+            iMSE.setText(String.format("%.3f", MSE));
         } else {
             iMSE.setText("Ошибка");
             MSE = null;
@@ -321,9 +331,82 @@ public class Controller {
             iCVintra.setText("Ошибка");
         } else {
             double CVintra = 100 * Math.sqrt(Math.exp(MSE) - 1);
-            iCVintra.setText(Double.toString(CVintra));
+            iCVintra.setText(String.format("%.3f", CVintra));
         }
     }
+
+    // Рассчет CVintra 1
+    public void iBtCVintraCalc1Action() {
+        CVintraCalc1();
+    };
+
+    // Производим расчет по всем вводимым полям
+    private void CVintraCalc2() {
+        // Number of subjects
+        int numOfSubject;
+        if (iNumOfSubject2.getText().compareTo("") == 0) {
+            numOfSubject = 0;
+        } else {
+            numOfSubject = Integer.parseInt(iNumOfSubject2.getText());
+        }
+
+        Double lowBound;
+        if (iLowBound2.getText().compareTo("") == 0) {
+            lowBound = 0.0;
+        } else {
+            lowBound = Double.valueOf(iLowBound2.getText());
+        }
+
+        Double upperBound;
+        if (iUpperBound2.getText().compareTo("") == 0) {
+            upperBound = 0.0;
+        } else {
+            upperBound = Double.valueOf(iUpperBound2.getText());
+        }
+
+        // PointEst
+        Double pointEst = Math.sqrt(lowBound * upperBound);
+        iPointEst2.setText(String.format("%.3f", pointEst));
+
+        // iConfInterval
+        Double confInterval = Math.log1p(pointEst-1) - Math.log1p(lowBound-1);
+        iConfInterval2.setText(String.format("%.3f", confInterval));
+
+        // Student
+        Double stdn = students.getVal(numOfSubject - 2);
+        if (stdn == null) {
+            iCVStudent2.setText("N/A");
+        } else {  // ведено валидное значение
+            iCVStudent2.setText(String.format("%.3f", stdn));
+        }
+
+        // iMSE
+// 2*(Conf/((КОРЕНЬ(1/(num/2)+1/(num/2)))*stu)*(Conf/((КОРЕНЬ(1/(num/2)+1/(num/2)))*stu)))
+        Double MSE;
+        if (stdn != null) {
+            MSE = 2 * (confInterval / ((Math.sqrt(1.0 / (numOfSubject / 2.0) + 1.0 / (numOfSubject / 2.0))) * stdn) *
+                    (confInterval / ((Math.sqrt(1.0 / (numOfSubject / 2.0) + 1.0 / (numOfSubject / 2.0))) * stdn)));
+            iMSE2.setText(String.format("%.3f", MSE));
+        } else {
+            iMSE2.setText("Ошибка");
+            MSE = null;
+        }
+
+        // CVintra
+// =100*КОРЕНЬ(EXP(C8)-1)
+        if (stdn == null || MSE == null) {
+            iCVintra2.setText("Ошибка");
+        } else {
+            double CVintra = 100 * Math.sqrt(Math.exp(MSE) - 1);
+            iCVintra2.setText(String.format("%.3f", CVintra));
+        }
+    }
+
+    // Рассчет CVintra 2
+    public void iBtCVintraCalc2Action() {
+//        CVintraCalc2();
+    };
+
 
     public void initialize() {
         TopMenu t = new TopMenu();
@@ -332,7 +415,7 @@ public class Controller {
         students = new Students();
         students.TableViewDecorate(iStudentTable);
 
-        // Калькулятор CVintra
+        // Калькулятор CVintra1
         UnaryOperator<TextFormatter.Change> iNumOfSubjectFilter = change -> {
             String text = change.getText();
             if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
@@ -345,7 +428,7 @@ public class Controller {
         iNumOfSubject.setTextFormatter(iNumOfSubjectlFormatter);
         iNumOfSubject.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    CVintraCalc(); // Считаем все
+                    CVintraCalc1(); // Считаем все
                 });
 
         UnaryOperator<TextFormatter.Change> iLowBoundFilter = change -> {
@@ -358,10 +441,10 @@ public class Controller {
             return null;
         };
         TextFormatter<String> iLowBoundFormatter = new TextFormatter<>(iLowBoundFilter);
-        iNumOfSubject.setTextFormatter(iLowBoundFormatter);
+        iLowBound.setTextFormatter(iLowBoundFormatter);
         iLowBound.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    CVintraCalc(); // Считаем все
+                    CVintraCalc1(); // Считаем все
                 });
 
         UnaryOperator<TextFormatter.Change> iUpperBoundFilter = change -> {
@@ -374,12 +457,62 @@ public class Controller {
             return null;
         };
         TextFormatter<String> iUpperBoundFormatter = new TextFormatter<>(iUpperBoundFilter);
-        iNumOfSubject.setTextFormatter(iUpperBoundFormatter);
+        iUpperBound.setTextFormatter(iUpperBoundFormatter);
         iUpperBound.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    CVintraCalc(); // Считаем все
+                    CVintraCalc1(); // Считаем все
                 });
 
+//*************
+        // Калькулятор CVintra2
+        UnaryOperator<TextFormatter.Change> iNumOfSubject2Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iNumOfSubject2Formatter = new TextFormatter<>(iNumOfSubject2Filter);
+        iNumOfSubject2.setTextFormatter(iNumOfSubject2Formatter);
+        iNumOfSubject2.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalc2(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iLowBound2Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iLowBound2.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iLowBound2Formatter = new TextFormatter<>(iLowBound2Filter);
+        iLowBound2.setTextFormatter(iLowBound2Formatter);
+        iLowBound2.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalc2(); // Считаем все
+                });
+
+        UnaryOperator<TextFormatter.Change> iUpperBound2Filter = change -> {
+            String text = change.getText();
+            if (text.compareTo(",") == 0) { text = "."; change.setText(".");}
+            if (text.matches("[0-9.-]*")) {
+                if ((text.compareTo(".") == 0) && iUpperBound2.getText().contains(".")) { return null; }  // вторую точку вводят
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> iUpperBound2Formatter = new TextFormatter<>(iUpperBound2Filter);
+        iUpperBound2.setTextFormatter(iUpperBound2Formatter);
+        iUpperBound2.textProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    CVintraCalc2(); // Считаем все
+                });
+
+        //*******************
 
         // При выходе пользователя, переводим на открытый раздел
         iHiUserPane.visibleProperty().addListener((obj, oldValue, newValue) -> {
