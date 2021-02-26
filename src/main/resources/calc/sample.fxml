@@ -18,7 +18,7 @@
          </VBox.margin>
       </HBox>
           <HBox alignment="CENTER_LEFT" prefWidth="1000.0" styleClass="module-caption" visible="true">
-              <Label fx:id="iModuleCaption" alignment="CENTER_LEFT" minHeight="30.0" prefHeight="30.0" prefWidth="700.0" text="1111">
+              <Label fx:id="iModuleCaption" alignment="CENTER_LEFT" minHeight="30.0" prefHeight="30.0" prefWidth="700.0">
                   <padding>
                       <Insets left="5.0" />
                   </padding></Label>
@@ -33,8 +33,15 @@
           </HBox>
       <StackPane fx:id="iStackPane">
          <VBox fx:id="iStudentPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
-         </VBox>
-         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+               <children>
+                  <TableView fx:id="iStudentTable" editable="true" maxWidth="200.0" prefHeight="729.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="C1" />
+                      <TableColumn prefWidth="75.0" text="C2" />
+                    </columns>
+                  </TableView>
+               </children></VBox>
+         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
             <children>
                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
                   <children>
@@ -153,7 +160,7 @@
                   </HBox>
             </children>
          </VBox>
-          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iPriznakiPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="682.0" prefWidth="1000.0">
                       <children>
@@ -257,7 +264,7 @@
 
 
           <!--  ********* -->
-          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iCalcQEArcPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
               <children>
                   <HBox alignment="CENTER_LEFT" prefWidth="1000.0" spacing="5.0" visible="true">
                       <Label text="Выбрать за период c (&gt;=):" />
@@ -351,7 +358,7 @@
               </children>
           </VBox>
           <!--  ********* -->
-          <VBox fx:id="iUsersPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iUsersPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" visible="false">
               <HBox prefHeight="733.0" prefWidth="1000.0">
                   <VBox>
                       <HBox fx:id="iUsersTable" minWidth="300" prefHeight="714.0" prefWidth="419.0">
@@ -405,7 +412,7 @@
           </VBox>
 
           <!--  ********* CVintra -->
-          <VBox fx:id="iCVintraPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;">
+          <VBox fx:id="iCVintraPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" visible="false">
               <HBox prefHeight="733.0" prefWidth="1000.0">
                   <VBox prefHeight="714.0" prefWidth="575.0" spacing="5.0">
                       <HBox spacing="5.0">

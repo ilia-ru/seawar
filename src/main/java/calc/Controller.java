@@ -12,7 +12,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
@@ -96,6 +95,7 @@ public class Controller {
     public TextField iMSE;
     public TextField iCVStudent;
     public TextField iCVintra;
+    public TableView iStudentTable;
 
 
 //    public VBox iPrCreateEditDecimalPane;
@@ -108,9 +108,10 @@ public class Controller {
     TableView tableCalcs; // Список сохраненных расчетов
     CalcArc calcArc;
     TableView tableUsers; // Список пользователей
+//    TableView tableStudents; // Критерии Стьюдента
     Users users;          // Список пользователей. Там-же и текущий автооризованный, если есть
     int moduleAccessMode; // У каждого модуля свой режим. 0 - общий доступ, 1 - только админ.
-    Student student;      // Student
+    Students students;      // Student
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
@@ -128,9 +129,11 @@ public class Controller {
                     iFonPane.setVisible(true);
                     iAuthorPane.toFront();
                     iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
                     return;
                 }
                 iModuleCaption.setText("Симуляционный калькулятор");
+                iCalcQEPane.setVisible(true);
                 iCalcQEPane.toFront();
             });
             Menu mi = new Menu("", ll);
@@ -145,9 +148,11 @@ public class Controller {
                     iFonPane.setVisible(true);
                     iAuthorPane.toFront();
                     iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
                     return;
                 }
                 iModuleCaption.setText("CVintra");
+                iCVintraPane.setVisible(true);
                 iCVintraPane.toFront();
             });
             mi = new Menu("", ll);
@@ -169,10 +174,12 @@ public class Controller {
                     iFonPane.setVisible(true);
                     iAuthorPane.toFront();
                     iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
                     return;
                 }
                 iModuleCaption.setText("Архив");
                 tableCalcs = calcArc.getCalcsFromSQL("");
+                iCalcQEArcPane.setVisible(true);
                 iCalcQEArcPane.toFront();
                 tableCalcs.requestFocus();
             });
@@ -188,11 +195,13 @@ public class Controller {
                     iFonPane.setVisible(true);
                     iAuthorPane.toFront();
                     iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
                     return;
                 }
                 iModuleCaption.setText("Признаки");
                 lvPR.getFocusModel().focusNext();
                 lvPR.getFocusModel().focusPrevious();
+                iPriznakiPane.setVisible(true);
                 iPriznakiPane.toFront();
             });
             mi = new Menu("", ll);
@@ -206,9 +215,11 @@ public class Controller {
                     iFonPane.setVisible(true);
                     iAuthorPane.toFront();
                     iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
                     return;
                 }
                 iModuleCaption.setText("Критерии Стьюдента");
+                iStudentPane.setVisible(true);
                 iStudentPane.toFront();
 
             });
@@ -223,6 +234,7 @@ public class Controller {
                     iFonPane.setVisible(true);
                     iAuthorPane.toFront();
                     iAuthorPane.setVisible(true);
+                    iLogin.requestFocus();
                     return;
                 }
                 iModuleCaption.setText("Пользователи");
@@ -240,6 +252,7 @@ public class Controller {
                     iUsersEditPane.setVisible(true);
                 }
                 iUsersPane.toFront();
+                iUsersPane.setVisible(true);
             });
             mi = new Menu("", ll);
             menu.getMenus().add(mi);
@@ -283,7 +296,7 @@ public class Controller {
         iConfInterval.setText(confInterval.toString());
 
         // Student
-        Double stdn = student.getVal(numOfSubject - 2);
+        Double stdn = students.getVal(numOfSubject - 2);
         if (stdn == null) {
             iCVStudent.setText("N/A");
         } else {  // ведено валидное значение
@@ -316,7 +329,8 @@ public class Controller {
         TopMenu t = new TopMenu();
         iHBoxMenu.getChildren().add(t.getMenu());
 
-        student = new Student();
+        students = new Students();
+        students.TableViewDecorate(iStudentTable);
 
         // Калькулятор CVintra
         UnaryOperator<TextFormatter.Change> iNumOfSubjectFilter = change -> {
@@ -510,7 +524,6 @@ public class Controller {
 
         // Архив расчетов
         calcArc = new CalcArc();
- //       CalcArc.getTableArc().setItems();  // Список расчетов
         tableCalcs = calcArc.getCalcsFromSQL("");
         tableCalcs.setPrefWidth(285);
         tableCalcs.setMaxWidth(285);
@@ -622,12 +635,8 @@ public class Controller {
         });
 
         iModuleCaption.setText("Симуляционный калькулятор");
-
+        iCalcQEPane.setVisible(true);  // Первое окно - симуляц кальк
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
-
-//        iListArCalcPane.setVisible(true);
-//        iListArCalcPane.toFront();
-
     }
 
 
@@ -786,6 +795,8 @@ public class Controller {
             iAuthorPane.setVisible(false);
             iMsgNoUserFound.setVisible(false);
             iHiUserPane.setVisible(true);
+            iLogin.setText("");
+            iPassword.setText("");
             users.getCurrentUser().getHiUserPane(iHiUserPane);
         } else {
             iMsgNoUserFound.setVisible(true);
