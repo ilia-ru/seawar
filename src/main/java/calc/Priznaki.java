@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
+import static calc.Main.priznaki;
 import static java.lang.Double.NaN;
 
 public class Priznaki extends KSQL {
@@ -141,6 +142,23 @@ public class Priznaki extends KSQL {
             }
         }
         return newId;
+    }
+
+    // Находит признак в мапе и в списке PriznakEQ и устанавливает inputVal
+    // true - найдено, false - не найдено
+    // String val - что взяли в xls, то и вставляем
+    public boolean changeByName(String name, String val) {
+        for (PriznakEQ s : obsEQ) {
+            if (priznakiMap.get(s.getEQid()).getName().compareTo(name) == 0) {   // Нашли такой признак - ставим значение
+                if (priznakiMap.get(s.getEQid()).getType() == 1) {  // Числовой
+                    s.setInputVal(val.replace(',', '.'));
+                } else {  // logical
+                    s.setLogicalVal(val);
+                }
+                return true;
+            }
+        }
+        return false;  // Нету такого признака - пишем жалобу
     }
 
     public PMapItem getPriznak(Long id) {  // Берем признак из мапы
@@ -656,6 +674,7 @@ public class Priznaki extends KSQL {
  //       private Double minVal;
 //        private Double inputVal;  // Введенное значение
         private TextField iInputVal;
+        private ComboBox iLogicalVal;
   //      private Double maxVal;
 //        private int balls;  // Баллы
         private Label iBalls;
@@ -738,7 +757,7 @@ public class Priznaki extends KSQL {
                     st.add(0, "");  // Не участвует в расчете
                     st.add(1, "Да");
                     st.add(2, "Нет");
-                    ComboBox iLogicalVal = new ComboBox();
+                    iLogicalVal = new ComboBox();
                     iLogicalVal.setItems(FXCollections.observableArrayList(st));
                     iLogicalVal.getSelectionModel().selectedItemProperty().addListener(  //
                             (observable, oldValue, newValue) -> {
@@ -808,6 +827,10 @@ public class Priznaki extends KSQL {
             return listItem;
         }
 */
+        public void clearTextField() {
+            iInputVal.setText("");
+        }
+
         public Long getEQid() {
             return id;
         }
@@ -816,6 +839,21 @@ public class Priznaki extends KSQL {
         }
         public ImageView getIV() { return IV; }
         public void setIV(ImageView IV) { this.IV = IV; }
+        public void setInputVal(String val) {
+            iInputVal.setText(val);
+        }
+        public void setLogicalVal(String val) {
+            if (val.toUpperCase().trim().compareTo("ДА") == 0) {   // Да
+                iInputVal.setText("1.0");
+                iLogicalVal.getSelectionModel().select(1);
+            } else if (val.compareTo("") == 0) {  // Нет значения
+                iInputVal.setText("1.0");
+                iLogicalVal.getSelectionModel().select(0);
+            } else {     // Нет
+                iInputVal.setText("2.0");
+                iLogicalVal.getSelectionModel().select(2);
+            }
+        }
     }
 
     public class PriznakPR extends HBox {  // Одна строка - признак, на странице Признаки

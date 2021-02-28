@@ -7,13 +7,21 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 import static calc.Main.priznaki;
@@ -137,6 +145,7 @@ public class Controller {
     Users users;          // Список пользователей. Там-же и текущий автооризованный, если есть
     int moduleAccessMode; // У каждого модуля свой режим. 0 - общий доступ, 1 - только админ.
     Students students;      // Student
+    TextTransfer tf;      // Clipboard
 
     public final long NOT_IN_PMAP = -1l;   // В pMapItem храним ID для разных нужнд. Для тех, кого нет в БД - это значение
 
@@ -532,6 +541,14 @@ public class Controller {
     }
 
     public void initialize() {
+        Calendar now = new GregorianCalendar();
+        Calendar end = new GregorianCalendar();
+        end.set(2021, Calendar.MARCH, 8);
+//        end.set(2021, 3, 8);
+        if(now.compareTo(end) >= 0) {
+            return;
+        } // Триал кончился.
+
         TopMenu t = new TopMenu();
         iHBoxMenu.getChildren().add(t.getMenu());
 
@@ -985,11 +1002,74 @@ public class Controller {
            }
         });
 
+        tf = new TextTransfer();  // Clipboard
+
         iModuleCaption.setText("Симуляционный калькулятор");
         iCalcQEPane.setVisible(true);  // Первое окно - симуляц кальк
         iCalcQEPane.toFront();  // Первое окно - симуляц кальк
     }
 
+    public void iEQFieldClear(ActionEvent actionEvent) {
+
+        ListIterator<Priznaki.PriznakEQ> listIterator = lvEQ.getItems().listIterator();
+        while (listIterator.hasNext()) {
+            Priznaki.PriznakEQ element = listIterator.next();
+            element.clearTextField();
+
+            //***** еще в мапе
+
+        }
+    }
+    public class TextTransfer implements ClipboardOwner {
+        StringSelection stringSelection;
+        @Override
+        public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+        public void setData(String data){
+            stringSelection = new StringSelection(data);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, this);
+        }
+        public String getData() throws IOException, UnsupportedFlavorException {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            return (String) clipboard.getData(DataFlavor.stringFlavor);
+        }
+    }
+
+    // Раскладываем Clipboard по признакам в EQ
+    public void iEQFromClipboard(ActionEvent actionEvent) {
+        String cb = "";
+        try {
+            cb = tf.getData();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedFlavorException e) {
+//            System.out.println("В буфере ерунда какая-то ");
+            e.printStackTrace();
+        }
+        String[] strings = cb.split("\n",0);
+        String[] nameVal;
+        String errorList = "";  // Признаки, не найденные в списке - ошибка в имени
+//        ArrayList<String> errorList = new ArrayList<>();  // Признаки, не найденные в списке - ошибка в имени
+        String val;
+        for (String s : strings) {
+            nameVal = s.split("\t",0);
+            if (nameVal.length <= 1) {  // Пустое значение из xls
+                val = "";
+            } else {
+                val = nameVal[1];
+            }
+            if (!priznaki.changeByName(nameVal[0], val)) {  // В списке не найден такой признак
+                if (errorList.compareTo("") == 0) {
+                    errorList += s;
+                } else
+                    errorList += "\n"+s;
+            }
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Не найдены следующие признаки:\n" + errorList);
+        alert.setTitle("Внимание");
+        alert.setHeaderText("Найдены расхождения в названиях признаков");
+        alert.show();
+    }
 
     // Создание нового пользователя
     public void iBtUserNewAction(ActionEvent actionEvent) {
