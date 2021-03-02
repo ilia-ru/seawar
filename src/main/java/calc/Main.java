@@ -13,9 +13,6 @@ public class Main extends Application {
 
     public static Connection connSQL = null;
 
-    public static Priznaki priznaki = null;  // Признаки во всех видах
-
-
     @Override
     public void start(Stage primaryStage) throws Exception{
 /*        List<String> params = getParameters().getRaw();
@@ -30,6 +27,10 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
+        UserService userService = new UserService();
+        User user = new User("Masha2",226);
+        userService.saveUser(user);
+
         launch(args);
     }
 }

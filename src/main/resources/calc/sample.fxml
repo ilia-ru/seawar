@@ -54,7 +54,7 @@
                   </HBox>
                </children>
          </VBox>
-         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;">
+         <VBox fx:id="iCalcQEPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #ffffff;" visible="false">
             <children>
                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="697.0" prefWidth="1000.0">
                   <children>
@@ -62,8 +62,8 @@
                         <children>
                             <Label alignment="CENTER" prefHeight="17.0" prefWidth="388.0" styleClass="H1" text="Список признаков" />
                             <HBox spacing="140.0">
-                                <Button mnemonicParsing="false" onAction="#iEQFieldClear" prefHeight="25.0" prefWidth="120.0" text="Очистить поля" />
-                                <Button mnemonicParsing="false" onAction="#iEQFromClipboard" prefHeight="25.0" prefWidth="183.0" text="Вставить из Clipboard" />
+                                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Очистить поля" />
+                                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Вставить из Clipboard" />
                                  <VBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
@@ -108,7 +108,7 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="52.0" prefHeight="33.0" prefWidth="399.0" spacing="10.0">
                                     <Label prefHeight="17.0" prefWidth="297.0" styleClass="H3" text="Дизайн 2х2х4" />
-                              <Button id="btn_bold" fx:id="iBtnCalcEqGo" mnemonicParsing="false" onAction="#iBtnCalcEqGoAction" prefHeight="25.0" prefWidth="168.0" style="-fx-font-weight: bold;" text="Рассчитать">
+                              <Button id="btn_bold" fx:id="iBtnCalcEqGo" mnemonicParsing="false" prefHeight="25.0" prefWidth="168.0" style="-fx-font-weight: bold;" text="Рассчитать">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
                                     </font>
@@ -157,7 +157,7 @@
                                        <children>
                                           <Label text="Название расчета" />
                                           <TextField fx:id="iCalcNameToSave" prefHeight="25.0" prefWidth="239.0" />
-                                          <Button mnemonicParsing="false" onAction="#iVBCalcSaveaction" prefHeight="25.0" prefWidth="103.0" text="Сохранить">
+                                          <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="103.0" text="Сохранить">
                                              <HBox.margin>
                                                 <Insets right="5.0" />
                                              </HBox.margin>
@@ -194,7 +194,7 @@
                                  <VBox.margin>
                                     <Insets top="3.0" />
                                  </VBox.margin></HBox>
-                              <Button mnemonicParsing="false" onAction="#iBtnPRCreatePR" text="Создать признак">
+                              <Button mnemonicParsing="false" text="Создать признак">
                                  <VBox.margin>
                                     <Insets top="7.0" />
                                  </VBox.margin>
@@ -243,7 +243,7 @@
                                           <TextField fx:id="iPrFastTo" layoutX="36.0" layoutY="10.0" prefHeight="25.0" prefWidth="60.0" />
                                           <Label layoutX="119.0" layoutY="10.0" text="Кол-во" />
                                           <TextField fx:id="iPrFastCount" layoutX="147.0" layoutY="10.0" prefHeight="25.0" prefWidth="45.0" />
-                                          <Button mnemonicParsing="false" onAction="#iBtFastCreatePriznakAction" prefHeight="25.0" prefWidth="145.0" text="Создать интервалы" />
+                                          <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="145.0" text="Создать интервалы" />
                                        </children>
                                     </HBox>
                                       </children>
@@ -257,7 +257,7 @@
                                        <padding>
                                           <Insets left="5.0" />
                                        </padding></Label>
-                                          <Button fx:id="iBtIntervalAdd" alignment="CENTER" mnemonicParsing="false" onAction="#iBtIntervalAddAction" prefHeight="25.0" prefWidth="152.0" text="Добавить интервал" />
+                                          <Button fx:id="iBtIntervalAdd" alignment="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="152.0" text="Добавить интервал" />
                                       </children>
                                  <VBox.margin>
                                     <Insets top="5.0" />
@@ -268,8 +268,8 @@
 
                                   <HBox alignment="CENTER" layoutX="10.0" layoutY="157.0" prefHeight="49.0" prefWidth="399.0" spacing="120.0">
                                       <children>
-                                          <Button fx:id="iBtnPrNewSave" mnemonicParsing="false" onAction="#iBtnPrNewSaveAction" text="Сохранить признак" />
-                                    <Button layoutX="10.0" layoutY="22.0" mnemonicParsing="false" onAction="#iBtnPRCreateEditCancelAction" text="Отмена" />
+                                          <Button fx:id="iBtnPrNewSave" mnemonicParsing="false" text="Сохранить признак" />
+                                    <Button layoutX="10.0" layoutY="22.0" mnemonicParsing="false" text="Отмена" />
                                       </children>
                                   </HBox>
                               </children>
@@ -297,12 +297,12 @@
                            <Insets left="5.0" />
                         </padding></Label>
                       <DatePicker fx:id="iArcDateTo" />
-                      <Button mnemonicParsing="false" onAction="#iBtnArcFilterAction" text="Показать">
+                      <Button mnemonicParsing="false" text="Показать">
                         <HBox.margin>
                            <Insets left="10.0" />
                         </HBox.margin>
                       </Button>
-                      <Button mnemonicParsing="false" onAction="#iBtnArcFilterCancelAction" text="Сбросить фильтр">
+                      <Button mnemonicParsing="false" text="Сбросить фильтр">
                         <HBox.margin>
                            <Insets left="5.0" />
                         </HBox.margin></Button>
@@ -389,7 +389,7 @@
                            <Insets left="5.0" />
                         </VBox.margin></HBox>
                       <HBox alignment="CENTER" minWidth="300">
-                          <Button fx:id="iBtUserNew" mnemonicParsing="false" onAction="#iBtUserNewAction" prefHeight="25.0" prefWidth="194.0" text="Добавить пользователя">
+                          <Button fx:id="iBtUserNew" mnemonicParsing="false" prefHeight="25.0" prefWidth="194.0" text="Добавить пользователя">
                            <HBox.margin>
                               <Insets bottom="5.0" top="5.0" />
                            </HBox.margin></Button>
@@ -420,8 +420,8 @@
                       </HBox>
                       <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="80.0">
                           <children>
-                              <Button fx:id="iBtUserSave" mnemonicParsing="false" onAction="#iBtUserSaveAction" prefHeight="25.0" prefWidth="131.0" text="Сохранить" />
-                              <Button fx:id="iBtUserSaveCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtUserSaveCancelAction" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
+                              <Button fx:id="iBtUserSave" mnemonicParsing="false" prefHeight="25.0" prefWidth="131.0" text="Сохранить" />
+                              <Button fx:id="iBtUserSaveCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="131.0" text="Отмена" />
                           </children>
                           <padding>
                               <Insets left="5.0" top="5.0" />
@@ -435,7 +435,7 @@
           </VBox>
 
           <!--  ********* CVintra -->
-          <VBox fx:id="iCVintraPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;" visible="false">
+          <VBox fx:id="iCVintraPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ffffff;">
               <HBox prefHeight="733.0" prefWidth="1000.0">
                   <VBox prefHeight="733.0" prefWidth="500.0" spacing="5.0">
                       <HBox alignment="CENTER" spacing="5.0" styleClass="H2">
@@ -449,15 +449,15 @@
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
-                          <TextField fx:id="iNumOfSubject" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iNumOfSubject" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Low bound" />
-                          <TextField fx:id="iLowBound" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iLowBound" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Upper bound" />
-                          <TextField fx:id="iUpperBound" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iUpperBound" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Point estimate" />
@@ -478,9 +478,6 @@
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="CVintra" />
                           <TextField fx:id="iCVintra" alignment="CENTER_RIGHT" editable="false" mouseTransparent="true" styleClass="calc-res2" />
-                      </HBox>
-                      <HBox alignment="CENTER" spacing="5.0">
-                          <Button fx:id="iBtCVintraCalc1" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtCVintraCalc1Action" prefHeight="25.0" prefWidth="131.0" text="Рассчитать" />
                       </HBox>
                       <padding>
                           <Insets left="10.0" />
@@ -553,15 +550,15 @@
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
-                          <TextField fx:id="iNumOfSubjectD1" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iNumOfSubjectD1" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Gmean ratio (PE)" />
-                          <TextField fx:id="iGmeanD1" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iGmeanD1" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
-                          <TextField fx:id="iMSED1" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iMSED1" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="t (student)" />
@@ -598,15 +595,15 @@
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Number of subjects" />
-                          <TextField fx:id="iNumOfSubjectD2" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iNumOfSubjectD2" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="Gmean ratio (PE)" />
-                          <TextField fx:id="iGmeanD2" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iGmeanD2" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="MSE" />
-                          <TextField fx:id="iMSED2" alignment="CENTER_RIGHT" />
+                          <TextField fx:id="iMSED2" alignment="CENTER_RIGHT" promptText="Введите данные" />
                       </HBox>
                       <HBox spacing="5.0">
                           <Label prefHeight="17.0" prefWidth="125.0" text="t (student)" />
@@ -682,8 +679,8 @@
                  </HBox>
                  <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="70.0">
                      <children>
-                         <Button fx:id="iBtLogin" mnemonicParsing="false" onAction="#iBtLoginLogin" prefHeight="25.0" prefWidth="131.0" text="Войти" />
-                         <Button fx:id="iBtCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#iBtLoginCancel" prefHeight="25.0" prefWidth="131.0" text="Отмена">
+                         <Button fx:id="iBtLogin" mnemonicParsing="false" prefHeight="25.0" prefWidth="131.0" text="Войти" />
+                         <Button fx:id="iBtCancel" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="131.0" text="Отмена">
                         <graphic>
                         </graphic></Button>
                      </children>
