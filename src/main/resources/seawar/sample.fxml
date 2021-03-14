@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="anchSettings" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="563.0" prefWidth="632.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="seawar.Controller">
+    <children>
+        <Button fx:id="bStart" layoutX="395.0" layoutY="311.0" onAction="#bStartAction" prefHeight="100.0" prefWidth="180.0" text="Начать игру">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Button>
+        <Label fx:id="txt1" layoutX="53.0" layoutY="14.0" prefHeight="30.0" prefWidth="521.0" text="Выбор кораблей">
+            <font>
+                <Font name="Arial Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label fx:id="txt11" alignment="CENTER" contentDisplay="CENTER" layoutX="53.0" layoutY="56.0" prefHeight="30.0" prefWidth="94.0" text="1-клеточных">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label fx:id="txt111" alignment="CENTER" contentDisplay="CENTER" layoutX="53.0" layoutY="106.0" prefHeight="30.0" prefWidth="94.0" text="2-клеточных">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label fx:id="txt1111" alignment="CENTER" contentDisplay="CENTER" layoutX="53.0" layoutY="159.0" prefHeight="30.0" prefWidth="94.0" text="3-клеточных">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label fx:id="txt11111" alignment="CENTER" contentDisplay="CENTER" layoutX="53.0" layoutY="213.0" prefHeight="30.0" prefWidth="94.0" text="4-клеточных">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Spinner fx:id="cells1" editable="true" layoutX="162.0" layoutY="56.0" prefHeight="30.0" prefWidth="78.0" />
+        <Slider fx:id="cells2" blockIncrement="0.0" layoutX="162.0" layoutY="106.0" majorTickUnit="1.0" max="5.0" minorTickCount="0" prefHeight="40.0" prefWidth="193.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+        <Spinner fx:id="iFieldSize" editable="true" layoutX="514.0" layoutY="33.0" prefHeight="47.0" prefWidth="94.0" />
+        <ImageView fx:id="imgNotField" fitHeight="240.0" fitWidth="240.0" layoutX="94.0" layoutY="303.0" pickOnBounds="true" preserveRatio="true" visible="false" />
+        <Slider fx:id="cells3" blockIncrement="0.0" layoutX="162.0" layoutY="159.0" majorTickUnit="1.0" max="5.0" minorTickCount="0" prefHeight="40.0" prefWidth="193.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+        <Slider fx:id="cells4" blockIncrement="0.0" layoutX="162.0" layoutY="213.0" majorTickUnit="1.0" max="5.0" minorTickCount="0" onDragDone="#cell4OnChange" onInputMethodTextChanged="#cell4OnChange" prefHeight="40.0" prefWidth="193.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+        <Label fx:id="txt12" layoutX="392.0" layoutY="42.0" prefHeight="30.0" prefWidth="113.0" text="Размеры поля">
+            <font>
+                <Font name="Arial Bold" size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="cell4L" editable="false" layoutX="364.0" layoutY="206.0" prefHeight="38.0" prefWidth="43.0" style="-fx-font-weight: bold;">
+            <font>
+                <Font name="Arial" size="14.0" />
+            </font></TextField>
+        <TextField fx:id="cell3L" editable="false" layoutX="364.0" layoutY="155.0" prefHeight="38.0" prefWidth="43.0" style="-fx-font-weight: bold;">
+            <font>
+                <Font name="Arial" size="14.0" />
+            </font></TextField>
+        <TextField fx:id="cell2L" editable="false" layoutX="364.0" layoutY="102.0" prefHeight="38.0" prefWidth="43.0" style="-fx-font-weight: bold;">
+            <font>
+                <Font name="Arial" size="14.0" />
+            </font></TextField>
+        <Label fx:id="txt111111" alignment="CENTER" contentDisplay="CENTER" layoutX="53.0" layoutY="267.0" prefHeight="30.0" prefWidth="161.0" text="Показывать корабли">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <CheckBox fx:id="needShowL" layoutX="223.0" layoutY="274.0" mnemonicParsing="false" onAction="#needShowLAction" text="Левое поле">
+            <font>
+                <Font name="Arial" size="14.0" />
+            </font>
+        </CheckBox>
+        <CheckBox fx:id="needShowR" layoutX="357.0" layoutY="274.0" mnemonicParsing="false" onAction="#needShowRAction" selected="true" text="Правое поле">
+            <font>
+                <Font name="Arial" size="14.0" />
+            </font>
+        </CheckBox>
+        <AnchorPane fx:id="anchGame" prefHeight="543.0" prefWidth="653.0" style="-fx-background-color: #efefef;" visible="false">
+            <children>
+                <Button fx:id="bEndGame" layoutX="436.0" layoutY="87.0" mnemonicParsing="false" onAction="#bEndGameAction" text="Сдаться и закончить игру">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font></Button>
+                <ImageView fx:id="imgLocator" fitHeight="150.0" fitWidth="150.0" layoutX="102.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
+                    <viewport>
+                        <Rectangle2D />
+                    </viewport></ImageView>
+                <CheckBox fx:id="needShowLGame" layoutX="68.0" layoutY="510.0" mnemonicParsing="false" onAction="#needShowLGameAction" text="Показывать корабли">
+                    <font>
+                        <Font name="Arial Bold" size="14.0" />
+                    </font>
+                </CheckBox>
+                <CheckBox fx:id="needShowRGame" layoutX="467.0" layoutY="510.0" mnemonicParsing="false" onAction="#needShowRGameAction" selected="true" text="Показывать корабли">
+                    <font>
+                        <Font name="Arial Bold" size="14.0" />
+                    </font>
+                </CheckBox>
+                <Label fx:id="iKill" layoutX="438.0" layoutY="125.0" prefHeight="47.0" prefWidth="193.0" style="--fx-font-weight: bold;">
+                    <font>
+                        <Font name="Arial" size="24.0" />
+                    </font>
+                </Label>
+                <Label layoutX="108.0" layoutY="21.0" text="Осталось кораблей">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+                <Label fx:id="iShipsTotalL" alignment="CENTER" layoutX="246.0" layoutY="11.0" prefHeight="47.0" prefWidth="43.0" style="-fx-font-weight: bold;">
+                    <font>
+                        <Font name="Arial" size="24.0" />
+                    </font>
+                </Label>
+                <Label fx:id="iShipsTotalR" alignment="CENTER" layoutX="579.0" layoutY="11.0" prefHeight="47.0" prefWidth="43.0" style="-fx-font-weight: bold;">
+                    <font>
+                        <Font name="Arial" size="24.0" />
+                    </font>
+                </Label>
+                <Label layoutX="443.0" layoutY="24.0" text="Осталось кораблей">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>

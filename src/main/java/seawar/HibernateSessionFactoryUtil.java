@@ -1,4 +1,4 @@
-package calc;
+package seawar;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -17,7 +17,7 @@ public class HibernateSessionFactoryUtil {
         if (sessionFactory == null) {
             try {
                 configuration = new Configuration().configure();
-                configuration.addAnnotatedClass(User.class);
+//                configuration.addAnnotatedClass(User.class);
 //                configuration.addAnnotatedClass(Auto.class);
                 builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
             } catch (IllegalStateException e) {

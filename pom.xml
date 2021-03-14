@@ -14,12 +14,11 @@
     </properties>
 
     <dependencies>
-    <dependency>
-        <groupId>org.hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>2.5.1</version>
-    </dependency>
-        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.5.1</version>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -62,12 +61,12 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <finalName>calc_eq</finalName>
+                    <finalName>seawar</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>calc.Begin</mainClass>
+                            <mainClass>seawar.Begin</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
